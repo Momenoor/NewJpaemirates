@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-use App\Contracts\MatterPartyContract;
-use Illuminate\Database\Eloquent\Relations\Pivot;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class MatterParty extends Pivot
+class MatterParty extends Model
 {
+    protected $table = 'matter_party';
 
-    //
     protected $fillable = [
+        'id',
         'matter_id',
         'party_id',
         'parent_id',
@@ -19,15 +19,47 @@ class MatterParty extends Pivot
         'role',
     ];
 
-    public $timestamps = true;
+    public $incrementing = true;
+    protected $keyType = 'int';
+    public $timestamps = false;
 
-    public function representedParty(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    /**
+     * The matter this row belongs to.
+     */
+    public function matter(): BelongsTo
     {
-        return $this->belongsTo(Party::class, 'parent_id');
+        return $this->belongsTo(Matter::class);
     }
 
-    public function party(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    /**
+     * The party this row points to.
+     */
+    public function party(): BelongsTo
     {
         return $this->belongsTo(Party::class, 'party_id');
+    }
+
+    /**
+     * The parent matter party record (the plaintiff/defendant this representative acts for).
+     * parent_id → matter_party.id
+     */
+    public function parentMatterParty(): BelongsTo
+    {
+        return $this->belongsTo(MatterParty::class, 'parent_id', 'id');
+    }
+
+    /**
+     * Representatives of this party in the same matter.
+     *
+     * Finds matter_party rows where:
+     *   parent_id = this.id  → refers back to this row
+     *   role      = 'representative'
+     *
+     * Used by the nested Filament Repeater.
+     */
+    public function representatives(): HasMany
+    {
+        return $this->hasMany(MatterParty::class, 'parent_id', 'id')
+            ->where('role', 'representative');
     }
 }

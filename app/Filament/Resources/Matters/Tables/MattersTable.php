@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Matters\Tables;
 
+use App\Enums\MatterStatus;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -15,54 +16,66 @@ class MattersTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->striped(false)
+            ->recordClasses(fn($record) => match ($record->status?->value ?? $record->status) {
+                'current' => 'bg-info-50 dark:bg-info-900',
+                'reported' => 'bg-success-50 dark:bg-success-900',
+                'submitted' => 'bg-warning-50 dark:bg-warning-900',
+                default => null,
+            })
             ->columns([
                 TextColumn::make('year'),
                 TextColumn::make('number')
                     ->searchable(),
-                TextColumn::make('status')
-                    ->searchable(),
+                IconColumn::make('difficulty')
+                    ->icon(fn($state) => $state?->getIcon())
+                    ->searchable()
+                    ->tooltip(fn($state) => $state?->getLabel()),
                 TextColumn::make('commissioning')
                     ->searchable(),
-                IconColumn::make('assign')
-                    ->boolean(),
                 TextColumn::make('received_date')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('next_session_date')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('reported_date')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('submitted_date')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('external_marketing_rate')
                     ->numeric()
-                    ->sortable(),
-                TextColumn::make('user_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('expert.id')
-                    ->searchable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('court.name')
                     ->searchable(),
-                TextColumn::make('level_id')
-                    ->numeric()
+                TextColumn::make('level')
+                    ->badge()
                     ->sortable(),
                 TextColumn::make('type.name')
                     ->searchable(),
                 TextColumn::make('parent_id')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('parties.name')
                     ->listWithLineBreaks() // Nicer than bulleted for professional UIs
                     ->formatStateUsing(function ($state, $record) {
                         // $state is the 'name' of the party because of 'parties.name'
                         // We find the specific party in the loaded relationship to get pivot data
                         $party = $record->parties->firstWhere('name', $state);
+                        if (!$party || !$party->pivot) return $state;
 
-                        return ($party->pivot->role ?? null). '-' .($party->pivot->type ?? null) . ' - ' . $state;
+                        $role = $party->pivot->role ?? '';
+                        $type = $party->pivot->type ?? '';
+
+                        return "{$role} ({$type}) - {$state}";
                     })
                     ->searchable(),
                 TextColumn::make('created_at')
@@ -74,12 +87,13 @@ class MattersTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('claim_status')
+                    ->badge()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('collection_status')
                     ->badge(),
                 TextColumn::make('last_action_date')
                     ->date()
                     ->sortable(),
-                TextColumn::make('level')
-                    ->searchable(),
             ])
             ->filters([
                 //

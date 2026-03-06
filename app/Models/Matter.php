@@ -2,11 +2,17 @@
 
 namespace App\Models;
 
+use App\Enums\MatterCollectionStatus;
+use App\Enums\MatterStatus;
+use App\Enums\MatterDifficulty;
+use App\Enums\MatterLevel;
 use App\Services\ClaimCollectionStatus;
 use App\Services\ClaimsService;
 use App\Services\Money;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Support\Facades\DB;
@@ -31,17 +37,11 @@ class Matter extends Model
         'next_session_date',
         'reported_date',
         'submitted_date',
-        'user_id',
-        'expert_id',
         'court_id',
-        'level_id',
         'type_id',
-        'assign',
-        'parent_id',
-        'claim_status',
-        'last_action_date',
         'level',
-        'difficulty'
+        'difficulty',
+        'collection_status'
     ];
 
     protected $dates = [
@@ -52,6 +52,13 @@ class Matter extends Model
         'created_at',
         'updated_at',
         'last_action_date',
+    ];
+
+    protected $casts = [
+        'status' => MatterStatus::class,
+        'difficulty' => MatterDifficulty::class,
+        'level' => MatterLevel::class,
+        'collection_status' => MatterCollectionStatus::class,
     ];
 
     public $timestamps = true;
@@ -65,67 +72,90 @@ class Matter extends Model
 
     public int $commissionCompeletionPeriod = 0;
 
-    public static function boot(): void
-    {
-        parent::boot();
-//        static::retrieved(function ($matter) {
-//            (new ClaimsService($matter));
-//        });
-    }
-
-        public function getAssistantAttribute(): Expert|\Closure|null
-    {
-        //$this->unsetRelation('assistants');
-        return $this->assistants->first();
-    }
-
-    public function getPlaintiffAttribute(): \Closure|Party|null
-    {
-        //$this->unsetRelation('plaintiffs');
-        return $this->plaintiffs->first();
-    }
-
-    public function getDefendantAttribute(): \Closure|Party|null
-    {
-        //$this->unsetRelation('defendants');
-        return $this->defendants->first();
-    }
-
-    public function getClaimsSumAmountAttribute()
-    {
-        //return $this->claims->sum('amount');
-        return ClaimCollectionStatus::make($this)->getSumTotalClaims();
-    }
-
-    public function getClaimsSumAmountUnformattedAttribute()
-    {
-        //return $this->claims->sum('amount');
-        return $this->claims->sum('amount');
-    }
-
-    public function getCashSumAmountAttribute()
-    {
-        return ClaimCollectionStatus::make($this)->getSumCollectedClaims();
-    }
-
     public function court(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Court::class);
     }
 
-    public function expert(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    /**
+     * All matter_party rows (including representatives).
+     */
+    public function matterParties(): HasMany
     {
-        return $this->belongsTo(Expert::class);
+        return $this->hasMany(MatterParty::class, 'matter_id');
     }
 
-    public function matterExperts(): \Illuminate\Database\Eloquent\Relations\HasMany
+    /**
+     * Top-level matter_party rows only (excludes representatives).
+     * Used by the outer Filament Repeater.
+     */
+    public function mainParties(): HasMany
     {
-        return $this->hasMany(MatterExpert::class);
+        return $this->hasMany(MatterParty::class, 'matter_id')
+            ->where(fn($q) => $q->whereNull('parent_id')->orWhere('parent_id', 0));
     }
 
-    public function matter_experts(): \Illuminate\Database\Eloquent\Relations\HasMany
+    // -----------------------------------------------------------------------
+    // FOR QUERYING / READING
+    // BelongsToMany gives you Party models directly, useful outside forms.
+    // e.g. $matter->parties, $matter->mainPartiesQuery
+    // -----------------------------------------------------------------------
+
+    /**
+     * All parties in this matter via belongsToMany.
+     * e.g. $matter->parties->pluck('name')
+     */
+    public function parties(): BelongsToMany
     {
-        return $this->hasMany(MatterExpert::class);
+        return $this->belongsToMany(Party::class, 'matter_party')
+            ->withPivot('id', 'type', 'role', 'parent_id');
+    }
+
+    /**
+     * Top-level parties only via belongsToMany (no representatives).
+     */
+    public function mainPartiesQuery(): BelongsToMany
+    {
+        return $this->belongsToMany(Party::class, 'matter_party')
+            ->withPivot('id', 'type', 'role', 'parent_id')
+            ->wherePivot(fn($q) => $q->whereNull('parent_id')->orWhere('parent_id', 0));
+    }
+
+    public function fees(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Fee::class);
+    }
+
+    public function allocations(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Allocation::class);
+    }
+
+    /**
+     * Update the matter's collection status based on its fees.
+     */
+    public function updateCollectionStatus(): void
+    {
+        $fees = $this->fees()->get();
+
+        if ($fees->isEmpty()) {
+            $this->collection_status = MatterCollectionStatus::NO_FEES;
+        } else {
+            $totalAmount = (float) $fees->sum('amount');
+            $totalAllocated = (float) $this->allocations()->sum('amount');
+
+            if ($totalAllocated <= 0) {
+                $this->collection_status = MatterCollectionStatus::UNPAID;
+            } elseif ($totalAllocated < $totalAmount) {
+                $this->collection_status = MatterCollectionStatus::PARTIAL;
+            } else {
+                $this->collection_status = MatterCollectionStatus::PAID;
+            }
+        }
+
+        if ($this->isDirty('collection_status')) {
+            $this->save();
+        }
     }
 
     public function type(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -133,94 +163,11 @@ class Matter extends Model
         return $this->belongsTo(Type::class);
     }
 
-    public function assistants(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
-    {
-        return $this->belongsToMany(Expert::class, 'matter_expert')
-            ->wherePivot('type', '=', 'assistant')->withTimestamps();
-    }
 
-    public function experts(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
-    {
-        return $this->belongsToMany(Expert::class, 'matter_expert')
-            ->withPivot('type')->withTimestamps();
-    }
-
-    public function marketers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'matter_marketing')->withPivot('type')->withTimestamps();
-    }
-
-    public function internalMarketers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'matter_marketing')
-            ->wherePivot('type', '=', 'marketer')->withTimestamps();
-    }
-
-    public function externalMarketers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
-    {
-        return $this->belongsToMany(Party::class, 'matter_party')
-            ->wherePivot('type', '=', 'external_marketer')->withTimestamps();
-    }
-
-    public function plaintiffs(): \LaravelIdea\Helper\App\Models\_IH_Party_QB|\Illuminate\Database\Eloquent\Relations\BelongsToMany
-    {
-        return $this->parties()->wherePivot('type', 'plaintiff');
-    }
-
-    public function defendants(): \LaravelIdea\Helper\App\Models\_IH_Party_QB|\Illuminate\Database\Eloquent\Relations\BelongsToMany
-    {
-        return $this->parties()->wherePivot('type', 'defendant');
-    }
-
-    public function lawyers(): \LaravelIdea\Helper\App\Models\_IH_Party_QB|\Illuminate\Database\Eloquent\Relations\BelongsToMany
-    {
-        return $this->parties()
-            ->wherePivot('type', 'lawyer')
-            ->with('representedParty'); // See logic below
-    }
-
-    public function parties(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
-    {
-        return $this->belongsToMany(Party::class, 'matter_party')
-            ->using(MatterParty::class) // Tell Laravel to use your custom class
-            ->withPivot(['type','role', 'parent_id'])
-            ->withTimestamps();
-    }
-
-    public function matterParties(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
-    {
-        return $this->belongsToMany(Party::class)->withPivot(['type', 'parent_id'])->withTimestamps();
-    }
-
-    public function onlyParties(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
-    {
-        return $this->belongsToMany(Party::class)->withPivot(['type', 'parent_id'])->wherePivotIn('type', ['defendant', 'plaintiff', 'implicat-litigant'])->withTimestamps();
-    }
 
     public function procedures(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Procedure::class);
-    }
-
-    public function nextSessionDateProcedureList()
-    {
-        return $this->procedures()
-            ->where('type', 'next_session_date');
-    }
-
-    public function claims(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(Claim::class);
-    }
-
-    public function claimsWithOutVat(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(Claim::class)->where('type', '!=', 'vat');
-    }
-
-    public function cashes(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(Cash::class);
     }
 
     public function notes(): \Illuminate\Database\Eloquent\Relations\HasMany
@@ -233,87 +180,7 @@ class Matter extends Model
         return $this->hasMany(Attachment::class);
     }
 
-    public function scopeCurrent($query)
-    {
-        return $query->where('matters.status', 'current');
-    }
-
-    public function scopeFinished($query)
-    {
-        return $query->whereIn('matters.status', ['reported', 'submitted']);
-    }
-
-    public function isCurrent(): bool
-    {
-        return (!$this->isSubmitted() and !$this->isReported()) or $this->status == 'current';
-    }
-
-    public function isReported(): bool
-    {
-        return (!is_null($this->reported_date)) or $this->status == 'reported';
-    }
-
-    public function isSubmitted(): bool
-    {
-        return $this->isReported() && (!is_null($this->submitted_date) or $this->status == 'submitted');
-    }
-
-    public function isOverPaid(): bool
-    {
-        return Cash::OVERPAID == ClaimCollectionStatus::make($this)->getClaimStatus();
-    }
-
-    public function isPaid(): bool
-    {
-        return Cash::PAID == ClaimCollectionStatus::make($this)->getClaimStatus();
-    }
-
-    public function isUnpaid(): bool
-    {
-        return Cash::UNPAID == ClaimCollectionStatus::make($this)->getClaimStatus();
-    }
-
-    public function isPartial(): bool
-    {
-        return Cash::PARTIAL == ClaimCollectionStatus::make($this)->getClaimStatus();
-    }
-
-    public function claimsOpen(): bool
-    {
-        return $this->isUnpaid() or $this->isPartial();
-    }
-
-    public function dueAmount()
-    {
-        return ClaimCollectionStatus::make($this)->getSumDueClaims();
-    }
-
-    public function dueClaims()
-    {
-        return ClaimCollectionStatus::make($this)->getDueClaims();
-    }
-
-    public function isPrivate(): bool
-    {
-        return $this->whereNotIn('experts.id', config('system.experts.main'));
-    }
-
-    public function isOffice(): bool
-    {
-        return !$this->isPrivate();
-    }
-
-    public function isNotPrivate(): bool
-    {
-        return $this->isOffice();
-    }
-
-    public function getClaimStatusColorAttribute()
-    {
-        return config('system.claims.status.' . $this->claim_status . '.color');
-    }
-
-    public function requests(): \Illuminate\Database\Eloquent\Relations\HasMany
+      public function requests(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Request::class);
     }

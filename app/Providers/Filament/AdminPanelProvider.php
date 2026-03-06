@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Auth\Pages\EditProfile;
+use Filament\Forms\Components\Select;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -64,5 +65,10 @@ class AdminPanelProvider extends PanelProvider
                 FilamentUsersPlugin::make(),
                 FilamentShieldPlugin::make(),
             ]);
+    }
+
+    public function boot(): void
+    {
+        Select::configureUsing(fn(Select $select) => $select->native(false));
     }
 }

@@ -23,11 +23,9 @@ class User extends Authenticatable implements FilamentUser
         'language',
         'email',
         'display_name',
-        'account_id',
     ];
 
     protected $with = [
-        'account',
     ];
 
     /**
@@ -86,16 +84,6 @@ class User extends Authenticatable implements FilamentUser
     public function pivotType(): string
     {
         return 'marketing';
-    }
-
-    public function account(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(Account::class);
-    }
-
-    public function expert(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
-        return $this->hasOne(Expert::class, 'account_id', 'account_id');
     }
 
     public function canAccessPanel(Panel $panel): bool

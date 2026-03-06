@@ -10,6 +10,10 @@ class Type extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'active' => 'boolean',
+    ];
+
     protected $fillable = [
         'name',
         'active'

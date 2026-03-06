@@ -15,7 +15,10 @@ class MatterInfolist
             ->components([
                 TextEntry::make('year'),
                 TextEntry::make('number'),
-                TextEntry::make('status'),
+                TextEntry::make('status')
+                    ->badge(),
+                TextEntry::make('difficulty')
+                    ->badge(),
                 TextEntry::make('commissioning'),
                 IconEntry::make('assign')
                     ->boolean(),
@@ -34,15 +37,10 @@ class MatterInfolist
                 TextEntry::make('external_marketing_rate')
                     ->numeric()
                     ->placeholder('-'),
-                TextEntry::make('user_id')
-                    ->numeric(),
-                TextEntry::make('expert.id')
-                    ->label('Expert'),
                 TextEntry::make('court.name')
                     ->label('Court'),
-                TextEntry::make('level_id')
-                    ->numeric()
-                    ->placeholder('-'),
+                TextEntry::make('level')
+                    ->badge(),
                 TextEntry::make('type.name')
                     ->label('Type'),
                 TextEntry::make('parent_id')
@@ -59,8 +57,18 @@ class MatterInfolist
                 TextEntry::make('last_action_date')
                     ->date()
                     ->placeholder('-'),
-                TextEntry::make('level')
-                    ->placeholder('-'),
+                TextEntry::make('parties.name')
+                    ->label('Parties')
+                    ->listWithLineBreaks()
+                    ->formatStateUsing(function ($state, $record) {
+                        $party = $record->parties->firstWhere('name', $state);
+                        if (!$party || !$party->pivot) return $state;
+
+                        $role = $party->pivot->role ?? '';
+                        $type = $party->pivot->type ?? '';
+
+                        return "{$role} ({$type}) - {$state}";
+                    }),
             ]);
     }
 }

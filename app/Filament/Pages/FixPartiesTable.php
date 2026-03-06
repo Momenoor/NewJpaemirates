@@ -22,6 +22,16 @@ class FixPartiesTable extends Page
     protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-wrench-screwdriver';
     protected static ?string $navigationLabel = 'Fix Parties Data';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return true;
+    }
+
+    public static function canAccess(): bool
+    {
+        return true;
+    }
+
     public function content(Schema $schema): Schema
     {
         return $schema->components([
@@ -44,16 +54,55 @@ class FixPartiesTable extends Page
                 ->modalHeading('Fix Parties Table')
                 ->modalDescription('This will migrate "office" types to "representative" in parties table, and add all experts to parties table and update JSON roles. Are you sure?')
                 ->action(fn() => $this->runFix()),
+
+            Action::make('removeNullRoles')
+                ->label('Remove Null Roles')
+                ->color('warning')
+                ->icon('heroicon-o-trash')
+                ->requiresConfirmation()
+                ->action(fn() => $this->runRemoveNullRoles()),
         ];
+    }
+
+    protected function runRemoveNullRoles(bool $notify = true): void
+    {
+        $count = 0;
+        if (Party::where('role', 'like', '%"role":null%')->count() === 0) {
+            if ($notify) {
+                Notification::make()->title('No Null Roles Found')->info()->send();
+            }
+            return;
+        }
+
+        Party::where('role', 'like', '%"role":null%')->chunk(100, function ($parties) use (&$count) {
+            foreach ($parties as $party) {
+                $currentRoles = is_array($party->role) ? $party->role : [];
+                $newRoles = collect($currentRoles)->reject(fn($role) => is_array($role) && array_key_exists('role', $role) && $role['role'] === null)->values()->toArray();
+
+                if (count($currentRoles) !== count($newRoles)) {
+                    $party->update(['role' => $newRoles]);
+                    $count++;
+                }
+            }
+        });
+
+        if ($notify) {
+            Notification::make()
+                ->title('Null Roles Removed')
+                ->body("Removed null roles from $count parties.")
+                ->success()
+                ->send();
+        }
     }
 
     protected function runFix(): void
     {
         \Illuminate\Support\Facades\DB::transaction(function () {
-            //$this->cleanupDuplicates();
+            $this->runRemoveNullRoles(false);
             $this->runFixParties();
             $this->runFixExperts();
         });
+
         Notification::make()
             ->title('Global Migration Complete')
             ->body('Parties, Experts, and Matter links have been synchronized.')
@@ -67,7 +116,7 @@ class FixPartiesTable extends Page
 
         foreach ($parties as $party) {
 
-            $roleData = [
+            $roleMapping = [
                 'party' => 'party',
                 'partie' => 'party',
                 'office' => 'representative',
@@ -81,10 +130,15 @@ class FixPartiesTable extends Page
             // Initialize as empty array if null
             $currentRoles = is_array($party->role) ? $party->role : [];
 
-            // Check if this specific role name already exists in the array
-            $exists = collect($currentRoles)->contains('role', $newRoleName);
+            // Remove role:null if found
+            $currentRoles = collect($currentRoles)->reject(fn($role) => is_array($role) && array_key_exists('role', $role) && $role['role'] === null)->values()->toArray();
 
-            if (!$exists) {
+            // Check if this specific role name already exists in the array
+            $exists = collect($currentRoles)->contains(function ($role) use ($newRoleName) {
+                return isset($role['role']) && $role['role'] === $newRoleName;
+            });
+
+            if ($newRoleName && !$exists) {
                 $currentRoles[] = ['role' => $newRoleName];
             }
 
@@ -133,8 +187,8 @@ class FixPartiesTable extends Page
         foreach ($experts as $expert) {
             $cleanName = trim($expert->name);
             $expertTypes = [
-                'main' => ['role' => 'expert', 'type' => 'main'],
-                'certified' => ['role' => 'expert', 'type' => 'certified'],
+                'main' => ['role' => 'expert', 'type' => 'certified'],
+                'certified' => ['role' => 'expert', 'type' => 'assistant'],
                 'assistant' => ['role' => 'expert', 'type' => 'assistant'],
                 'external' => ['role' => 'expert', 'type' => 'external'],
                 'external-assistant' => ['role' => 'expert', 'type' => 'external-assistant'],
@@ -155,18 +209,27 @@ class FixPartiesTable extends Page
 
             $currentRoles = is_array($party->role) ? $party->role : [];
 
+            // Remove role:null if found
+            $currentRoles = collect($currentRoles)->reject(fn($role) => is_array($role) && array_key_exists('role', $role) && $role['role'] === null)->values()->toArray();
+
             // IMPROVED CHECK: Check for the specific role AND type combination
             $alreadyHasThisExpertRole = collect($currentRoles)->contains(function ($value) use ($expertRole) {
-                return $value['role'] === 'expert' && ($value['type'] ?? '') === ($expertRole['type'] ?? '');
+                return isset($value['role']) && $value['role'] === 'expert' && ($value['type'] ?? '') === ($expertRole['type'] ?? '');
             });
 
             if (!$alreadyHasThisExpertRole) {
                 $currentRoles[] = $expertRole;
             }
 
-
-            if (!$expertRole) {
-                $currentRoles[] = $expertRole;
+            // If main or certified expert, add another role as assistant with the same field
+            if (in_array($expert->category, ['main', 'certified'])) {
+                $assistantRole = ['role' => 'expert', 'type' => 'assistant', 'field' => $expert->field];
+                $alreadyHasAssistantRole = collect($currentRoles)->contains(function ($value) use ($assistantRole) {
+                    return isset($value['role']) && $value['role'] === 'expert' && ($value['type'] ?? '') === 'assistant';
+                });
+                if (!$alreadyHasAssistantRole) {
+                    $currentRoles[] = $assistantRole;
+                }
             }
 
             $party->update([
@@ -175,28 +238,28 @@ class FixPartiesTable extends Page
             ]);
         }
 
-        $matters = Matter::whereNotNull('expert_id')->get();
-        foreach ($matters as $matter) {
-            $expertAsParty = Party::where('old_id', $matter->expert_id)
-                ->whereJsonContains('role', ['role' => 'expert'])
-                ->first();
-
-            if ($expertAsParty) {
-                $roleData = collect($expertAsParty->role)->firstWhere('role', 'expert');
-                $existing = MatterParty::where('matter_id', $matter->id)
-                    ->where('party_id', $expertAsParty->id)
-                    ->first();
-                if (!$existing) {
-
-                    MatterParty::create([
-                        'matter_id' => $matter->id,
-                        'party_id' => $expertAsParty->id,
-                        'role' => $roleData['role'] ?? 'expert',
-                        'type' => $roleData['type'] ?? 'main'
-                    ]);
-                }
-            }
-        }
+        // $matters = Matter::whereNotNull('expert_id')->get();
+        // foreach ($matters as $matter) {
+        //     $expertAsParty = Party::where('old_id', $matter->expert_id)
+        //         ->whereJsonContains('role', ['role' => 'expert'])
+        //         ->first();
+        //
+        //     if ($expertAsParty) {
+        //         $roleData = collect($expertAsParty->role)->firstWhere('role', 'expert');
+        //         $existing = MatterParty::where('matter_id', $matter->id)
+        //             ->where('party_id', $expertAsParty->id)
+        //             ->first();
+        //         if (!$existing) {
+        //
+        //             MatterParty::create([
+        //                 'matter_id' => $matter->id,
+        //                 'party_id' => $expertAsParty->id,
+        //                 'role' => $roleData['role'] ?? 'expert',
+        //                 'type' => $roleData['type'] ?? 'main'
+        //             ]);
+        //         }
+        //     }
+        // }
 
         // 2. Migrate Additional Experts (from MatterExpert pivot)
         // Assuming your MatterExpert model has matter_id and expert_id
