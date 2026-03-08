@@ -17,21 +17,19 @@ class MattersTable
     {
         return $table
             ->striped(false)
-            ->recordClasses(fn($record) => match ($record->status?->value ?? $record->status) {
-                'current' => 'bg-info-50 dark:bg-info-900',
-                'reported' => 'bg-success-50 dark:bg-success-900',
-                'submitted' => 'bg-warning-50 dark:bg-warning-900',
-                default => null,
-            })
+            ->extraAttributes(['class' => '[&_td]:py-1 [&_th]:py-1'])
             ->columns([
-                TextColumn::make('year'),
+                TextColumn::make('year')->grow(false),
                 TextColumn::make('number')
+                    ->grow(false)
                     ->searchable(),
                 IconColumn::make('difficulty')
+                    ->grow(false)
                     ->icon(fn($state) => $state?->getIcon())
                     ->searchable()
                     ->tooltip(fn($state) => $state?->getLabel()),
                 TextColumn::make('commissioning')
+                    ->grow(false)
                     ->searchable(),
                 TextColumn::make('received_date')
                     ->date()
@@ -54,14 +52,18 @@ class MattersTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('court.name')
+                    ->grow(false)
                     ->searchable(),
                 TextColumn::make('level')
+                    ->grow(false)
                     ->badge()
                     ->sortable(),
                 TextColumn::make('type.name')
+                    ->grow(false)
                     ->searchable(),
                 TextColumn::make('parent_id')
                     ->numeric()
+                    ->grow(false)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('parties.name')

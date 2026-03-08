@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Matters\Schemas;
 
 use App\Models\Matter;
 use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
@@ -57,18 +58,22 @@ class MatterInfolist
                 TextEntry::make('last_action_date')
                     ->date()
                     ->placeholder('-'),
-                TextEntry::make('parties.name')
+                RepeatableEntry::make('mainPartiesOnly')
                     ->label('Parties')
-                    ->listWithLineBreaks()
-                    ->formatStateUsing(function ($state, $record) {
-                        $party = $record->parties->firstWhere('name', $state);
-                        if (!$party || !$party->pivot) return $state;
-
-                        $role = $party->pivot->role ?? '';
-                        $type = $party->pivot->type ?? '';
-
-                        return "{$role} ({$type}) - {$state}";
-                    }),
+                    ->schema([
+                        TextEntry::make('party.name')->label(function ($state, $record) {
+                            $type = $record->type ?? '';
+                            return "{$type}";
+                        })
+                    ])->columnSpanFull(),
+                RepeatableEntry::make('mainExpertsOnly')
+                    ->label('Experts')
+                    ->schema([
+                        TextEntry::make('party.name')->label(function ($state, $record) {
+                            $type = $record->type ?? '';
+                            return "{$type}";
+                        })
+                    ])->columnSpanFull(),
             ]);
     }
 }

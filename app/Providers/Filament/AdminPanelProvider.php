@@ -13,6 +13,7 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\Width;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use GeoSot\FilamentEnvEditor\FilamentEnvEditorPlugin;
@@ -64,7 +65,8 @@ class AdminPanelProvider extends PanelProvider
                 //FilamentEnvEditorPlugin::make(),
                 FilamentUsersPlugin::make(),
                 FilamentShieldPlugin::make(),
-            ]);
+            ])
+            ->maxContentWidth(Width::Full);
     }
 
     public function boot(): void

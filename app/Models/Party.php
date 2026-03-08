@@ -5,6 +5,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Party extends Model
 {
@@ -42,4 +43,5 @@ class Party extends Model
         return $this->belongsToMany(Matter::class, 'matter_party')
             ->withPivot('id', 'type', 'role', 'parent_id');
     }
+
 }

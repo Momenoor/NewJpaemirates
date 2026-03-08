@@ -61,6 +61,15 @@ class FixPartiesTable extends Page
                 ->icon('heroicon-o-trash')
                 ->requiresConfirmation()
                 ->action(fn() => $this->runRemoveNullRoles()),
+
+            Action::make('fixParentId')
+                ->label('Fix Parent IDs')
+                ->color('info')
+                ->icon('heroicon-o-link')
+                ->requiresConfirmation()
+                ->modalHeading('Fix Parent IDs')
+                ->modalDescription('This will update parent_id to refer to the new PK id instead of old_id. Continue?')
+                ->action(fn() => $this->runFixParentRelation()),
         ];
     }
 
@@ -238,28 +247,28 @@ class FixPartiesTable extends Page
             ]);
         }
 
-        // $matters = Matter::whereNotNull('expert_id')->get();
-        // foreach ($matters as $matter) {
-        //     $expertAsParty = Party::where('old_id', $matter->expert_id)
-        //         ->whereJsonContains('role', ['role' => 'expert'])
-        //         ->first();
-        //
-        //     if ($expertAsParty) {
-        //         $roleData = collect($expertAsParty->role)->firstWhere('role', 'expert');
-        //         $existing = MatterParty::where('matter_id', $matter->id)
-        //             ->where('party_id', $expertAsParty->id)
-        //             ->first();
-        //         if (!$existing) {
-        //
-        //             MatterParty::create([
-        //                 'matter_id' => $matter->id,
-        //                 'party_id' => $expertAsParty->id,
-        //                 'role' => $roleData['role'] ?? 'expert',
-        //                 'type' => $roleData['type'] ?? 'main'
-        //             ]);
-        //         }
-        //     }
-        // }
+         $matters = Matter::whereNotNull('expert_id')->get();
+         foreach ($matters as $matter) {
+             $expertAsParty = Party::where('old_id', $matter->expert_id)
+                 ->whereJsonContains('role', ['role' => 'expert'])
+                 ->first();
+
+             if ($expertAsParty) {
+                 $roleData = collect($expertAsParty->role)->firstWhere('role', 'expert');
+                 $existing = MatterParty::where('matter_id', $matter->id)
+                     ->where('party_id', $expertAsParty->id)
+                     ->first();
+                 if (!$existing) {
+
+                     MatterParty::create([
+                         'matter_id' => $matter->id,
+                         'party_id' => $expertAsParty->id,
+                         'role' => $roleData['role'] ?? 'expert',
+                         'type' => $roleData['type'] ?? 'main'
+                     ]);
+                 }
+             }
+         }
 
         // 2. Migrate Additional Experts (from MatterExpert pivot)
         // Assuming your MatterExpert model has matter_id and expert_id
@@ -307,6 +316,46 @@ class FixPartiesTable extends Page
                     );
                 }
             }
+        }
+    }
+
+    protected function runFixParentRelation(bool $notify = true): void
+    {
+        $countParties = 0;
+        $countMatterParties = 0;
+
+        // 1. Fix parties.parent_id
+        Party::whereNotNull('parent_id')->chunk(100, function ($parties) use (&$countParties) {
+            foreach ($parties as $party) {
+                $parent = Party::where('old_id', $party->parent_id)->first();
+                if ($parent && $party->parent_id != $parent->id) {
+                    $party->update(['parent_id' => $parent->id]);
+                    $countParties++;
+                }
+            }
+        });
+
+        // 2. Fix matter_party.parent_id
+        DB::table('matter_party')
+            ->where('parent_id', '>', 0)
+            ->chunkById(100, function ($matterParties) use (&$countMatterParties) {
+                foreach ($matterParties as $matterParty) {
+                    $parent = MatterParty::where('party_id', $matterParty->parent_id)->where('matter_id',$matterParty->matter_id)->first();
+                    if ($parent && $matterParty->parent_id != $parent->id) {
+                        DB::table('matter_party')
+                            ->where('id', $matterParty->id)
+                            ->update(['parent_id' => $parent->id]);
+                        $countMatterParties++;
+                    }
+                }
+            });
+
+        if ($notify) {
+            Notification::make()
+                ->title('Parent Relations Fixed')
+                ->body("Updated parent_id for $countParties parties and $countMatterParties matter-party links.")
+                ->success()
+                ->send();
         }
     }
 }

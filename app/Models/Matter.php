@@ -95,6 +95,26 @@ class Matter extends Model
             ->where(fn($q) => $q->whereNull('parent_id')->orWhere('parent_id', 0));
     }
 
+    /**
+     * Top-level matter_party rows with role 'party' only.
+     */
+    public function mainPartiesOnly(): HasMany
+    {
+        return $this->hasMany(MatterParty::class, 'matter_id')
+            ->where(fn($q) => $q->whereNull('parent_id')->orWhere('parent_id', 0))
+            ->where('role', 'party');
+    }
+
+    /**
+     * Top-level matter_party rows with role 'expert' only.
+     */
+    public function mainExpertsOnly(): HasMany
+    {
+        return $this->hasMany(MatterParty::class, 'matter_id')
+            ->where(fn($q) => $q->whereNull('parent_id')->orWhere('parent_id', 0))
+            ->where('role', 'expert');
+    }
+
     // -----------------------------------------------------------------------
     // FOR QUERYING / READING
     // BelongsToMany gives you Party models directly, useful outside forms.
