@@ -111,16 +111,6 @@ class MatterForm
                                                         if ($type) {
                                                             $query->where('role', 'like', '%"' . $type . '"%');
                                                         }
-
-                                                        $selectedPartyIds = collect($get('../../mainExpertsOnly'))
-                                                            ->pluck('party_id')
-                                                            ->filter()
-                                                            ->forget($get('id')) // Ignore self if editing
-                                                            ->all();
-
-                                                        if ($selectedPartyIds) {
-                                                            $query->whereNotIn('id', $selectedPartyIds);
-                                                        }
                                                     })
                                                     ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                                     ->columnSpan(2)
@@ -170,15 +160,6 @@ class MatterForm
                                                     ->label('Party Name')
                                                     ->relationship('party', 'name', function ($query, Get $get) {
                                                         $query->where('role', 'like', '%"party"%');
-
-                                                        $selectedPartyIds = collect($get('../../mainPartiesOnly'))
-                                                            ->pluck('party_id')
-                                                            ->filter()
-                                                            ->all();
-
-                                                        if ($selectedPartyIds) {
-                                                            $query->whereNotIn('id', $selectedPartyIds);
-                                                        }
                                                     })
                                                     ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                                     ->searchable()
@@ -204,15 +185,6 @@ class MatterForm
                                                             ->label('Representative')
                                                             ->relationship('party', 'name', function ($query, Get $get) {
                                                                 $query->where('role', 'like', '%"representative"%');
-
-                                                                $selectedPartyIds = collect($get('../../representatives'))
-                                                                    ->pluck('party_id')
-                                                                    ->filter()
-                                                                    ->all();
-
-                                                                if ($selectedPartyIds) {
-                                                                    $query->whereNotIn('id', $selectedPartyIds);
-                                                                }
                                                             })
                                                             ->searchable()
                                                             ->preload()
@@ -230,7 +202,7 @@ class MatterForm
                                                             ->dehydrateStateUsing(fn(Get $get) => $get('../../id')),
 
                                                         Hidden::make('matter_id')
-                                                            ->dehydrateStateUsing(fn(Get $get) => $get('../../matter_id')),
+                                                            ->dehydrateStateUsing(fn(Get $get, $state) => $state ?: $get('../../matter_id')),
                                                     ])
                                                     ->addAction(
                                                         fn(Action $action) => $action

@@ -22,6 +22,13 @@ class Request extends Model
 
     protected $dates = ['approved_at'];
 
+    protected static function booted(): void
+    {
+        static::deleting(function (Request $request) {
+            $request->attachments()->delete();
+        });
+    }
+
     public function matter(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Matter::class);

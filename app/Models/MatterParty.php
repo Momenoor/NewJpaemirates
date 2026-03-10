@@ -23,6 +23,22 @@ class MatterParty extends Model
     protected $keyType = 'int';
     public $timestamps = false;
 
+    protected static function booted(): void
+    {
+        static::deleting(function (MatterParty $matterParty) {
+            $matterParty->representatives()->delete();
+        });
+
+        static::creating(function (MatterParty $matterParty) {
+            if (!$matterParty->matter_id && $matterParty->parent_id) {
+                $parent = MatterParty::find($matterParty->parent_id);
+                if ($parent) {
+                    $matterParty->matter_id = $parent->matter_id;
+                }
+            }
+        });
+    }
+
     /**
      * The matter this row belongs to.
      */

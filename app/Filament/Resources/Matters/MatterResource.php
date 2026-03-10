@@ -55,4 +55,23 @@ class MatterResource extends Resource
             'edit' => EditMatter::route('/{record}/edit'),
         ];
     }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()->with([
+            // For infolist parties/experts sections
+            // (accessors will use these already-loaded relations — no extra queries)
+            'mainPartiesOnly.party',
+            'mainPartiesOnly.representatives.party',
+            'mainExpertsOnly.party',
+
+            // For fees section — allocations eager loaded so ->sum() runs in PHP
+            // not as a separate query per fee row
+            'fees.allocations',
+
+            // For classification section
+            'court',
+            'type',
+        ]);
+    }
 }

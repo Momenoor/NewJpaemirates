@@ -27,6 +27,19 @@ class Matter extends Model
     use MatterCommissionMethods;
 
 
+    protected static function booted(): void
+    {
+        static::deleting(function (Matter $matter) {
+            $matter->matterParties()->delete();
+            $matter->fees()->delete();
+            $matter->allocations()->delete();
+            $matter->procedures()->delete();
+            $matter->notes()->delete();
+            $matter->attachments()->delete();
+            $matter->requests()->delete();
+        });
+    }
+
     protected $fillable = [
         'year',
         'number',
@@ -139,6 +152,90 @@ class Matter extends Model
         return $this->belongsToMany(Party::class, 'matter_party')
             ->withPivot('id', 'type', 'role', 'parent_id')
             ->wherePivot(fn($q) => $q->whereNull('parent_id')->orWhere('parent_id', 0));
+    }
+
+    /**
+     * Parties (role = 'party') grouped by type with per-type indexing.
+     * e.g. Plaintiff #1, Plaintiff #2, Defendant #1, Defendant #2 ...
+     *
+     * Used by RepeatableEntry::make('indexedParties') in the infolist.
+     */
+    public function getIndexedPartiesAttribute()
+    {
+        if (isset($this->_indexedPartiesCache)) {
+            return $this->_indexedPartiesCache;
+        }
+
+        // If eager loaded by getEloquentQuery() → use in-memory collection, zero queries
+        // If not loaded (e.g. accessed outside resource) → query with eager loads
+        if ($this->relationLoaded('mainPartiesOnly')) {
+            $parties = $this->mainPartiesOnly;
+
+            // representatives may or may not be loaded — load if missing
+            $parties->each(function ($matterParty) {
+                if (! $matterParty->relationLoaded('representatives')) {
+                    $matterParty->load('representatives.party');
+                } elseif ($matterParty->representatives->isNotEmpty()) {
+                    $matterParty->representatives->each(function ($rep) {
+                        if (! $rep->relationLoaded('party')) {
+                            $rep->load('party');
+                        }
+                    });
+                }
+            });
+        } else {
+            $parties = $this->mainPartiesOnly()
+                ->with(['party', 'representatives.party'])
+                ->get();
+        }
+
+        $this->_indexedPartiesCache = $parties
+            ->groupBy('type')
+            ->flatMap(function ($group) {
+                return $group->values()->map(function ($item, $index) {
+                    $item->role_index = $index + 1;
+                    $item->representatives->values()->each(function ($rep, $repIndex) {
+                        $rep->rep_index = $repIndex + 1;
+                    });
+                    return $item;
+                });
+            })
+            ->values();
+
+        return $this->_indexedPartiesCache;
+    }
+
+    public function getIndexedExpertsAttribute()
+    {
+        if (isset($this->_indexedExpertsCache)) {
+            return $this->_indexedExpertsCache;
+        }
+
+        if ($this->relationLoaded('mainExpertsOnly')) {
+            $experts = $this->mainExpertsOnly;
+
+            $experts->each(function ($matterParty) {
+                if (! $matterParty->relationLoaded('party')) {
+                    $matterParty->load('party');
+                }
+            });
+        } else {
+            $experts = $this->mainExpertsOnly()
+                ->with('party')
+                ->get();
+        }
+
+        $this->_indexedExpertsCache = $experts
+            ->groupBy('type')
+            ->flatMap(function ($group) {
+                return $group->values()->map(function ($item, $index) {
+                    $item->role_index = $index + 1;
+                    return $item;
+                });
+            })
+            ->values();
+
+        return $this->_indexedExpertsCache;
     }
 
     public function fees(): \Illuminate\Database\Eloquent\Relations\HasMany

@@ -9,20 +9,12 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Procedure extends Model
 {
-    use HasFactory,LogsActivity;
+    use HasFactory;
 
     protected static $logOnlyDirty = true;
 
     protected static $submitEmptyLogs = false;
 
-    protected $logAttributes  = [
-        'type',
-        'datetime',
-        'description',
-        'link',
-        'link_type',
-        'matter_id',
-    ];
     protected $fillable = [
         'type',
         'datetime',
@@ -36,10 +28,6 @@ class Procedure extends Model
         'datetime'
     ];
 
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults();
-    }
 
     public function scopeReceivedDate($query)
     {

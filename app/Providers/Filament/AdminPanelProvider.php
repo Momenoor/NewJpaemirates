@@ -66,6 +66,7 @@ class AdminPanelProvider extends PanelProvider
                 FilamentUsersPlugin::make(),
                 FilamentShieldPlugin::make(),
             ])
+            ->databaseTransactions()
             ->maxContentWidth(Width::Full);
     }
 

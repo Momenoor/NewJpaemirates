@@ -32,6 +32,10 @@ class Fee extends Model
     {
         parent::boot();
 
+        static::deleting(function (Fee $fee) {
+            $fee->allocations()->delete();
+        });
+
         static::creating(function (Fee $fee) {
             $fee->user_id = auth()->id();
             if (!$fee->date) {
