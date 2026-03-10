@@ -6,15 +6,10 @@ use App\Enums\MatterCollectionStatus;
 use App\Enums\MatterStatus;
 use App\Enums\MatterDifficulty;
 use App\Enums\MatterLevel;
-use App\Services\ClaimCollectionStatus;
-use App\Services\ClaimsService;
-use App\Services\Money;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -23,9 +18,6 @@ use Illuminate\Support\Facades\Log;
  */
 class Matter extends Model
 {
-
-    use MatterCommissionMethods;
-
 
     protected static function booted(): void
     {
