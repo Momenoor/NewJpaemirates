@@ -15,10 +15,18 @@ class CourtsTable
     {
         return $table
             ->columns([
-                TextColumn::make('name')->sortable(),
-                TextColumn::make('phone')->sortable(),
-                TextColumn::make('email')->sortable(),
-                TextColumn::make('address')->sortable(),
+                TextColumn::make('name')
+                    ->label(__('Name'))
+                    ->sortable(),
+                TextColumn::make('phone')
+                    ->label(__('Phone'))
+                    ->sortable(),
+                TextColumn::make('email')
+                    ->label(__('Email address'))
+                    ->sortable(),
+                TextColumn::make('address')
+                    ->label(__('Address'))
+                    ->sortable(),
             ])
             ->filters([
                 //

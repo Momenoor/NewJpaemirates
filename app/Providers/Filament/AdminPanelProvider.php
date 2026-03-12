@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Auth\Pages\EditProfile;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -23,6 +24,8 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use TomatoPHP\FilamentUsers\Filament\Resources\Users\Schemas\UserForm;
+use TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\UserActions;
 use TomatoPHP\FilamentUsers\FilamentUsersPlugin;
 
 class AdminPanelProvider extends PanelProvider
@@ -73,5 +76,9 @@ class AdminPanelProvider extends PanelProvider
     public function boot(): void
     {
         Select::configureUsing(fn(Select $select) => $select->native(false));
+        UserForm::register([
+            TextInput::make('display_name')->required(),
+            Select::make('party')->searchable()->relationship('party', 'name'),
+        ]);
     }
 }

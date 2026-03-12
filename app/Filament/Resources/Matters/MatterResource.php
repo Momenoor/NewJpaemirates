@@ -11,14 +11,26 @@ use App\Filament\Resources\Matters\Schemas\MatterInfolist;
 use App\Filament\Resources\Matters\Tables\MattersTable;
 use App\Models\Matter;
 use BackedEnum;
+use Filament\Resources\Pages\Page;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class MatterResource extends Resource
 {
     protected static ?string $model = Matter::class;
+
+    public static function getModelLabel(): string
+    {
+        return __('Matter');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Matters');
+    }
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
@@ -41,37 +53,41 @@ class MatterResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => ListMatters::route('/'),
+            'index'  => ListMatters::route('/'),
             'create' => CreateMatter::route('/create'),
-            'view' => ViewMatter::route('/{record}'),
-            'edit' => EditMatter::route('/{record}/edit'),
+            'view'   => ViewMatter::route('/{record}'),
+            'edit'   => EditMatter::route('/{record}/edit'),
         ];
     }
 
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with([
-            // For infolist parties/experts sections
-            // (accessors will use these already-loaded relations — no extra queries)
-            'mainPartiesOnly.party',
-            'mainPartiesOnly.representatives.party',
-            'mainExpertsOnly.party',
+        $query = parent::getEloquentQuery()
+            // SoftDeletingScope left intact — tabs use onlyTrashed() to control visibility
+            ->with([
+                'mainPartiesOnly.party',
+                'mainPartiesOnly.representatives.party',
+                'mainExpertsOnly.party',
+                'fees.allocations',
+                'court',
+                'type',
+            ])
+            ->orderByRaw('COALESCE(parent_id, id) ASC, id ASC');
 
-            // For fees section — allocations eager loaded so ->sum() runs in PHP
-            // not as a separate query per fee row
-            'fees.allocations',
+        $user = auth()->user();
 
-            // For classification section
-            'court',
-            'type',
-        ]);
+        if (!$user->can('ViewAny:Matter') && $user->party) {
+            $query->whereHas('matterParties', fn(Builder $q) =>
+            $q->where('party_id', $user->party->id)
+            );
+        }
+
+        return $query;
     }
 }

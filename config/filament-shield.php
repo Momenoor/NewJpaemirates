@@ -23,7 +23,7 @@ return [
             'pages' => true,
             'widgets' => true,
             'resources' => true,
-            'custom_permissions' => false,
+            'custom_permissions' => true,
         ],
     ],
 
@@ -147,7 +147,7 @@ return [
     */
 
     'localization' => [
-        'enabled' => false,
+        'enabled' => true,
         'key' => 'filament-shield::filament-shield.resource_permission_prefixes_labels',
     ],
 
@@ -172,6 +172,36 @@ return [
                 'update',
                 'delete',
             ],
+            \App\Filament\Resources\Matters\MatterResource::class => [
+                'export',
+                'import',
+                'initialReport',
+                'finalReport',
+
+                // Notes
+                'createNote',
+                'updateNote',
+                'deleteNote',
+
+                // Requests
+                'createRequest',
+                'approveRequest',
+                'rejectRequest',
+
+                // Fees
+                'createFee',
+                'updateFee',
+                'deleteFee',
+
+                // Payments / Allocations
+                'collectFee',
+                'updateAllocation',
+                'deleteAllocation',
+
+                // Attachments
+                'createAttachment',
+                'deleteAttachment',
+            ]
         ],
         'exclude' => [
             //

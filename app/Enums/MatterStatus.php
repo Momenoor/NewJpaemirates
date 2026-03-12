@@ -14,9 +14,9 @@ enum MatterStatus: string implements HasLabel, HasColor
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::CURRENT => 'Current',
-            self::REPORTED => 'Reported',
-            self::SUBMITTED => 'Submitted',
+            self::CURRENT => __('Current'),
+            self::REPORTED => __('Reported'),
+            self::SUBMITTED => __('Submitted'),
         };
     }
 

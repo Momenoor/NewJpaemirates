@@ -12,10 +12,15 @@ class CourtForm
     {
         return $schema
             ->components([
-                TextInput::make('name')->required(),
-                TextInput::make('phone'),
-                TextInput::make('email'),
-                Textarea::make('address'),
+                TextInput::make('name')
+                    ->label(__('Name'))
+                    ->required(),
+                TextInput::make('phone')
+                    ->label(__('Phone')),
+                TextInput::make('email')
+                    ->label(__('Email address')),
+                Textarea::make('address')
+                    ->label(__('Address')),
             ]);
     }
 }

@@ -15,10 +15,10 @@ enum MatterCollectionStatus: string implements HasLabel, HasColor
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::UNPAID => 'Unpaid',
-            self::PARTIAL => 'Partial',
-            self::PAID => 'Paid',
-            self::NO_FEES => 'No Fees',
+            self::UNPAID => __('Unpaid'),
+            self::PARTIAL => __('Partial'),
+            self::PAID => __('Paid'),
+            self::NO_FEES => __('No Fees'),
         };
     }
 

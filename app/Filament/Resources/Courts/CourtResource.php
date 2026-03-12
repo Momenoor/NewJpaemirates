@@ -9,6 +9,7 @@ use App\Filament\Resources\Courts\Pages\ViewCourt;
 use App\Filament\Resources\Courts\Schemas\CourtForm;
 use App\Filament\Resources\Courts\Schemas\CourtInfolist;
 use App\Filament\Resources\Courts\Tables\CourtsTable;
+use App\Filament\Resources\Courts\RelationManagers\MattersRelationManager;
 use App\Models\Court;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,6 +20,16 @@ use Filament\Tables\Table;
 class CourtResource extends Resource
 {
     protected static ?string $model = Court::class;
+
+    public static function getModelLabel(): string
+    {
+        return __('Court');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Courts');
+    }
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
@@ -42,7 +53,7 @@ class CourtResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            MattersRelationManager::class,
         ];
     }
 

@@ -11,10 +11,12 @@ class CourtInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('name')->label('Name'),
-                TextEntry::make('phone')->label('Phone'),
-                TextEntry::make('email')->label('Email'),
-                TextEntry::make('address')->label('Address'),
+                TextEntry::make('name')->label(__('Name')),
+                TextEntry::make('phone')->label(__('Phone')),
+                TextEntry::make('email')->label(__('Email address')),
+                TextEntry::make('address')->label(__('Address')),
+                TextEntry::make('created_at')->label(__('Created'))->dateTime(),
+                TextEntry::make('updated_at')->label(__('Updated'))->dateTime(),
             ]);
     }
 }

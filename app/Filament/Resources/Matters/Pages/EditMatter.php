@@ -4,6 +4,8 @@ namespace App\Filament\Resources\Matters\Pages;
 
 use App\Filament\Resources\Matters\MatterResource;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -16,6 +18,10 @@ class EditMatter extends EditRecord
         return [
             ViewAction::make(),
             DeleteAction::make(),
+            ForceDeleteAction::make()
+                ->visible(fn ($record) => $record->trashed()),
+            RestoreAction::make()
+                ->visible(fn ($record) => $record->trashed()),
         ];
     }
 }

@@ -13,8 +13,10 @@ class TypeForm
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label(__('Name'))
                     ->required(),
                 Toggle::make('active')
+                    ->label(__('Active'))
                     ->default(true)
                     ->required(),
             ]);

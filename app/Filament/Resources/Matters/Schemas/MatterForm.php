@@ -4,6 +4,8 @@ namespace App\Filament\Resources\Matters\Schemas;
 
 use App\Enums\MatterDifficulty;
 use App\Enums\MatterLevel;
+use App\Filament\Resources\Parties\Schemas\PartyForm;
+use App\Models\Party;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
@@ -18,7 +20,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
-use Filament\Support\Enums\Width;
+use Illuminate\Support\Str;
 
 class MatterForm
 {
@@ -30,25 +32,33 @@ class MatterForm
                     ->schema([
                         Group::make()
                             ->schema([
-                                Section::make('Basic Data')->schema([
+                                Section::make(__('Basic Data'))->schema([
                                     TextInput::make('year')
+                                        ->label(__('Year'))
                                         ->required(),
                                     TextInput::make('number')
+                                        ->label(__('Number'))
                                         ->required(),
-                                    DatePicker::make('received_date'),
-                                    DatePicker::make('next_session_date'),
-                                ])->columns(2),
-                                Section::make('Court Data')->schema([
+                                    DatePicker::make('received_date')
+                                        ->label(__('Received Date')),
+                                    DatePicker::make('next_session_date')
+                                        ->label(__('Next Session Date')),
+                                ]),
+
+                                Section::make(__('Court Data'))->schema([
                                     Select::make('court_id')
+                                        ->label(__('Court'))
                                         ->relationship('court', 'name')
                                         ->searchable()
                                         ->preload()
                                         ->required()
                                         ->columnSpanFull(),
                                     Select::make('level')
+                                        ->label(__('Level'))
                                         ->options(MatterLevel::class)
                                         ->required(),
                                     Select::make('type_id')
+                                        ->label(__('Type'))
                                         ->relationship('type', 'name', modifyQueryUsing: function ($query) {
                                             $query->where('active', true);
                                         })
@@ -56,13 +66,35 @@ class MatterForm
                                         ->preload()
                                         ->required(),
                                     Select::make('difficulty')
+                                        ->label(__('Difficulty'))
                                         ->options(MatterDifficulty::class)
                                         ->required(),
-                                    Toggle::make('commissioning')
-                                        ->label('Is Committee?')
+                                    // live() is needed here so expert type options
+                                    // re-evaluate when commissioning changes
+                                    Toggle::make('is_committee')
+                                        ->label(__('Is Committee?'))
                                         ->live()
-                                        ->inline(false)
-                                        ->required(),
+                                        ->afterStateHydrated(function ($state, Set $set, Get $get) {
+                                            $set('is_committee', $get('commissioning') === 'committee');
+                                        })
+                                        ->afterStateUpdated(function ($state, Set $set) {
+                                            $set('commissioning', $state ? 'committee' : 'individual');
+                                        })
+                                        ->inline(false),
+                                    Select::make('commissioning')
+                                        ->label(__('Commissioning'))
+                                        ->options([
+                                            'individual' => __('Individual'),
+                                            'committee' => __('Committee'),
+                                        ])
+                                        ->required()
+                                        ->live()
+                                        ->afterStateHydrated(function ($state, Set $set) {
+                                            $set('is_committee', $state === 'committee');
+                                        })
+                                        ->afterStateUpdated(function ($state, Set $set) {
+                                            $set('is_committee', $state === 'committee');
+                                        }),
                                 ]),
                             ])
                             ->columns(1)
@@ -70,62 +102,78 @@ class MatterForm
 
                         Group::make()
                             ->schema([
-                                Section::make('Parties & Experts')
+                                Section::make(__('Parties & Experts'))
                                     ->schema([
                                         Repeater::make('mainExpertsOnly')
+                                            ->relationship('mainExpertsOnly')
+                                            ->label(__('Experts'))
                                             ->columns(3)
                                             ->table([
-                                                Repeater\TableColumn::make('type')->width(250),
-                                                Repeater\TableColumn::make('name'),
+                                                Repeater\TableColumn::make(__('Type'))->width(250),
+                                                Repeater\TableColumn::make(__('Name')),
                                             ])
                                             ->compact()
-                                            ->relationship('mainExpertsOnly')
-                                            ->label('Experts')
                                             ->schema([
                                                 Select::make('type')
-                                                    ->label('Type')
-                                                    ->options(function (Get $get) {
-                                                        $isCommittee = $get('../../../commissioning');
+                                                    ->label(__('Type'))
+                                                    ->options(function (Get $get, $livewire) {
+                                                        // Layout components (Grid/Group/Section) are transparent
+                                                        // to Filament's data tree — commissioning lives flat on $livewire->data
+                                                        $commissioning = $livewire->data['commissioning'] ?? 'individual';
+                                                        $isCommittee = $commissioning === 'committee';
                                                         $options = [
-                                                            'certified' => 'Certified Expert',
-                                                            'assistant' => 'Assistant Expert',
+                                                            'certified' => __('Certified Expert'),
+                                                            'assistant' => __('Assistant Expert'),
                                                         ];
                                                         if ($isCommittee) {
-                                                            $options['external'] = 'External Expert';
-                                                            $options['external-assistant'] = 'External Assistant';
+                                                            $options['external'] = __('External Expert');
+                                                            $options['external-assistant'] = __('External Assistant');
                                                         }
                                                         return $options;
                                                     })
                                                     ->required()
-                                                    ->live()
-                                                    ->columnSpan(1)
+                                                    ->live(onBlur: true) // onBlur — only re-render when leaving the field
                                                     ->afterStateUpdated(function (Set $set) {
                                                         $set('role', 'expert');
                                                         $set('party_id', null);
-                                                    }),
+                                                    })
+                                                    ->columnSpan(1),
 
+                                                // No ->live() — nothing downstream reads party_id changes
                                                 Select::make('party_id')
-                                                    ->label('Expert Name')
+                                                    ->label(__('Expert Name'))
                                                     ->relationship('party', 'name', function ($query, Get $get) {
                                                         $type = $get('type');
                                                         if ($type) {
-                                                            $query->where('role', 'like', '%"' . $type . '"%');
+                                                            $query->whereJsonContains('role', [['role' => 'expert', 'type' => $type]]);
+                                                        } else {
+                                                            $query->whereJsonContains('role', [['role' => 'expert']]);
                                                         }
+                                                    })
+                                                    ->createOptionForm(fn(Schema $schema) => PartyForm::configure($schema))
+                                                    ->createOptionAction(function (Action $action, Get $get) {
+                                                        $type = $get('type') ?? null;
+                                                        return $action->fillForm([
+                                                            'role' => [
+                                                                'role' => ['expert'],
+                                                                'type' => [$type],
+                                                            ],
+                                                        ]);
+                                                    })
+                                                    ->createOptionUsing(function (array $data) {
+                                                        return Party::create($data)->id;
                                                     })
                                                     ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                                     ->columnSpan(2)
                                                     ->searchable()
                                                     ->preload()
-                                                    ->required()
-                                                    ->live(),
+                                                    ->required(),
 
                                                 Hidden::make('matter_id'),
-                                                Hidden::make('role')
-                                                    ->default('expert'),
+                                                Hidden::make('role')->default('expert'),
                                                 Hidden::make('id'),
                                             ])
-                                            ->columns(3)
-                                            ->addActionLabel('Add Expert')
+                                            ->addActionLabel(__('Add Expert'))
                                             ->itemLabel(function (array $state): ?string {
                                                 $type = $state['type'] ?? '';
                                                 $role = $state['role'] ?? '';
@@ -137,63 +185,83 @@ class MatterForm
                                                     ->icon('heroicon-m-plus-circle')
                                             )
                                             ->addActionAlignment(Alignment::Start),
+
                                         Repeater::make('mainPartiesOnly')
                                             ->relationship('mainPartiesOnly')
-                                            ->label('Parties')
+                                            ->label(__('Parties'))
+                                            ->columns(3)
                                             ->schema([
                                                 Select::make('type')
-                                                    ->label('Type')
+                                                    ->label(__('Type'))
                                                     ->options([
-                                                        'plaintiff' => 'Plaintiff',
-                                                        'defendant' => 'Defendant',
-                                                        'implicate-litigant' => 'Implicate Litigant',
+                                                        'plaintiff' => __('Plaintiff'),
+                                                        'defendant' => __('Defendant'),
+                                                        'implicate-litigant' => __('Implicate Litigant'),
                                                     ])
                                                     ->required()
-                                                    ->live()
+                                                    ->live(onBlur: true) // onBlur reduces round-trips
                                                     ->afterStateUpdated(function (Set $set) {
                                                         $set('role', 'party');
                                                         $set('party_id', null);
                                                         $set('representatives', []);
                                                     }),
 
+                                                // No ->live() — nothing downstream reads party_id changes
                                                 Select::make('party_id')
-                                                    ->label('Party Name')
-                                                    ->relationship('party', 'name', function ($query, Get $get) {
-                                                        $query->where('role', 'like', '%"party"%');
+                                                    ->label(__('Party Name'))
+                                                    ->relationship('party', 'name', function ($query) {
+                                                        $query->whereJsonContains('role', [['role' => 'party']]);
                                                     })
-                                                    ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                                                    ->createOptionForm(fn(Schema $schema) => PartyForm::configure($schema))
+                                                    ->createOptionAction(function (Action $action) {
+                                                        return $action->fillForm([
+                                                            'role' => [
+                                                                'role' => ['party'],
+                                                            ],
+                                                        ]);
+                                                    })
+                                                    ->createOptionUsing(function (array $data) {
+                                                        return Party::create($data)->id;
+                                                    })
                                                     ->searchable()
                                                     ->preload()
                                                     ->columnSpan(2)
-                                                    ->required()
-                                                    ->live(),
+                                                    ->required(),
 
                                                 Hidden::make('matter_id'),
-                                                Hidden::make('role')
-                                                    ->default('party'),
+                                                Hidden::make('role')->default('party'),
                                                 Hidden::make('id'),
 
                                                 Repeater::make('representatives')
+                                                    ->relationship('representatives')
+                                                    ->label(__('Representatives / Lawyers'))
                                                     ->table([
-                                                        Repeater\TableColumn::make('name'),
+                                                        Repeater\TableColumn::make(__('Name')),
                                                     ])
                                                     ->compact()
-                                                    ->relationship('representatives')
-                                                    ->label('Representatives / Lawyers')
                                                     ->schema([
                                                         Select::make('party_id')
-                                                            ->label('Representative')
-                                                            ->relationship('party', 'name', function ($query, Get $get) {
-                                                                $query->where('role', 'like', '%"representative"%');
+                                                            ->label(__('Representative'))
+                                                            ->relationship('party', 'name', function ($query) {
+                                                                $query->whereJsonContains('role', [['role' => 'representative']]);
                                                             })
-                                                            ->searchable()
+                                                            ->createOptionForm(fn(Schema $schema) => PartyForm::configure($schema))
+                                                            ->createOptionAction(function (Action $action) {
+                                                                return $action->fillForm([
+                                                                    'role' => [
+                                                                        'role' => ['representative'],
+                                                                    ],
+                                                                ]);
+                                                            })
+                                                            ->createOptionUsing(function (array $data) {
+                                                                return Party::create($data)->id;
+                                                            })
                                                             ->preload()
                                                             ->required()
                                                             ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                                             ->columnSpanFull(),
 
-                                                        Hidden::make('role')
-                                                            ->default('representative'),
+                                                        Hidden::make('role')->default('representative'),
 
                                                         Hidden::make('type')
                                                             ->dehydrateStateUsing(fn(Get $get) => $get('../../type')),
@@ -209,16 +277,15 @@ class MatterForm
                                                             ->color('warning')
                                                             ->icon('heroicon-m-plus-circle')
                                                     )
-                                                    ->addActionLabel('Add Representative')
+                                                    ->addActionLabel(__('Add Representative'))
                                                     ->compact()
                                                     ->columnSpanFull(),
                                             ])
-                                            ->columns(3)
-                                            ->addActionLabel('Add Party')
+                                            ->addActionLabel(__('Add Party'))
                                             ->itemLabel(function (array $state): ?string {
                                                 $type = $state['type'] ?? '';
                                                 $role = $state['role'] ?? '';
-                                                return $type ? "{$type} ({$role})" : null;
+                                                return $type ? __($role) . " (" . __($type) . ")" : null;
                                             })
                                             ->addActionAlignment(Alignment::Start)
                                             ->addAction(
@@ -228,32 +295,35 @@ class MatterForm
                                             ),
                                     ]),
 
-                                Section::make('Fees')
+                                Section::make(__('Fees'))
+                                    ->visible(fn() => auth()->user()->can('createFee', \App\Models\Matter::class) || auth()->user()->can('updateFee', \App\Models\Matter::class))
                                     ->schema([
                                         Repeater::make('fees')
+                                            ->label(__('Fees'))
                                             ->relationship('fees')
                                             ->table([
-                                                Repeater\TableColumn::make('Type'),
-                                                Repeater\TableColumn::make('Amount'),
-                                                Repeater\TableColumn::make('Including Vat')
+                                                Repeater\TableColumn::make(__('Type')),
+                                                Repeater\TableColumn::make(__('Amount')),
+                                                Repeater\TableColumn::make(__('Including VAT'))
                                                     ->alignment(Alignment::Center),
                                             ])
                                             ->compact()
                                             ->schema([
                                                 Select::make('type')
+                                                    ->label(__('Type'))
                                                     ->options([
-                                                        'expert' => 'Expert Fee',
-                                                        'marketing' => 'Marketing',
-                                                        'other' => 'Other',
+                                                        'expert' => __('Expert Fee'),
+                                                        'marketing' => __('Marketing'),
+                                                        'other' => __('Other'),
                                                     ])
                                                     ->required(),
 
                                                 TextInput::make('amount')
+                                                    ->label(__('Amount'))
                                                     ->numeric()
                                                     ->required()
                                                     ->live(onBlur: true)
                                                     ->afterStateUpdated(function ($state, Set $set, Get $get) {
-                                                        // Only recalculate if this row has including_vat ON
                                                         if (!$get('including_vat')) return;
 
                                                         $amount = (float)$state;
@@ -262,7 +332,6 @@ class MatterForm
                                                         $rowId = $get('row_id');
                                                         $fees = $get('../../fees') ?? [];
 
-                                                        // Find current row key and position
                                                         $currentKey = null;
                                                         foreach ($fees as $key => $fee) {
                                                             if (($fee['row_id'] ?? null) === $rowId) {
@@ -270,30 +339,26 @@ class MatterForm
                                                                 break;
                                                             }
                                                         }
-
                                                         if ($currentKey === null) return;
 
                                                         $keys = array_keys($fees);
                                                         $currentPos = array_search($currentKey, $keys, true);
                                                         $nextKey = $keys[$currentPos + 1] ?? null;
 
-                                                        // Check the next row is the linked VAT row
                                                         if (!$nextKey || ($fees[$nextKey]['type'] ?? '') !== 'vat') return;
 
                                                         $basic = round($amount / 1.05, 2);
                                                         $vat = round($amount - $basic, 2);
 
-                                                        // Update base row amount
                                                         $set('amount', $basic);
                                                         $fees[$currentKey]['amount'] = $basic;
-
-                                                        // Update linked VAT row amount
                                                         $fees[$nextKey]['amount'] = $vat;
 
                                                         $set('../../fees', $fees);
                                                     }),
 
                                                 Toggle::make('including_vat')
+                                                    ->label(__('Including VAT'))
                                                     ->live()
                                                     ->inline(false)
                                                     ->extraAttributes(['style' => 'margin: 0 1rem;'])
@@ -303,7 +368,6 @@ class MatterForm
                                                         $rowId = $get('row_id');
                                                         $fees = $get('../../fees') ?? [];
 
-                                                        // Find current row key and position
                                                         $currentKey = null;
                                                         foreach ($fees as $key => $fee) {
                                                             if (($fee['row_id'] ?? null) === $rowId) {
@@ -311,14 +375,12 @@ class MatterForm
                                                                 break;
                                                             }
                                                         }
-
                                                         if ($currentKey === null) return;
 
                                                         $keys = array_keys($fees);
                                                         $currentPos = array_search($currentKey, $keys, true);
 
                                                         if ($state) {
-                                                            // ── Toggle ON ─────────────────────────────────────
                                                             if ($amount <= 0) return;
 
                                                             $basic = round($amount / 1.05, 2);
@@ -329,25 +391,22 @@ class MatterForm
                                                             $fees[$currentKey]['including_vat'] = true;
 
                                                             $vatRow = [
-                                                                'row_id' => (string)\Illuminate\Support\Str::uuid(),
+                                                                'row_id' => (string)Str::uuid(),
                                                                 'type' => 'vat',
                                                                 'amount' => $vat,
                                                                 'including_vat' => false,
                                                             ];
 
-                                                            // Insert VAT row immediately after current row
                                                             $newFees = [];
                                                             foreach ($fees as $k => $fee) {
                                                                 $newFees[$k] = $fee;
                                                                 if ($k === $currentKey) {
-                                                                    $newFees[(string)\Illuminate\Support\Str::uuid()] = $vatRow;
+                                                                    $newFees[(string)Str::uuid()] = $vatRow;
                                                                 }
                                                             }
-
                                                             $set('../../fees', $newFees);
 
                                                         } else {
-                                                            // ── Toggle OFF ────────────────────────────────────
                                                             $nextKey = $keys[$currentPos + 1] ?? null;
 
                                                             if ($nextKey && ($fees[$nextKey]['type'] ?? '') === 'vat') {
@@ -365,10 +424,10 @@ class MatterForm
                                                     }),
 
                                                 Hidden::make('row_id')
-                                                    ->default(fn() => (string)\Illuminate\Support\Str::uuid()),
+                                                    ->default(fn() => (string)Str::uuid()),
                                             ])
                                             ->columns(1)
-                                            ->addActionLabel('Add Fee'),
+                                            ->addActionLabel(__('Add Fee')),
                                     ]),
                             ])
                             ->columnSpan(2),

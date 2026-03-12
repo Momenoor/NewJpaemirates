@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Party extends Model
 {
@@ -26,7 +27,81 @@ class Party extends Model
 
     protected $casts = [
         'role' => 'array', // This tells Laravel to JSON encode/decode automatically
+        'extra' => 'array',
+        'black_list' => 'boolean',
     ];
+
+    public function getRoleAttribute($value)
+    {
+        $roles = json_decode($value, true) ?? [];
+
+        // If it's already in the form format (nested with 'role', 'type', 'field')
+        if (isset($roles['role'])) {
+            return $roles;
+        }
+
+        // If it's an array of objects (database format), transform it for the form
+        $formRole = [
+            'role' => [],
+            'type' => [],
+            'field' => null,
+        ];
+
+        foreach ($roles as $item) {
+            if (isset($item['role'])) {
+                if (!in_array($item['role'], $formRole['role'])) {
+                    $formRole['role'][] = $item['role'];
+                }
+                if ($item['role'] === 'expert') {
+                    if (isset($item['type']) && !in_array($item['type'], $formRole['type'])) {
+                        $formRole['type'][] = $item['type'];
+                    }
+                    if (isset($item['field'])) {
+                        $formRole['field'] = $item['field'];
+                    }
+                }
+            }
+        }
+
+        return $formRole;
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($party) {
+            if (isset($party->role['role']) && is_array($party->role['role'])) {
+                $newRoles = [];
+                $roles = $party->role['role'];
+                $types = $party->role['type'] ?? [];
+                $field = $party->role['field'] ?? null;
+
+                foreach ($roles as $role) {
+                    if ($role === 'expert') {
+                        if (empty($types)) {
+                            $newRoles[] = [
+                                'role' => 'expert',
+                                'field' => $field,
+                            ];
+                        } else {
+                            foreach ($types as $type) {
+                                $newRoles[] = [
+                                    'role' => 'expert',
+                                    'type' => $type,
+                                    'field' => $field,
+                                ];
+                            }
+                        }
+                    } else {
+                        $newRoles[] = ['role' => $role];
+                    }
+                }
+                $party->role = $newRoles;
+            }
+        });
+
+    }
 
     public function parent(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
@@ -38,10 +113,16 @@ class Party extends Model
         return $this->hasMany(MatterParty::class, 'parent_id', 'party_id');
     }
 
-    public function matters(): BelongsToMany
+    public function matters(): Party|\Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
-        return $this->belongsToMany(Matter::class, 'matter_party')
-            ->withPivot('id', 'type', 'role', 'parent_id');
+        return $this->hasManyThrough(Matter::class, MatterParty::class, 'id', 'id', 'id', 'matter_id');
+    }
+
+    public function isExpert(): bool
+    {
+        // The accessor ensures 'role' is an array with a 'role' key.
+        // We check if 'expert' exists inside that sub-array.
+        return isset($this->role['role']) && in_array('expert', (array)$this->role['role']);
     }
 
 }

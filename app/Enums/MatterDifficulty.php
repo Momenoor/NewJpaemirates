@@ -16,9 +16,9 @@ enum MatterDifficulty: string implements HasLabel, HasColor, HasIcon
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::EASY => 'Easy',
-            self::MEDIUM => 'Medium',
-            self::HARD => 'Hard',
+            self::EASY => __('Easy'),
+            self::MEDIUM => __('Medium'),
+            self::HARD => __('Hard'),
         };
     }
 

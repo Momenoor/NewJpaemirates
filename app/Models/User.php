@@ -7,6 +7,7 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\HasRoles;
 
 
@@ -48,42 +49,9 @@ class User extends Authenticatable implements FilamentUser
     ];
 
 
-
-    public function marketers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function party(): User|\Illuminate\Database\Eloquent\Relations\HasOne
     {
-
-        return $this->belongsToMany(User::class, 'matter_marketing')->withPivot('type');
-    }
-
-    public function symbol(): string
-    {
-        return 'M';
-    }
-
-    public function color(): string
-    {
-        if ($this->pivot) {
-            return 'info';
-        }
-        return 'warning';
-    }
-
-    public function category()
-    {
-        return $this->category;
-    }
-
-    public function field()
-    {
-        if ($this->pivot) {
-            return $this->pivot->type;
-        }
-        return 'user';
-    }
-
-    public function pivotType(): string
-    {
-        return 'marketing';
+        return $this->hasOne(Party::class);
     }
 
     public function canAccessPanel(Panel $panel): bool

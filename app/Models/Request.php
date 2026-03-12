@@ -17,10 +17,14 @@ class Request extends Model
         'comment',
         'approved_by',
         'approved_at',
-        'approved_comment'
+        'approved_comment',
+        'extra',
     ];
 
-    protected $dates = ['approved_at'];
+    protected $casts = [
+        'extra' => 'array',
+        'approved_at' => 'datetime',
+    ];
 
     protected static function booted(): void
     {
@@ -44,8 +48,8 @@ class Request extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
-    public function attachments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function attachments(): Request|\Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
-        return $this->hasMany(RequestAttachment::class);
+        return $this->hasManyThrough(Attachment::class, Matter::class, 'id', 'matter_id', 'id');
     }
 }

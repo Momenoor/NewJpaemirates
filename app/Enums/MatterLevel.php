@@ -14,9 +14,9 @@ enum MatterLevel: string implements HasLabel, HasColor
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::FIRST_INSTANCE => 'First Instance',
-            self::APPEAL => 'Appeal',
-            self::CONGESTION => 'Congestion',
+            self::FIRST_INSTANCE => __('First Instance'),
+            self::APPEAL => __('Appeal'),
+            self::CONGESTION => __('Congestion'),
         };
     }
 

@@ -122,7 +122,7 @@ class FixPartiesTable extends Page
     public function runFixParties(): void
     {
         $parties = Party::all();
-
+        $blackList = 0;
         foreach ($parties as $party) {
 
             $roleMapping = [
@@ -150,10 +150,11 @@ class FixPartiesTable extends Page
             if ($newRoleName && !$exists) {
                 $currentRoles[] = ['role' => $newRoleName];
             }
-
+            $blackList += $party->black_list == 2 ? 0 : 1;
             $party->update([
                 'role' => $currentRoles,
                 'old_id' => $party->id,
+                'black_list' => $blackList,
             ]);
         }
 
@@ -178,6 +179,8 @@ class FixPartiesTable extends Page
                         'updated_at' => now(),
                     ]);
             }
+
+
         }
 
     }

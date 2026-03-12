@@ -15,10 +15,10 @@ enum FeeStatus: string implements HasLabel, HasColor
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::UNPAID => 'Unpaid',
-            self::PARTIAL => 'Partial',
-            self::PAID => 'Paid',
-            self::OVERPAID => 'Overpaid',
+            self::UNPAID => __('Unpaid'),
+            self::PARTIAL => __('Partial'),
+            self::PAID => __('Paid'),
+            self::OVERPAID => __('Overpaid'),
         };
     }
 

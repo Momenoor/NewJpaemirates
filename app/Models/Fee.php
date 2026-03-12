@@ -42,6 +42,14 @@ class Fee extends Model
                 $fee->date = now();
             }
         });
+
+        static::updated(function (Fee $fee) {
+            $fee->matter?->updateCollectionStatus();
+        });
+
+        static::deleted(function (Fee $fee) {
+            $fee->matter?->updateCollectionStatus();
+        });
     }
 
     public function matter(): BelongsTo

@@ -12,16 +12,20 @@ class TypeInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('name'),
+                TextEntry::make('name')
+                    ->label(__('Name')),
                 IconEntry::make('active')
+                    ->label(__('Active'))
                     ->boolean(),
                 TextEntry::make('matters_count')
                     ->counts('matters')
-                    ->label('Total Matters'),
+                    ->label(__('Total Matters')),
                 TextEntry::make('created_at')
+                    ->label(__('Created'))
                     ->dateTime()
                     ->placeholder('-'),
                 TextEntry::make('updated_at')
+                    ->label(__('Updated'))
                     ->dateTime()
                     ->placeholder('-'),
             ]);

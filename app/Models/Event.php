@@ -8,9 +8,9 @@ use Momenoor\LaravelFullcalendar\Event as LaravelFullcalendarEvent;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class Event extends Model implements LaravelFullcalendarEvent
+class Event extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory;
 
 
     protected $logAttributes  = [
@@ -58,10 +58,6 @@ class Event extends Model implements LaravelFullcalendarEvent
         });
     }
 
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults();
-    }
     /**
      * Get the event's id number
      *

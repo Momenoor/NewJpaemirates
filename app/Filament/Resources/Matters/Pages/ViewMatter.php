@@ -2,9 +2,21 @@
 
 namespace App\Filament\Resources\Matters\Pages;
 
+use App\Enums\MatterCollectionStatus;
+use App\Enums\MatterStatus;
 use App\Filament\Resources\Matters\MatterResource;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ViewMatter extends ViewRecord
 {
@@ -13,7 +25,139 @@ class ViewMatter extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('initial_report')
+                ->label(__('Initial Report'))
+                ->color('warning')
+                ->visible(fn($record) => auth()->user()->can('initialReport', $record))
+                ->disabled(fn($record) => $record->reported_date !== null)
+                ->label(fn($record) => $record->submitted_date ? __('Initial Report Submitted') : __('Submit Initial Report'))
+                ->schema([
+                    FileUpload::make('screen_shot')
+                        ->label(__('Screenshot'))
+                        ->image()
+                        ->disk('public')
+                        ->directory('matter-attachments')
+                        ->visibility('public')
+                        ->required(),
+                    DatePicker::make('date')
+                        ->label(__('Date')),
+                ])
+                ->action(fn($record, array $data) => $this->initialReportSubmit($record, $data)),
+
+            Action::make('final_report')
+                ->label(fn($record) => $record->reported_date ? __('Final Report Submitted') : __('Submit Final Report'))
+                ->color('success')
+                ->visible(fn($record) => auth()->user()->can('finalReport', $record))
+                ->disabled(fn($record) => $record->reported_date !== null)
+                ->schema([
+                    DatePicker::make('date')
+                        ->label(__('Date')),
+                ])
+                ->action(fn($record, array $data) => $this->finalReportSubmit($record, $data)),
+
+            Action::make('clone')
+                ->label(__('Supplementary Matter'))
+                ->color('info')
+                ->visible(fn($record) => auth()->user()->can('replicate', $record))
+                ->action(fn($record) => $this->cloneMatter($record)),
             EditAction::make(),
+            DeleteAction::make(),
+            ForceDeleteAction::make()
+                ->visible(fn ($record) => $record->trashed()),
+            RestoreAction::make()
+                ->visible(fn ($record) => $record->trashed()),
         ];
+    }
+
+    private function cloneMatter($record): void
+    {
+        DB::transaction(function () use ($record) {
+            // ── 1. Clone the matter itself ────────────────────────────────
+            $newMatter = $record->replicate();
+
+            // Clear all dates except received_date
+            $newMatter->received_date = now();
+            $newMatter->next_session_date = null;
+            $newMatter->last_action_date = null;
+            $newMatter->reported_date = null;
+            $newMatter->submitted_date = null;
+            $newMatter->status = MatterStatus::CURRENT;
+
+            // Reset status fields
+            $newMatter->collection_status = MatterCollectionStatus::NO_FEES;
+            $newMatter->parent_id = $record->id;
+
+            $newMatter->save();
+
+            // ── 2. Clone main parties (plaintiffs / defendants etc.) ───────
+            $mainParties = $record->mainPartiesOnly()
+                ->with('representatives')
+                ->get();
+
+            foreach ($mainParties as $mp) {
+                $newMp = $mp->replicate();
+                $newMp->matter_id = $newMatter->id;
+                $newMp->save();
+
+                // Clone representatives for this party
+                foreach ($mp->representatives as $rep) {
+                    $newRep = $rep->replicate();
+                    $newRep->matter_id = $newMatter->id;
+                    $newRep->parent_id = $newMp->id;
+                    $newRep->save();
+                }
+            }
+
+            // ── 3. Clone experts ──────────────────────────────────────────
+            $experts = $record->mainExpertsOnly()->get();
+
+            foreach ($experts as $expert) {
+                $newExpert = $expert->replicate();
+                $newExpert->matter_id = $newMatter->id;
+                $newExpert->save();
+            }
+
+            // ── 4. Fees are intentionally NOT cloned ──────────────────────
+
+            Notification::make()
+                ->success()
+                ->title(__('Supplementary Matter cloned successfully'))
+                ->body(__('Redirecting to the new matter...'))
+                ->send();
+
+            // Redirect to the new matter's view page
+            $this->redirect(
+                MatterResource::getUrl('view', ['record' => $newMatter->id])
+            );
+        });
+    }
+
+    private function finalReportSubmit($record, array $data): void
+    {
+        $record->reported_date = $data['date'] ?? now();
+        $record->save();
+    }
+
+    private function initialReportSubmit($record, array $data): void
+    {
+        $path = $data['screen_shot'];
+        $disk = Storage::disk('public');
+
+        $record->submitted_date = $data['date'] ?? now();
+        $record->save();
+
+        $record->attachments()->create([
+            'user_id' => Auth::id(),
+            'type' => 'initial_report',
+            'path' => $path,
+            'name' => basename($path),
+            'size' => $disk->exists($path) ? $disk->size($path) : 0,
+            'extension' => pathinfo($path, PATHINFO_EXTENSION) ?? 0,
+        ]);
+
+        Notification::make('Initial Report Submitted')
+            ->title(__('Initial Report Submitted'))
+            ->success()
+            ->send();
     }
 }

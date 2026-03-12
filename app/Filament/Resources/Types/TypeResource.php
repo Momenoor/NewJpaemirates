@@ -22,11 +22,20 @@ class TypeResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-tag';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Settings';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Settings');
+    }
 
-    protected static ?string $modelLabel = 'Matter Type';
+    public static function getModelLabel(): string
+    {
+        return __('Matter Type');
+    }
 
-    protected static ?string $pluralModelLabel = 'Matter Types';
+    public static function getPluralModelLabel(): string
+    {
+        return __('Matter Types');
+    }
 
     protected static ?string $recordTitleAttribute = 'name';
 

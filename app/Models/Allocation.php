@@ -42,14 +42,17 @@ class Allocation extends Model
 
         static::created(function (Allocation $allocation) {
             $allocation->fee?->updateStatus();
+            $allocation->matter?->updateCollectionStatus();
         });
 
         static::updated(function (Allocation $allocation) {
             $allocation->fee?->updateStatus();
+            $allocation->matter?->updateCollectionStatus();
         });
 
         static::deleted(function (Allocation $allocation) {
             $allocation->fee?->updateStatus();
+            $allocation->matter?->updateCollectionStatus();
         });
     }
 
