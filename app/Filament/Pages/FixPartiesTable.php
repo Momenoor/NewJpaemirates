@@ -60,6 +60,13 @@ class FixPartiesTable extends Page
                 ->requiresConfirmation()
                 ->action(fn() => $this->runRemoveNullRoles()),
 
+            Action::make('mattersExperts')
+                ->label('Fix Matter Experts')
+                ->color('warning')
+                ->icon('heroicon-o-trash')
+                ->requiresConfirmation()
+                ->action(fn() => $this->fixMatterExperts()),
+
             Action::make('fixParentId')
                 ->label('Fix Parent IDs')
                 ->color('info')
@@ -196,6 +203,55 @@ class FixPartiesTable extends Page
     {
         $sql = Str::of('DELETE p1 FROM parties p1 INNER JOIN parties p2 WHERE p1.id > p2.id AND TRIM(p1.name) = TRIM(p2.name)');
         DB::statement($sql);
+    }
+
+    public function fixMatterExperts(){
+        $matterExperts = MatterExpert::all();
+        foreach ($matterExperts as $matterExpert) {
+            $expertAsParty = Party::where('old_id', $matterExpert->expert_id)
+                ->whereJsonContains('role', ['role' => 'expert'])
+                ->first();
+
+            if (!$expertAsParty) continue;
+
+            $roles = is_array($expertAsParty->role) ? $expertAsParty->role : (json_decode($expertAsParty->role, true) ?? []);
+            $expertData = collect($roles)->firstWhere('role', 'expert');
+
+            // Guard: skip if no expert role entry found in the JSON
+            if (!$expertData) continue;
+
+            $expertType = ($expertData['type'] ?? '') === 'certified'
+                ? 'assistant'
+                : ($expertData['type'] ?? 'assistant');
+
+            $pivotData = [
+                'matter_id' => $matterExpert->matter_id,
+                'party_id'  => $expertAsParty->id,
+            ];
+
+            $exists = DB::table('matter_party')
+                ->where('matter_id', $pivotData['matter_id'])
+                ->where('party_id', $pivotData['party_id'])
+                ->exists();
+
+            if ($exists) {
+                DB::table('matter_party')
+                    ->where('matter_id', $pivotData['matter_id'])
+                    ->where('party_id', $pivotData['party_id'])
+                    ->update([
+                        'role'       => $expertData['role'] ?? 'expert',
+                        'type'       => $expertType,
+                        'updated_at' => now(),
+                    ]);
+            } else {
+                DB::table('matter_party')->insert(array_merge($pivotData, [
+                    'role'       => $expertData['role'] ?? 'expert',
+                    'type'       => $expertType,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]));
+            }
+        }
     }
 
     private function runFixExperts(): void
