@@ -211,7 +211,7 @@ class FixPartiesTable extends Page
             $expertAsParty = Party::where('old_id', $matter->expert_id)
                 ->whereJsonContains('role', ['role' => 'expert'])
                 ->first();
-            dd($expertAsParty);
+
             if (!$expertAsParty) continue;
 
             $roles = is_array($expertAsParty->role) ? $expertAsParty->role : (json_decode($expertAsParty->role, true) ?? []);
@@ -223,7 +223,7 @@ class FixPartiesTable extends Page
             $exists = MatterParty::where('matter_id', $matter->id)
                 ->where('party_id', $expertAsParty->id)
                 ->exists();
-
+            dd($exists,$roleData,$roles,$expertAsParty,$matter->expert_id,$matter->id);
             if (!$exists) {
                 MatterParty::create([
                     'matter_id' => $matter->id,
@@ -232,6 +232,7 @@ class FixPartiesTable extends Page
                     'type'      => $roleData['type'] ?? 'certified',
                 ]);
             }
+
         }
 
         // Migrate MatterExpert pivot → matter_party
