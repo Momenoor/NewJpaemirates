@@ -29,11 +29,6 @@ class MigrateClaimsToFees extends Page
         return true;
     }
 
-    public static function canAccess(): bool
-    {
-        return true;
-    }
-
     public function content(Schema $schema): Schema
     {
         return $schema->components([
