@@ -7,6 +7,7 @@ use App\Models\Matter;
 use App\Models\MatterExpert;
 use App\Models\MatterParty;
 use App\Models\Party;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Actions\Action;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
@@ -18,6 +19,7 @@ use Illuminate\Support\Str;
 
 class FixPartiesTable extends Page
 {
+    use HasPageShield;
     protected string $view = 'filament.pages.fix-parties-table';
     protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-wrench-screwdriver';
     protected static ?string $navigationLabel = 'Fix Parties Data';
@@ -27,10 +29,6 @@ class FixPartiesTable extends Page
         return true;
     }
 
-    public static function canAccess(): bool
-    {
-        return true;
-    }
 
     public function content(Schema $schema): Schema
     {

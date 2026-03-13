@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\Matter;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Actions\Action;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class FixMattersDifficulty extends Page
 {
+    use HasPageShield;
     protected string $view = 'filament.pages.fix-matters-difficulty';
     protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-wrench-screwdriver';
     protected static ?string $navigationLabel = 'Fix Matters Difficulty';
@@ -23,10 +25,6 @@ class FixMattersDifficulty extends Page
         return true;
     }
 
-    public static function canAccess(): bool
-    {
-        return true;
-    }
 
     public function content(Schema $schema): Schema
     {

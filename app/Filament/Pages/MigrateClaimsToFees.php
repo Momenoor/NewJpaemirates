@@ -7,6 +7,7 @@ use App\Models\Cash;
 use App\Models\Claim;
 use App\Models\Fee;
 use App\Models\Matter;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Actions\Action;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 
 class MigrateClaimsToFees extends Page
 {
+    use HasPageShield;
     protected string $view = 'filament.pages.migrate-claims-to-fees';
     protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-arrow-path';
     protected static ?string $navigationLabel = 'Migrate Claims to Fees';
