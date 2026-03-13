@@ -206,6 +206,35 @@ class FixPartiesTable extends Page
     }
 
     public function fixMatterExperts(){
+        $matters = Matter::whereNotNull('expert_id')->get();
+        foreach ($matters as $matter) {
+            $expertAsParty = Party::where('old_id', $matter->expert_id)
+                ->whereJsonContains('role', ['role' => 'expert'])
+                ->first();
+
+            if (!$expertAsParty) continue;
+
+            $roles = is_array($expertAsParty->role) ? $expertAsParty->role : (json_decode($expertAsParty->role, true) ?? []);
+            $roleData = collect($roles)->firstWhere('role', 'expert');
+
+            // Guard: skip if no expert role entry found in the JSON
+            if (!$roleData) continue;
+
+            $exists = MatterParty::where('matter_id', $matter->id)
+                ->where('party_id', $expertAsParty->id)
+                ->exists();
+
+            if (!$exists) {
+                MatterParty::create([
+                    'matter_id' => $matter->id,
+                    'party_id'  => $expertAsParty->id,
+                    'role'      => $roleData['role'] ?? 'expert',
+                    'type'      => $roleData['type'] ?? 'certified',
+                ]);
+            }
+        }
+
+        // Migrate MatterExpert pivot → matter_party
         $matterExperts = MatterExpert::all();
         foreach ($matterExperts as $matterExpert) {
             $expertAsParty = Party::where('old_id', $matterExpert->expert_id)
