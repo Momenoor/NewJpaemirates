@@ -25,8 +25,6 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('parties', function (Blueprint $table) {
-            $table->dropIndex('parties_role_search_idx');
-            $table->dropIndex('parties_type_search_idx');
             $table->dropColumn('role');
             $table->dropColumn('old_id');
         });

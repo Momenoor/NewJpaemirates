@@ -13,7 +13,6 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -47,105 +46,31 @@ class FixPartiesTable extends Page
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('migrateFromExternal')
-                ->label('1. Migrate from External DB')
-                ->color('danger')
-                ->icon('heroicon-o-arrow-down-on-square-stack')
-                ->requiresConfirmation()
-                ->modalHeading('Migrate from External Database')
-                ->modalDescription('This will TRUNCATE "parties" and "matter_party" in the CURRENT database and copy all data from "jpaemirates". Are you sure?')
-                ->action(fn() => $this->runExternalMigration()),
-
             Action::make('fixParties')
-                ->label('2. Start Data Transformation')
-                ->color('warning')
+                ->label('Start Data Migration')
+                ->color('danger') // Red button to show it's a structural change
                 ->icon('heroicon-o-arrow-path')
-                ->requiresConfirmation()
+                ->requiresConfirmation() // Security: Ask before running loop
                 ->modalHeading('Fix Parties Table')
                 ->modalDescription('This will migrate "office" types to "representative" in parties table, and add all experts to parties table and update JSON roles. Are you sure?')
                 ->action(fn() => $this->runFix()),
 
             Action::make('removeNullRoles')
-                ->label('3. Remove Null Roles')
-                ->color('info')
+                ->label('Remove Null Roles')
+                ->color('warning')
                 ->icon('heroicon-o-trash')
                 ->requiresConfirmation()
                 ->action(fn() => $this->runRemoveNullRoles()),
 
             Action::make('fixParentId')
-                ->label('4. Fix Parent IDs')
-                ->color('success')
+                ->label('Fix Parent IDs')
+                ->color('info')
                 ->icon('heroicon-o-link')
                 ->requiresConfirmation()
                 ->modalHeading('Fix Parent IDs')
                 ->modalDescription('This will update parent_id to refer to the new PK id instead of old_id. Continue?')
                 ->action(fn() => $this->runFixParentRelation()),
         ];
-    }
-
-    protected function runExternalMigration(): void
-    {
-        $sourceDb = 'jpaemira_new';
-        $targetDb = DB::connection()->getDatabaseName();
-
-        // Configure temporary source connection
-        $sourceConfig = config('database.connections.mysql');
-        $sourceConfig['database'] = $sourceDb;
-        Config::set('database.connections.external_source', $sourceConfig);
-
-        try {
-            DB::beginTransaction();
-            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-
-            // 1. Truncate target tables
-            DB::table('matter_party')->truncate();
-            DB::table('parties')->truncate();
-
-            // 2. Fetch and inject Parties
-            $parties = DB::connection('external_source')->table('parties')->get();
-            foreach ($parties->chunk(500) as $chunk) {
-                $data = $chunk->map(fn($p) => (array)$p)->toArray();
-                DB::table('parties')->insert($data);
-            }
-
-            // 3. Fetch and inject MatterParties
-            $matterParties = DB::connection('external_source')->table('matter_party')->get();
-            foreach ($matterParties->chunk(500) as $chunk) {
-                $data = $chunk->map(fn($mp) => (array)$mp)->toArray();
-                DB::table('matter_party')->insert($data);
-            }
-
-            // 4. Fetch and inject Experts (optional check)
-            try {
-                $experts = DB::connection('external_source')->table('experts')->get();
-                if ($experts->isNotEmpty()) {
-                    DB::table('experts')->truncate();
-                    foreach ($experts->chunk(500) as $chunk) {
-                        $data = $chunk->map(fn($e) => (array)$e)->toArray();
-                        DB::table('experts')->insert($data);
-                    }
-                }
-            } catch (\Exception $e) {
-                // Skip experts if table doesn't exist
-            }
-
-            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-            DB::commit();
-
-            Notification::make()
-                ->title('External Migration Complete')
-                ->body("Successfully copied data from $sourceDb to $targetDb.")
-                ->success()
-                ->send();
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Notification::make()
-                ->title('Migration Failed')
-                ->body($e->getMessage())
-                ->danger()
-                ->send();
-        }
     }
 
     protected function runRemoveNullRoles(bool $notify = true): void
@@ -286,6 +211,7 @@ class FixPartiesTable extends Page
             $party = Party::firstOrCreate(
                 ['name' => $cleanName],
                 [
+                    'type' => $expert->category,
                     'old_id' => $expert->id,
                     'phone' => $expert->account?->phone,
                     'email' => $expert->account?->email,
@@ -324,28 +250,28 @@ class FixPartiesTable extends Page
             ]);
         }
 
-         $matters = Matter::whereNotNull('expert_id')->get();
-         foreach ($matters as $matter) {
-             $expertAsParty = Party::where('old_id', $matter->expert_id)
-                 ->whereJsonContains('role', ['role' => 'expert'])
-                 ->first();
+        $matters = Matter::whereNotNull('expert_id')->get();
+        foreach ($matters as $matter) {
+            $expertAsParty = Party::where('old_id', $matter->expert_id)
+                ->whereJsonContains('role', ['role' => 'expert'])
+                ->first();
 
-             if ($expertAsParty) {
-                 $roleData = collect($expertAsParty->role)->firstWhere('role', 'expert');
-                 $existing = MatterParty::where('matter_id', $matter->id)
-                     ->where('party_id', $expertAsParty->id)
-                     ->first();
-                 if (!$existing) {
+            if ($expertAsParty) {
+                $roleData = collect($expertAsParty->role)->firstWhere('role', 'expert');
+                $existing = MatterParty::where('matter_id', $matter->id)
+                    ->where('party_id', $expertAsParty->id)
+                    ->first();
+                if (!$existing) {
 
-                     MatterParty::create([
-                         'matter_id' => $matter->id,
-                         'party_id' => $expertAsParty->id,
-                         'role' => $roleData['role'] ?? 'expert',
-                         'type' => $roleData['type'] ?? 'certified'
-                     ]);
-                 }
-             }
-         }
+                    MatterParty::create([
+                        'matter_id' => $matter->id,
+                        'party_id' => $expertAsParty->id,
+                        'role' => $roleData['role'] ?? 'expert',
+                        'type' => $roleData['type'] ?? 'main'
+                    ]);
+                }
+            }
+        }
 
         // 2. Migrate Additional Experts (from MatterExpert pivot)
         // Assuming your MatterExpert model has matter_id and expert_id
