@@ -211,7 +211,7 @@ class FixPartiesTable extends Page
             $expertAsParty = Party::where('old_id', $matter->expert_id)
                 ->whereJsonContains('role', ['role' => 'expert'])
                 ->first();
-
+            dd($expertAsParty);
             if (!$expertAsParty) continue;
 
             $roles = is_array($expertAsParty->role) ? $expertAsParty->role : (json_decode($expertAsParty->role, true) ?? []);
