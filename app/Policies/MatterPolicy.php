@@ -11,7 +11,7 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class MatterPolicy
 {
     use HandlesAuthorization;
-    
+
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:Matter');
@@ -19,6 +19,21 @@ class MatterPolicy
 
     public function view(AuthUser $authUser, Matter $matter): bool
     {
+        if ($authUser->can('ViewAny:Matter')) return true;
+
+        if ($authUser->can('ViewOwn:Matter') && $authUser->party) {
+            // Use loaded relation — no extra query
+            if ($matter->relationLoaded('matterParties')) {
+                return $matter->matterParties
+                    ->contains('party_id', $authUser->party->id);
+            }
+
+            // Fallback if relation not loaded (e.g. direct URL access)
+            return $matter->matterParties()
+                ->where('party_id', $authUser->party->id)
+                ->exists();
+        }
+
         return $authUser->can('View:Matter');
     }
 
@@ -155,6 +170,11 @@ class MatterPolicy
     public function deleteAttachment(AuthUser $authUser, Matter $matter): bool
     {
         return $authUser->can('DeleteAttachment:Matter');
+    }
+
+    public function viewOwn(AuthUser $authUser, Matter $matter): bool
+    {
+        return $authUser->can('ViewOwn:Matter');
     }
 
 }

@@ -201,6 +201,8 @@ return [
                 // Attachments
                 'createAttachment',
                 'deleteAttachment',
+
+                'viewOwn'
             ]
         ],
         'exclude' => [

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Matters\Tables;
 
 use App\Enums\MatterCollectionStatus;
 use App\Filament\Resources\Matters\MatterResource;
+use App\Models\Matter;
 use Carbon\Carbon;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -72,7 +73,7 @@ class MattersTable
                         $record->status?->getLabel(),
                         $record->collection_status?->getLabel(),
                     ])->filter()->join(' · '))
-                    ->prefix(fn($record) => $record->parent_id ? (app()->getLocale() === 'en' ? '↳ ':' ↲') : '')
+                    ->prefix(fn($record) => $record->parent_id ? (app()->getLocale() === 'en' ? '↳ ' : ' ↲') : '')
                     ->color(fn($record) => $record->parent_id ? 'primary' : null)
                     ->extraAttributes(fn($record) => $record->parent_id
                         ? ['class' => 'pl-6 opacity-90']
@@ -93,8 +94,7 @@ class MattersTable
                 TextColumn::make('court.name')
                     ->label(__('Court / Type'))
                     ->description(fn($record) => $record->type?->name)
-                    ->searchable(query: fn(Builder $query, string $search) =>
-                    static::applyMultiWordSearch($query, $search, ['court.name', 'type.name'])
+                    ->searchable(query: fn(Builder $query, string $search) => static::applyMultiWordSearch($query, $search, ['court.name', 'type.name'])
                     )
                     ->wrap()
                     ->grow(false)
@@ -108,8 +108,7 @@ class MattersTable
                         $record->difficulty?->getLabel(),
                         $record->commissioning ? __('Committee') : null,
                     ])->filter()->join(' · '))
-                    ->searchable(query: fn(Builder $query, string $search) =>
-                    static::applyMultiWordSearch($query, $search, ['level', 'difficulty', 'commissioning'])
+                    ->searchable(query: fn(Builder $query, string $search) => static::applyMultiWordSearch($query, $search, ['level', 'difficulty', 'commissioning'])
                     )
                     ->sortable()
                     ->grow(false)
@@ -134,8 +133,7 @@ class MattersTable
                     ->searchable(query: function (Builder $query, string $search) {
                         $tokens = static::splitSearch($search);
                         foreach ($tokens as $token) {
-                            $query->whereHas('mainPartiesOnly.party', fn($q) =>
-                            $q->where('name', 'like', "%{$token}%")
+                            $query->whereHas('mainPartiesOnly.party', fn($q) => $q->where('name', 'like', "%{$token}%")
                             );
                         }
                         return $query;
@@ -160,8 +158,7 @@ class MattersTable
                     ->searchable(query: function (Builder $query, string $search) {
                         $tokens = static::splitSearch($search);
                         foreach ($tokens as $token) {
-                            $query->whereHas('mainExpertsOnly.party', fn($q) =>
-                            $q->where('name', 'like', "%{$token}%")
+                            $query->whereHas('mainExpertsOnly.party', fn($q) => $q->where('name', 'like', "%{$token}%")
                             );
                         }
                         return $query;
@@ -178,11 +175,11 @@ class MattersTable
                         $record->fees->sum(fn($fee) => $fee->allocations->sum('amount')), 2
                     ))
                     ->color(function ($record) {
-                        $total     = (float) $record->fees->sum('amount');
-                        $collected = (float) $record->fees->sum(fn($fee) => $fee->allocations->sum('amount'));
-                        if ($total <= 0)          return 'gray';
+                        $total = (float)$record->fees->sum('amount');
+                        $collected = (float)$record->fees->sum(fn($fee) => $fee->allocations->sum('amount'));
+                        if ($total <= 0) return 'gray';
                         if ($collected >= $total) return 'success';
-                        if ($collected > 0)       return 'warning';
+                        if ($collected > 0) return 'warning';
                         return 'danger';
                     })
                     ->searchable(false)
@@ -235,17 +232,23 @@ class MattersTable
                     ->label(__('Commissioning'))
                     ->options([
                         'individual' => __('Individual'),
-                        'committee'  => __('Committee'),
+                        'committee' => __('Committee'),
                     ])
                     ->multiple()
                     ->columnSpan(2),
 
                 SelectFilter::make('assistant_expert')
                     ->label(__('Assistant Expert'))
-                    ->relationship('matterParties.party', 'name', function ($query) {
-                        $query->whereHas('matters', function ($q) {
-                            $q->whereIn('matter_party.type', ['assistant']);
-                        });
+                    ->options(function () {
+                        return \App\Models\Party::query()
+                            ->whereExists(function ($query) {
+                                $query->select('party_id')
+                                    ->from('matter_party')
+                                    ->whereColumn('matter_party.party_id', 'parties.id')
+                                    ->whereIn('matter_party.type', ['assistant', 'external-assistant']);
+                            })
+                            ->orderBy('name')
+                            ->pluck('name', 'id');
                     })
                     ->query(function (Builder $query, array $data) {
                         if (empty($data['values'])) {
@@ -272,12 +275,12 @@ class MattersTable
                     ])
                     ->query(function (Builder $query, array $data) {
                         return $query
-                            ->when($data['received_from'],  fn($q, $v) => $q->whereDate('received_date', '>=', $v))
+                            ->when($data['received_from'], fn($q, $v) => $q->whereDate('received_date', '>=', $v))
                             ->when($data['received_until'], fn($q, $v) => $q->whereDate('received_date', '<=', $v));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
-                        if ($data['received_from'])  $indicators[] = __('Received from') . ': '  . $data['received_from'];
+                        if ($data['received_from']) $indicators[] = __('Received from') . ': ' . $data['received_from'];
                         if ($data['received_until']) $indicators[] = __('Received until') . ': ' . $data['received_until'];
                         return $indicators;
                     })
@@ -293,12 +296,12 @@ class MattersTable
                     ])
                     ->query(function (Builder $query, array $data) {
                         return $query
-                            ->when($data['last_action_from'],  fn($q, $v) => $q->whereDate('last_action_date', '>=', $v))
+                            ->when($data['last_action_from'], fn($q, $v) => $q->whereDate('last_action_date', '>=', $v))
                             ->when($data['last_action_until'], fn($q, $v) => $q->whereDate('last_action_date', '<=', $v));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
-                        if ($data['last_action_from'])  $indicators[] = __('Last action from') . ': '  . $data['last_action_from'];
+                        if ($data['last_action_from']) $indicators[] = __('Last action from') . ': ' . $data['last_action_from'];
                         if ($data['last_action_until']) $indicators[] = __('Last action until') . ': ' . $data['last_action_until'];
                         return $indicators;
                     })
@@ -314,12 +317,12 @@ class MattersTable
                     ])
                     ->query(function (Builder $query, array $data) {
                         return $query
-                            ->when($data['next_session_from'],  fn($q, $v) => $q->whereDate('next_session_date', '>=', $v))
+                            ->when($data['next_session_from'], fn($q, $v) => $q->whereDate('next_session_date', '>=', $v))
                             ->when($data['next_session_until'], fn($q, $v) => $q->whereDate('next_session_date', '<=', $v));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
-                        if ($data['next_session_from'])  $indicators[] = __('Next session from') . ': '  . $data['next_session_from'];
+                        if ($data['next_session_from']) $indicators[] = __('Next session from') . ': ' . $data['next_session_from'];
                         if ($data['next_session_until']) $indicators[] = __('Next session until') . ': ' . $data['next_session_until'];
                         return $indicators;
                     })
@@ -335,12 +338,12 @@ class MattersTable
                     ])
                     ->query(function (Builder $query, array $data) {
                         return $query
-                            ->when($data['reported_from'],  fn($q, $v) => $q->whereDate('reported_date', '>=', $v))
+                            ->when($data['reported_from'], fn($q, $v) => $q->whereDate('reported_date', '>=', $v))
                             ->when($data['reported_until'], fn($q, $v) => $q->whereDate('reported_date', '<=', $v));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
-                        if ($data['reported_from'])  $indicators[] = __('Reported from') . ': '  . $data['reported_from'];
+                        if ($data['reported_from']) $indicators[] = __('Reported from') . ': ' . $data['reported_from'];
                         if ($data['reported_until']) $indicators[] = __('Reported until') . ': ' . $data['reported_until'];
                         return $indicators;
                     })
@@ -356,12 +359,12 @@ class MattersTable
                     ])
                     ->query(function (Builder $query, array $data) {
                         return $query
-                            ->when($data['submitted_from'],  fn($q, $v) => $q->whereDate('submitted_date', '>=', $v))
+                            ->when($data['submitted_from'], fn($q, $v) => $q->whereDate('submitted_date', '>=', $v))
                             ->when($data['submitted_until'], fn($q, $v) => $q->whereDate('submitted_date', '<=', $v));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
-                        if ($data['submitted_from'])  $indicators[] = __('Submitted from') . ': '  . $data['submitted_from'];
+                        if ($data['submitted_from']) $indicators[] = __('Submitted from') . ': ' . $data['submitted_from'];
                         if ($data['submitted_until']) $indicators[] = __('Submitted until') . ': ' . $data['submitted_until'];
                         return $indicators;
                     })
@@ -385,21 +388,19 @@ class MattersTable
                     ])
                     ->query(function (Builder $query, array $data) {
                         return $query
-                            ->when($data['fees_from'],  fn($q, $v) => $q->whereHas('fees', fn($f) =>
-                            $f->havingRaw('SUM(amount) >= ?', [(float) $v])
+                            ->when($data['fees_from'], fn($q, $v) => $q->whereHas('fees', fn($f) => $f->havingRaw('SUM(amount) >= ?', [(float)$v])
                                 ->groupBy('matter_id')
                                 ->select('matter_id')
                             ))
-                            ->when($data['fees_until'], fn($q, $v) => $q->whereHas('fees', fn($f) =>
-                            $f->havingRaw('SUM(amount) <= ?', [(float) $v])
+                            ->when($data['fees_until'], fn($q, $v) => $q->whereHas('fees', fn($f) => $f->havingRaw('SUM(amount) <= ?', [(float)$v])
                                 ->groupBy('matter_id')
                                 ->select('matter_id')
                             ));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
-                        if ($data['fees_from'])  $indicators[] = __('Fees min') . ': $' . number_format((float) $data['fees_from'], 2);
-                        if ($data['fees_until']) $indicators[] = __('Fees max') . ': $' . number_format((float) $data['fees_until'], 2);
+                        if ($data['fees_from']) $indicators[] = __('Fees min') . ': $' . number_format((float)$data['fees_from'], 2);
+                        if ($data['fees_until']) $indicators[] = __('Fees max') . ': $' . number_format((float)$data['fees_until'], 2);
                         return $indicators;
                     })
                     ->columnSpan(3),
@@ -412,15 +413,15 @@ class MattersTable
                 EditAction::make()->iconButton()->visible(fn($record) => auth()->user()->can('update', $record)),
                 DeleteAction::make()->iconButton()->visible(fn($record) => auth()->user()->can('delete', $record)),
                 RestoreAction::make()->iconButton()
-                    ->visible(fn ($record) => $record->trashed() && auth()->user()->can('restore', $record)),
+                    ->visible(fn($record) => $record->trashed() && auth()->user()->can('restore', $record)),
                 ForceDeleteAction::make()->iconButton()
-                    ->visible(fn ($record) => $record->trashed() && auth()->user()->can('forceDelete', $record)),
+                    ->visible(fn($record) => $record->trashed() && auth()->user()->can('forceDelete', $record)),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => auth()->user()->can('deleteAny', \App\Models\Matter::class)),
-                    RestoreBulkAction::make()->visible(fn() => auth()->user()->can('restoreAny', \App\Models\Matter::class)),
-                    ForceDeleteBulkAction::make()->visible(fn() => auth()->user()->can('forceDeleteAny', \App\Models\Matter::class)),
+                    DeleteBulkAction::make()->visible(fn() => auth()->user()->can('deleteAny', Matter::class)),
+                    RestoreBulkAction::make()->visible(fn() => auth()->user()->can('restoreAny', Matter::class)),
+                    ForceDeleteBulkAction::make()->visible(fn() => auth()->user()->can('forceDeleteAny', Matter::class)),
                 ]),
             ]);
     }

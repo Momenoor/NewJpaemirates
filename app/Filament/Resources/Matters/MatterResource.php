@@ -16,11 +16,23 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
 class MatterResource extends Resource
 {
     protected static ?string $model = Matter::class;
+
+    public static function canViewAny(): bool
+    {
+        $user = auth()->user();
+        return $user->can('ViewAny:Matter') || $user->can('ViewOwn:Matter');
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return auth()->user()->can('view', $record);
+    }
 
     public static function getModelLabel(): string
     {
@@ -59,10 +71,10 @@ class MatterResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => ListMatters::route('/'),
+            'index' => ListMatters::route('/'),
             'create' => CreateMatter::route('/create'),
-            'view'   => ViewMatter::route('/{record}'),
-            'edit'   => EditMatter::route('/{record}/edit'),
+            'view' => ViewMatter::route('/{record}'),
+            'edit' => EditMatter::route('/{record}/edit'),
         ];
     }
 
@@ -77,14 +89,14 @@ class MatterResource extends Resource
                 'fees.allocations',
                 'court',
                 'type',
+                'matterParties'
             ])
             ->orderByRaw('COALESCE(parent_id, id) ASC, id ASC');
 
         $user = auth()->user();
 
-        if (!$user->can('ViewAny:Matter') && $user->party) {
-            $query->whereHas('matterParties', fn(Builder $q) =>
-            $q->where('party_id', $user->party->id)
+        if (!$user->can('ViewAny:Matter') && $user->can('ViewOwn:Matter') && $user->party) {
+            $query->whereHas('matterParties', fn(Builder $q) => $q->where('party_id', $user->party->id)
             );
         }
 

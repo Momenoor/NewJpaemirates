@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Matters\Schemas;
 use App\Enums\MatterDifficulty;
 use App\Enums\MatterLevel;
 use App\Filament\Resources\Parties\Schemas\PartyForm;
+use App\Models\Matter;
 use App\Models\Party;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
@@ -296,7 +297,7 @@ class MatterForm
                                     ]),
 
                                 Section::make(__('Fees'))
-                                    ->visible(fn() => auth()->user()->can('createFee', \App\Models\Matter::class) || auth()->user()->can('updateFee', \App\Models\Matter::class))
+                                    ->visible(fn() => auth()->user()->can('CreateFee:Matter') || auth()->user()->can('UpdateFee:Matter'))
                                     ->schema([
                                         Repeater::make('fees')
                                             ->label(__('Fees'))
