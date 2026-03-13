@@ -17,6 +17,7 @@ return new class extends Migration {
         Schema::table('matter_party', function (Blueprint $table) {
             $table->string('role')->nullable()->after('parent_id');
         });
+
     }
 
     /**

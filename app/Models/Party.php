@@ -16,19 +16,16 @@ class Party extends Model
         'fax',
         'address',
         'email',
-        'type',
         'role',
         'extra',
         'parent_id',
         'user_id',
-        'black_list',
         'old_id'
     ];
 
     protected $casts = [
         'role' => 'array', // This tells Laravel to JSON encode/decode automatically
         'extra' => 'array',
-        'black_list' => 'boolean',
     ];
 
     public function getRoleAttribute($value)
