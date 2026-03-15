@@ -89,7 +89,8 @@ class MattersTable
                                 foreach ($tokens as $token) {
                                     $q->where(function ($inner) use ($token) {
                                         $inner->orWhere('year', $token)
-                                            ->orWhere('number', $token);
+                                            ->orWhere('number', $token)
+                                            ->orWhere('number', "0".$token);
                                     });
                                 }
                             });
@@ -275,7 +276,7 @@ class MattersTable
                     ->columnSpan(2),
                 Filter::make('type')
                     ->label(__('Type'))
-                    ->form([
+                    ->Schema([
                         Radio::make('type_filter_mode')
                             ->label(__('Filter Mode'))
                             ->options([
