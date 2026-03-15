@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Matters\Tables;
 use App\Enums\MatterCollectionStatus;
 use App\Filament\Resources\Matters\MatterResource;
 use App\Models\Matter;
+use App\Models\Type;
 use Carbon\Carbon;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -15,6 +16,8 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Select;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
@@ -270,6 +273,51 @@ class MattersTable
                     ->multiple()
                     ->preload()
                     ->columnSpan(2),
+                Filter::make('type')
+                    ->label(__('Type'))
+                    ->form([
+                        Radio::make('type_filter_mode')
+                            ->label(__('Filter Mode'))
+                            ->options([
+                                'only_selected'      => __('Only selected type'),
+                                'all_except_selected' => __('All without selected'),
+                            ])
+                            ->default('only_selected')
+                            ->inline(),
+
+                        Select::make('type_id')
+                            ->label(__('Matter Type'))
+                            ->options(fn() => Type::orderBy('name')->pluck('name', 'id'))
+                            ->searchable()
+                            ->preload()
+                            ->multiple()
+                            ->placeholder(__('Select a type')),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (empty($data['type_id'])) return $query;
+
+                        $mode = $data['type_filter_mode'] ?? 'only_selected';
+
+                        return $mode === 'all_except_selected'
+                            ? $query->whereNotIn('type_id',  $data['type_id'])
+                            : $query->whereIn('type_id', $data['type_id']);
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        if (empty($data['type_id'])) return [];
+
+                        $typeNames = Type::whereIn('id', (array) $data['type_id'])
+                            ->pluck('name')
+                            ->join(', ');
+
+                        $mode = $data['type_filter_mode'] ?? 'only_selected';
+
+                        return [
+                            $mode === 'all_except_selected'
+                                ? __('Type') . ': ' . __('All without') . ' ' . $typeNames
+                                : __('Type') . ': ' . $typeNames,
+                        ];
+                    })
+                    ->columnSpan(3),
 
                 Filter::make('received_date')
                     ->label(__('Received Date'))
@@ -281,34 +329,13 @@ class MattersTable
                     ])
                     ->query(function (Builder $query, array $data) {
                         return $query
-                            ->when($data['received_from'], fn($q, $v) => $q->whereDate('received_date', '>=', $v))
-                            ->when($data['received_until'], fn($q, $v) => $q->whereDate('received_date', '<=', $v));
+                            ->when($data['received_from'], fn($q, $v) => $q->whereDate('received_at', '>=', $v))
+                            ->when($data['received_until'], fn($q, $v) => $q->whereDate('received_at', '<=', $v));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['received_from']) $indicators[] = __('Received from') . ': ' . $data['received_from'];
                         if ($data['received_until']) $indicators[] = __('Received until') . ': ' . $data['received_until'];
-                        return $indicators;
-                    })
-                    ->columnSpan(3),
-
-                Filter::make('last_action_date')
-                    ->label(__('Last Action Date'))
-                    ->schema([
-                        Fieldset::make(__('Last Action Date'))->schema([
-                            DatePicker::make('last_action_from')->label(__('From')),
-                            DatePicker::make('last_action_until')->label(__('Until')),
-                        ])->columns(2),
-                    ])
-                    ->query(function (Builder $query, array $data) {
-                        return $query
-                            ->when($data['last_action_from'], fn($q, $v) => $q->whereDate('last_action_date', '>=', $v))
-                            ->when($data['last_action_until'], fn($q, $v) => $q->whereDate('last_action_date', '<=', $v));
-                    })
-                    ->indicateUsing(function (array $data): array {
-                        $indicators = [];
-                        if ($data['last_action_from']) $indicators[] = __('Last action from') . ': ' . $data['last_action_from'];
-                        if ($data['last_action_until']) $indicators[] = __('Last action until') . ': ' . $data['last_action_until'];
                         return $indicators;
                     })
                     ->columnSpan(3),
@@ -334,18 +361,18 @@ class MattersTable
                     })
                     ->columnSpan(3),
 
-                Filter::make('reported_date')
-                    ->label(__('Reported Date'))
+                Filter::make('initial_report_at')
+                    ->label(__('Initial Report Date'))
                     ->schema([
-                        Fieldset::make(__('Reported Date'))->schema([
+                        Fieldset::make(__('Initial Report Date'))->schema([
                             DatePicker::make('reported_from')->label(__('From')),
                             DatePicker::make('reported_until')->label(__('Until')),
                         ])->columns(2),
                     ])
                     ->query(function (Builder $query, array $data) {
                         return $query
-                            ->when($data['reported_from'], fn($q, $v) => $q->whereDate('reported_date', '>=', $v))
-                            ->when($data['reported_until'], fn($q, $v) => $q->whereDate('reported_date', '<=', $v));
+                            ->when($data['reported_from'], fn($q, $v) => $q->whereDate('initial_report_at', '>=', $v))
+                            ->when($data['reported_until'], fn($q, $v) => $q->whereDate('initial_report_at', '<=', $v));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
@@ -355,18 +382,18 @@ class MattersTable
                     })
                     ->columnSpan(3),
 
-                Filter::make('submitted_date')
-                    ->label(__('Submitted Date'))
+                Filter::make('final_report_at')
+                    ->label(__('Final Report Date'))
                     ->schema([
-                        Fieldset::make(__('Submitted Date'))->schema([
+                        Fieldset::make(__('Final Report Date'))->schema([
                             DatePicker::make('submitted_from')->label(__('From')),
                             DatePicker::make('submitted_until')->label(__('Until')),
                         ])->columns(2),
                     ])
                     ->query(function (Builder $query, array $data) {
                         return $query
-                            ->when($data['submitted_from'], fn($q, $v) => $q->whereDate('submitted_date', '>=', $v))
-                            ->when($data['submitted_until'], fn($q, $v) => $q->whereDate('submitted_date', '<=', $v));
+                            ->when($data['submitted_from'], fn($q, $v) => $q->whereDate('final_report_at', '>=', $v))
+                            ->when($data['submitted_until'], fn($q, $v) => $q->whereDate('final_report_at', '<=', $v));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];

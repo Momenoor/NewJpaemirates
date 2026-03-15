@@ -258,5 +258,10 @@
     "Initial Report Date": "تاريخ التقرير المبدئي",
     "Final Report Date": "تاريخ التقرير النهائي",
     "Initial report": "التقرير المبدئي",
-    "Initial report submission": "تسليم التقرير المبدئي"
+    "Initial report submission": "تسليم التقرير المبدئي",
+    "Filter Mode": "طبيعة التصفية",
+    "Only selected type": "النوع المحدد فقط",
+    "All without selected": "الكل باستثناء المحدد",
+    "Select a type": "اختر نوعاً",
+    "All without": "الكل باستثناء"
 }
