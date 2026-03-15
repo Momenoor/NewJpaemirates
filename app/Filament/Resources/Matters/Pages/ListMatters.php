@@ -30,19 +30,26 @@ class ListMatters extends ListRecords
 
             'in_progress' => Tab::make('in progress')
                 ->label(__('In Progress'))
-                ->badge(Matter::whereNull('initial_report_at')->count())
+                ->badge(fn() => auth()->user()->can('ViewAny:Matter')
+                    ? Matter::whereNull('initial_report_at')->count()
+                    : null
+                )
                 ->badgeColor(Color::Blue)
                 ->modifyQueryUsing(fn(Builder $query) => $query->whereNull('initial_report_at')),
 
             'initial_prepared' => Tab::make('Initial Prepared')
                 ->label(__('Initial Prepared'))
-                ->badge(Matter::whereNotNull('initial_report_at')->whereNull('final_report_at')->count())
+                ->badge(fn() => auth()->user()->can('ViewAny:Matter')
+                    ? Matter::whereNotNull('initial_report_at')->whereNull('final_report_at')->count()
+                    : null)
                 ->badgeColor('warning')
                 ->modifyQueryUsing(fn(Builder $query) => $query->whereNotNull('initial_report_at')->whereNull('final_report_at')),
 
             'final_submitted' => Tab::make('Final Submitted')
                 ->label(__('Final Submitted'))
-                ->badge(Matter::whereNotNull('initial_report_at')->whereNotNull('final_report_at')->count())
+                ->badge(fn() => auth()->user()->can('ViewAny:Matter')
+                    ? Matter::whereNotNull('initial_report_at')->whereNotNull('final_report_at')->count()
+                    : null)
                 ->badgeColor('success')
                 ->modifyQueryUsing(fn(Builder $query) => $query->whereNotNull('initial_report_at')->whereNotNull('final_report_at')),
 
@@ -55,7 +62,9 @@ class ListMatters extends ListRecords
                     ->whereNotNull('matters.deleted_at')
                 )
                 ->visible(fn() => auth()->user()->can('ViewTrashed:Matter'))
-                ->badge(fn() => Matter::onlyTrashed()->count()),
+                ->badge(fn() => auth()->user()->can('ViewAny:Matter')
+                    ? Matter::onlyTrashed()->count()
+                    : null),
         ];
     }
 
