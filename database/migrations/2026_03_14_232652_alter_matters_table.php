@@ -14,16 +14,16 @@ return new class extends Migration {
      */
     public function up(): void
     {
-//        Schema::table('matters', function (Blueprint $table) {
-//            $table->dropConstrainedForeignId('expert_id');
-//            $table->dropColumn('external_marketing_rate');
-//            $table->dropColumn('assign');
-//            $table->dropColumn('last_action_date');
-//            $table->dropColumn('status');
-//            $table->renameColumn('reported_date', 'initial_report_at');
-//            $table->renameColumn('submitted_date', 'final_report_at');
-//            $table->renameColumn('received_date', 'received_at');
-//        });
+        Schema::table('matters', function (Blueprint $table) {
+            $table->dropConstrainedForeignId('expert_id');
+            $table->dropColumn('external_marketing_rate');
+            $table->dropColumn('assign');
+            $table->dropColumn('last_action_date');
+            $table->dropColumn('status');
+            $table->renameColumn('reported_date', 'initial_report_at');
+            $table->renameColumn('submitted_date', 'final_report_at');
+            $table->renameColumn('received_date', 'received_at');
+        });
         Schema::table('users', function (Blueprint $table) {
             $table->dropConstrainedForeignId('Account_id');
         });
