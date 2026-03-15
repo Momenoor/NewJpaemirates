@@ -88,8 +88,8 @@ class MattersTable
                             return $query->where(function ($q) use ($tokens) {
                                 foreach ($tokens as $token) {
                                     $q->where(function ($inner) use ($token) {
-                                        $inner->orWhere('year', 'like', "%{$token}%")
-                                            ->orWhere('number', 'like', "%{$token}%");
+                                        $inner->orWhere('year', $token)
+                                            ->orWhere('number', $token);
                                     });
                                 }
                             });
@@ -279,7 +279,7 @@ class MattersTable
                         Radio::make('type_filter_mode')
                             ->label(__('Filter Mode'))
                             ->options([
-                                'only_selected'      => __('Only selected type'),
+                                'only_selected' => __('Only selected type'),
                                 'all_except_selected' => __('All without selected'),
                             ])
                             ->default('only_selected')
@@ -299,13 +299,13 @@ class MattersTable
                         $mode = $data['type_filter_mode'] ?? 'only_selected';
 
                         return $mode === 'all_except_selected'
-                            ? $query->whereNotIn('type_id',  $data['type_id'])
+                            ? $query->whereNotIn('type_id', $data['type_id'])
                             : $query->whereIn('type_id', $data['type_id']);
                     })
                     ->indicateUsing(function (array $data): array {
                         if (empty($data['type_id'])) return [];
 
-                        $typeNames = Type::whereIn('id', (array) $data['type_id'])
+                        $typeNames = Type::whereIn('id', (array)$data['type_id'])
                             ->pluck('name')
                             ->join(', ');
 
