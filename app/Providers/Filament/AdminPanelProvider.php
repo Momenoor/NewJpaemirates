@@ -5,6 +5,9 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\Auth\CustomLogin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Auth\Pages\EditProfile;
+use App\Events\FilamentActionEvent;
+use Filament\Actions\Action;
+use Filament\Actions\StaticAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Http\Middleware\Authenticate;
@@ -21,6 +24,7 @@ use Filament\Widgets\FilamentInfoWidget;
 use GeoSot\FilamentEnvEditor\FilamentEnvEditorPlugin;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
@@ -74,12 +78,19 @@ class AdminPanelProvider extends PanelProvider
                 FilamentUsersPlugin::make(),
                 FilamentShieldPlugin::make(),
             ])
+            ->databaseNotifications()
             ->databaseTransactions()
             ->maxContentWidth(Width::Full);
     }
 
     public function boot(): void
     {
+        Action::configureUsing(function (Action $action) {
+            $action->after(function (Action $action, ?Model $record = null, array $data = []) {
+                FilamentActionEvent::dispatch($action, $record, $data);
+            });
+        });
+
         Select::configureUsing(fn(Select $select) => $select->native(false));
         UserForm::register([
             TextInput::make('display_name')->required(),
