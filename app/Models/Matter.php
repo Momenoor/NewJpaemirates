@@ -3,16 +3,16 @@
 namespace App\Models;
 
 use App\Enums\MatterCollectionStatus;
+use App\Enums\MatterCommissiong;
 use App\Enums\MatterStatus;
 use App\Enums\MatterDifficulty;
 use App\Enums\MatterLevel;
-use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+
 
 /**
  * @property mixed $status
@@ -52,7 +52,6 @@ class Matter extends Model
 
             // Other relations
             $matter->allocations()->delete();
-            $matter->procedures()->delete();
             $matter->notes()->delete();
             $matter->attachments()->delete();
             $matter->requests()->delete();
@@ -62,41 +61,36 @@ class Matter extends Model
     protected $fillable = [
         'year',
         'number',
-        'status',
         'commissioning',
-        'received_date',
+        'received_at',
         'next_session_date',
-        'reported_date',
-        'submitted_date',
+        'initial_report_at',
+        'final_report_at',
         'court_id',
         'type_id',
         'level',
         'difficulty',
-        'collection_status'
+        'collection_status',
     ];
 
     protected $dates = [
-        'received_date',
+        'received_at',
         'next_session_date',
-        'reported_date',
-        'submitted_date',
+        'initial_report_at',
+        'final_report_at',
         'created_at',
         'updated_at',
-        'last_action_date',
         'deleted_at',
     ];
 
     protected $casts = [
-        'status' => MatterStatus::class,
         'difficulty' => MatterDifficulty::class,
         'level' => MatterLevel::class,
         'collection_status' => MatterCollectionStatus::class,
+        'commissioning' => MatterCommissiong::class,
     ];
 
     public $timestamps = true;
-
-    public const INDIVIDUAL = 'individual';
-    public const COMMITTEE = 'committee';
 
     public int $commissionAmount = 0;
 
@@ -280,7 +274,15 @@ class Matter extends Model
         return $this->belongsTo(Type::class);
     }
 
-
+    public function status(): Attribute{
+        return new Attribute(
+            get: function() {
+                if (!$this->initial_report_at) return 'In Progress';
+                if (!$this->final_report_at)  return 'Initial Report';
+                return 'Final Report';
+                }
+        );
+    }
 
     public function procedures(): \Illuminate\Database\Eloquent\Relations\HasMany
     {

@@ -202,7 +202,10 @@ return [
                 'createAttachment',
                 'deleteAttachment',
 
-                'viewOwn'
+                'viewOwn',
+                'viewTrashed',
+                'updateInitialReportDate',
+                'updateFinalReportDate'
             ]
         ],
         'exclude' => [

@@ -22,6 +22,8 @@ use Illuminate\Database\Eloquent\Builder;
 class MatterResource extends Resource
 {
     protected static ?string $model = Matter::class;
+    protected static string|null|BackedEnum $navigationIcon = 'heroicon-o-scale';
+    protected static ?int $navigationSort = 1;
 
     public static function canViewAny(): bool
     {
@@ -43,8 +45,6 @@ class MatterResource extends Resource
     {
         return __('Matters');
     }
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'number';
 

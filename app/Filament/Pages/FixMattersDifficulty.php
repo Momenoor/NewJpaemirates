@@ -22,7 +22,7 @@ class FixMattersDifficulty extends Page
 
     public static function shouldRegisterNavigation(): bool
     {
-        return true;
+        return false;
     }
 
 

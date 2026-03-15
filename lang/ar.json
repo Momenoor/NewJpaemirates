@@ -249,5 +249,14 @@
     "plaintiff": "المدعي",
     "defendant": "المدعى عليه",
     "party": "طرف",
-    "Username or Email": "اسم المستخدم أو البريد الإلكتروني"
+    "Username or Email": "اسم المستخدم أو البريد الإلكتروني",
+    "In Progress": "قيد العمل",
+    "Initial Prepared": "تم إعداد التقرير المبدئي",
+    "Final Submitted": "تم التسليم النهائي",
+    "viewOwn": "عرض الخاص",
+    "View Trashed": "عرض المحذوف",
+    "Initial Report Date": "تاريخ التقرير المبدئي",
+    "Final Report Date": "تاريخ التقرير النهائي",
+    "Initial report": "التقرير المبدئي",
+    "Initial report submission": "تسليم التقرير المبدئي"
 }

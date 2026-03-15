@@ -40,10 +40,16 @@ class MatterForm
                                     TextInput::make('number')
                                         ->label(__('Number'))
                                         ->required(),
-                                    DatePicker::make('received_date')
+                                    DatePicker::make('received_at')
                                         ->label(__('Received Date')),
                                     DatePicker::make('next_session_date')
                                         ->label(__('Next Session Date')),
+                                    DatePicker::make('initial_report_at')
+                                        ->label(__('Initial Report Date'))
+                                        ->visible(fn(string $operation, $record) => $operation === 'edit' && $record->initial_report_at !== null && auth()->user()->can('UpdateInitialReportDate:Matter')),
+                                    DatePicker::make('final_report_at')
+                                        ->label(__('Final Report Date'))
+                                        ->visible(fn(string $operation, $record) => $operation === 'edit' && $record->final_report_at !== null && auth()->user()->can('UpdateFinalReportDate:Matter')),
                                 ]),
 
                                 Section::make(__('Court Data'))->schema([

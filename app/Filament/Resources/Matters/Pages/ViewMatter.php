@@ -14,6 +14,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Support\Colors\Color;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -27,31 +28,33 @@ class ViewMatter extends ViewRecord
         return [
             Action::make('initial_report')
                 ->label(__('Initial Report'))
-                ->color('warning')
+                ->color(fn($record) => $record->initial_report_at === null ? 'warning' : Color::Stone)
                 ->visible(fn($record) => auth()->user()->can('initialReport', $record))
-                ->disabled(fn($record) => $record->reported_date !== null)
-                ->label(fn($record) => $record->submitted_date ? __('Initial Report Submitted') : __('Submit Initial Report'))
+                ->disabled(fn($record) => $record->initial_report_at !== null)
+                ->label(fn($record) => $record->initial_report_at ? __('Initial Report Submitted') : __('Submit Initial Report'))
                 ->schema([
                     FileUpload::make('screen_shot')
                         ->label(__('Screenshot'))
-                        ->image()
+                        ->acceptedFileTypes(['image/*', 'application/pdf'])
                         ->disk('public')
                         ->directory('matter-attachments')
                         ->visibility('public')
                         ->required(),
                     DatePicker::make('date')
-                        ->label(__('Date')),
+                        ->label(__('Date'))
+                        ->visible(auth()->user()->can('UpdateInitialReportDate:Matter')),
                 ])
                 ->action(fn($record, array $data) => $this->initialReportSubmit($record, $data)),
 
             Action::make('final_report')
-                ->label(fn($record) => $record->reported_date ? __('Final Report Submitted') : __('Submit Final Report'))
-                ->color('success')
+                ->label(fn($record) => $record->final_report_at ? __('Final Report Submitted') : __('Submit Final Report'))
+                ->color(fn($record) => $record->final_report_at === null ? 'success' : Color::Stone)
                 ->visible(fn($record) => auth()->user()->can('finalReport', $record))
-                ->disabled(fn($record) => $record->reported_date !== null)
+                ->disabled(fn($record) => $record->final_report_at !== null)
                 ->schema([
                     DatePicker::make('date')
-                        ->label(__('Date')),
+                        ->label(__('Date'))
+                        ->visible(auth()->user()->can('UpdateFinalReportDate:Matter')),
                 ])
                 ->action(fn($record, array $data) => $this->finalReportSubmit($record, $data)),
 
@@ -63,9 +66,9 @@ class ViewMatter extends ViewRecord
             EditAction::make(),
             DeleteAction::make(),
             ForceDeleteAction::make()
-                ->visible(fn ($record) => $record->trashed()),
+                ->visible(fn($record) => $record->trashed()),
             RestoreAction::make()
-                ->visible(fn ($record) => $record->trashed()),
+                ->visible(fn($record) => $record->trashed()),
         ];
     }
 
@@ -134,7 +137,7 @@ class ViewMatter extends ViewRecord
 
     private function finalReportSubmit($record, array $data): void
     {
-        $record->reported_date = $data['date'] ?? now();
+        $record->final_report_at = $data['date'] ?? now();
         $record->save();
     }
 
@@ -143,12 +146,12 @@ class ViewMatter extends ViewRecord
         $path = $data['screen_shot'];
         $disk = Storage::disk('public');
 
-        $record->submitted_date = $data['date'] ?? now();
+        $record->initial_report_at = $data['date'] ?? now();
         $record->save();
 
         $record->attachments()->create([
             'user_id' => Auth::id(),
-            'type' => 'initial_report',
+            'type' => 'initial_report_submission',
             'path' => $path,
             'name' => basename($path),
             'size' => $disk->exists($path) ? $disk->size($path) : 0,

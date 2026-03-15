@@ -20,6 +20,8 @@ use Filament\Tables\Table;
 class CourtResource extends Resource
 {
     protected static ?string $model = Court::class;
+    protected static string|null|BackedEnum $navigationIcon = 'heroicon-o-building-library';
+    protected static ?int $navigationSort = 2;
 
     public static function getModelLabel(): string
     {
@@ -30,8 +32,6 @@ class CourtResource extends Resource
     {
         return __('Courts');
     }
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'name';
 

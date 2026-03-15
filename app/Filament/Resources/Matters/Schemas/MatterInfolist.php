@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Matters\Schemas;
 
+use App\Enums\MatterCommissiong;
 use App\Filament\Resources\Matters\MatterResource;
 use App\Enums\MatterDifficulty;
 use App\Models\Allocation;
@@ -47,13 +48,15 @@ class MatterInfolist
                             ->schema([
                                 TextEntry::make('year')->label(__('Year')),
                                 TextEntry::make('number')->label(__('Number')),
-                                TextEntry::make('status')->label(__('Status'))->badge()->columnSpan(2),
+                                TextEntry::make('status')->label(__('Status'))
+                                    ->formatStateUsing(fn($state) => __($state))
+                                    ->badge()->columnSpan(2),
                                 TextEntry::make('collection_status')->label(__('Collection'))->badge(),
                                 TextEntry::make('commissioning')->label(__('Commissioning'))
-                                    ->formatStateUsing(fn($state) => __($state ? ucfirst($state) : '')),
+                                    ->formatStateUsing(fn($state) => __($state->getLabel())),
                                 IconEntry::make('is_committee')
                                     ->label(__('Is Committee?'))
-                                    ->getStateUsing(fn($record) => $record->commissioning === 'committee')
+                                    ->getStateUsing(fn($record) => $record->commissioning === MatterCommissiong::COMMITTEE)
                                     ->boolean(),
                                 IconEntry::make('assign')->label(__('Assigned'))->boolean(),
                                 TextEntry::make('parent_id')->label(__('Parent Matter'))->numeric()->placeholder('—')->formatStateUsing(fn($state, $record) => $state ? __('Matter') . " #{$record->number}/{$record->year} [#{$state}]" : null)
@@ -79,11 +82,10 @@ class MatterInfolist
                             ->icon('heroicon-o-calendar-days')
                             ->columns(2)
                             ->schema([
-                                TextEntry::make('received_date')->label(__('Received'))->date()->icon('heroicon-o-arrow-down-tray')->placeholder('—'),
+                                TextEntry::make('received_at')->label(__('Received'))->date()->icon('heroicon-o-arrow-down-tray')->placeholder('—'),
                                 TextEntry::make('next_session_date')->label(__('Next Session'))->date()->icon('heroicon-o-calendar')->placeholder('—'),
-                                TextEntry::make('reported_date')->label(__('Reported'))->date()->icon('heroicon-o-document-check')->placeholder('—'),
-                                TextEntry::make('submitted_date')->label(__('Submitted'))->date()->icon('heroicon-o-paper-airplane')->placeholder('—'),
-                                TextEntry::make('last_action_date')->label(__('Last Action'))->date()->icon('heroicon-o-clock')->placeholder('—'),
+                                TextEntry::make('initial_report_at')->label(__('Initial Report'))->date()->icon('heroicon-o-document-check')->placeholder('—'),
+                                TextEntry::make('final_report_at')->label(__('Final Report'))->date()->icon('heroicon-o-paper-airplane')->placeholder('—'),
                                 TextEntry::make('created_at')->label(__('Created'))->dateTime()->placeholder('—'),
                                 TextEntry::make('updated_at')->label(__('Updated'))->dateTime()->placeholder('—'),
                             ]),
@@ -762,7 +764,7 @@ class MatterInfolist
                                             ->label(__('Type'))
                                             ->badge()
                                             ->color('info')
-                                            ->formatStateUsing(fn($state) => __($state ? ucfirst(str_replace('_', ' ', $state)) : '')),
+                                            ->formatStateUsing(fn($state) => __($state ? ucfirst(str_replace('_', ' ', __($state))) : '')),
                                         TextEntry::make('extension')
                                             ->label(__('Extension'))
                                             ->badge()
@@ -773,7 +775,6 @@ class MatterInfolist
                                         TextEntry::make('created_at')
                                             ->label(__('Date'))
                                             ->dateTime()
-
                                             ->icon('heroicon-o-calendar'),
                                         Actions::make([
                                             Action::make('deleteAttachment')

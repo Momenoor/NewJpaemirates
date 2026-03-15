@@ -70,7 +70,7 @@ class MattersTable
                     ->getStateUsing(fn($record) => $record->year . '/' . $record->number)
                     ->weight(FontWeight::Bold)
                     ->description(fn($record) => collect([
-                        $record->status?->getLabel(),
+                        __($record->status),
                         $record->collection_status?->getLabel(),
                     ])->filter()->join(' · '))
                     ->prefix(fn($record) => $record->parent_id ? (app()->getLocale() === 'en' ? '↳ ' : ' ↲') : '')
@@ -106,7 +106,7 @@ class MattersTable
                     ->badge()
                     ->description(fn($record) => collect([
                         $record->difficulty?->getLabel(),
-                        $record->commissioning ? __('Committee') : null,
+                         $record->commissioning->getLabel(),
                     ])->filter()->join(' · '))
                     ->searchable(query: fn(Builder $query, string $search) => static::applyMultiWordSearch($query, $search, ['level', 'difficulty', 'commissioning'])
                     )

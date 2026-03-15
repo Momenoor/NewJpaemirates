@@ -26,7 +26,7 @@ class MigrateClaimsToFees extends Page
 
     public static function shouldRegisterNavigation(): bool
     {
-        return true;
+        return false;
     }
 
     public function content(Schema $schema): Schema

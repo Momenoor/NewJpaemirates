@@ -39,8 +39,12 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login(CustomLogin::class)
             ->colors([
-                'primary' => Color::Teal,
+                'primary' => Color::Blue,
             ])
+            ->brandLogo(asset('images/logo.png'))
+            ->darkModeBrandLogo(asset('images/logo-dark.png'))
+            ->brandLogoHeight('4rem')
+            ->favicon(asset('images/favicon.png'))
             ->profile()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')

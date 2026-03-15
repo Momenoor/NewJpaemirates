@@ -22,6 +22,9 @@ class PartyResource extends Resource
 {
     protected static ?string $model = Party::class;
 
+    protected static string|null|BackedEnum $navigationIcon = 'heroicon-o-user-group';
+    protected static ?int $navigationSort = 3;
+
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();
@@ -52,9 +55,6 @@ class PartyResource extends Resource
     {
         return __('Parties');
     }
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
     protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Schema $schema): Schema
