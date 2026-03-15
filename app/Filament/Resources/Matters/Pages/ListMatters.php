@@ -31,27 +31,27 @@ class ListMatters extends ListRecords
             'in_progress' => Tab::make('in progress')
                 ->label(__('In Progress'))
                 ->badge(fn() => auth()->user()->can('ViewAny:Matter')
-                    ? Matter::whereNull('initial_report_at')->count()
+                    ? Matter::whereNull('initial_report_at')->withTrashed()->count()
                     : null
                 )
                 ->badgeColor(Color::Blue)
-                ->modifyQueryUsing(fn(Builder $query) => $query->whereNull('initial_report_at')),
+                ->modifyQueryUsing(fn(Builder $query) => $query->whereNull('initial_report_at')->withTrashed()),
 
             'initial_prepared' => Tab::make('Initial Prepared')
                 ->label(__('Initial Prepared'))
                 ->badge(fn() => auth()->user()->can('ViewAny:Matter')
-                    ? Matter::whereNotNull('initial_report_at')->whereNull('final_report_at')->count()
+                    ? Matter::whereNotNull('initial_report_at')->whereNull('final_report_at')->withTrashed()->count()
                     : null)
                 ->badgeColor('warning')
-                ->modifyQueryUsing(fn(Builder $query) => $query->whereNotNull('initial_report_at')->whereNull('final_report_at')),
+                ->modifyQueryUsing(fn(Builder $query) => $query->whereNotNull('initial_report_at')->withTrashed()->whereNull('final_report_at')),
 
             'final_submitted' => Tab::make('Final Submitted')
                 ->label(__('Final Submitted'))
                 ->badge(fn() => auth()->user()->can('ViewAny:Matter')
-                    ? Matter::whereNotNull('initial_report_at')->whereNotNull('final_report_at')->count()
+                    ? Matter::whereNotNull('initial_report_at')->whereNotNull('final_report_at')->withTrashed()->count()
                     : null)
                 ->badgeColor('success')
-                ->modifyQueryUsing(fn(Builder $query) => $query->whereNotNull('initial_report_at')->whereNotNull('final_report_at')),
+                ->modifyQueryUsing(fn(Builder $query) => $query->whereNotNull('initial_report_at')->withTrashed()->whereNotNull('final_report_at')),
 
             'deleted' => Tab::make('Deleted')
                 ->label(__('Deleted'))
