@@ -79,12 +79,10 @@ class ViewMatter extends ViewRecord
             $newMatter = $record->replicate();
 
             // Clear all dates except received_date
-            $newMatter->received_date = now();
+            $newMatter->received_at = now();
             $newMatter->next_session_date = null;
-            $newMatter->last_action_date = null;
-            $newMatter->reported_date = null;
-            $newMatter->submitted_date = null;
-            $newMatter->status = MatterStatus::CURRENT;
+            $newMatter->initial_report_at = null;
+            $newMatter->final_report_at = null;
 
             // Reset status fields
             $newMatter->collection_status = MatterCollectionStatus::NO_FEES;
