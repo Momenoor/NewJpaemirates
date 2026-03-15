@@ -42,14 +42,14 @@ class MattersTable
     {
         $tokens = static::splitSearch($search);
         foreach ($tokens as $token) {
-            $query->where(function (Builder $q) use ($token, $columns) {
+            $query->where(function (Builder $query) use ($token, $columns) {
                 foreach ($columns as $i => $column) {
                     $method = $i === 0 ? 'where' : 'orWhere';
                     if (str_contains($column, '.')) {
                         [$relation, $col] = explode('.', $column, 2);
-                        $q->{$i === 0 ? 'whereHas' : 'orWhereHas'}($relation, fn($r) => $r->where($col, 'like', "%{$token}%"));
+                        $query->{$i === 0 ? 'whereHas' : 'orWhereHas'}($relation, fn($r) => $r->where($col, 'like', "%{$token}%"));
                     } else {
-                        $q->{$method}($column, 'like', "%{$token}%");
+                        $query->{$method}($column, 'like', "%{$token}%");
                     }
                 }
             });
@@ -82,8 +82,14 @@ class MattersTable
                     ->searchable(query: function (Builder $query, string $search) {
                         $tokens = static::splitSearch($search);
                         if (count($tokens) === 2 && is_numeric($tokens[0]) && is_numeric($tokens[1])) {
-                            return $query->where('year', $tokens[0])
-                                ->where('number', 'like', "%{$tokens[1]}%");
+                            return $query->where(function ($q) use ($tokens) {
+                                foreach ($tokens as $token) {
+                                    $q->where(function ($inner) use ($token) {
+                                        $inner->orWhere('year', 'like', "%{$token}%")
+                                            ->orWhere('number', 'like', "%{$token}%");
+                                    });
+                                }
+                            });
                         }
                         return static::applyMultiWordSearch($query, $search, ['year', 'number']);
                     })
@@ -106,7 +112,7 @@ class MattersTable
                     ->badge()
                     ->description(fn($record) => collect([
                         $record->difficulty?->getLabel(),
-                         $record->commissioning->getLabel(),
+                        $record->commissioning->getLabel(),
                     ])->filter()->join(' · '))
                     ->searchable(query: fn(Builder $query, string $search) => static::applyMultiWordSearch($query, $search, ['level', 'difficulty', 'commissioning'])
                     )
@@ -404,6 +410,7 @@ class MattersTable
                         return $indicators;
                     })
                     ->columnSpan(3),
+
             ])
             ->filtersFormColumns(6)
             ->filtersLayout(FiltersLayout::Modal)

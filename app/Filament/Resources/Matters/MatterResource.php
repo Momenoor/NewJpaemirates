@@ -81,6 +81,7 @@ class MatterResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery()
+            ->withTrashed() // Ensure trashed records are visible
             // SoftDeletingScope left intact — tabs use onlyTrashed() to control visibility
             ->with([
                 'mainPartiesOnly.party',

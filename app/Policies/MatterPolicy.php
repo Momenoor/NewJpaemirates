@@ -19,6 +19,8 @@ class MatterPolicy
 
     public function view(AuthUser $authUser, Matter $matter): bool
     {
+        if ($matter->trashed() && !$authUser->can('ViewTrashed:Matter')) return false;
+
         if ($authUser->can('ViewAny:Matter')) return true;
 
         if ($authUser->can('ViewOwn:Matter') && $authUser->party) {
@@ -175,6 +177,10 @@ class MatterPolicy
     public function viewOwn(AuthUser $authUser, Matter $matter): bool
     {
         return $authUser->can('ViewOwn:Matter');
+    }
+
+    public function viewTrashed(AuthUser $authUser): bool{
+        return $authUser->can('ViewTrashed:Matter');
     }
 
 }

@@ -321,6 +321,7 @@ class MatterForm
                                                     ->options([
                                                         'expert' => __('Expert Fee'),
                                                         'marketing' => __('Marketing'),
+                                                        'vat' => __('VAT'),
                                                         'other' => __('Other'),
                                                     ])
                                                     ->required(),

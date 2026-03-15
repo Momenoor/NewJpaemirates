@@ -53,14 +53,11 @@ class ListMatters extends ListRecords
                 ->badgeColor('success')
                 ->modifyQueryUsing(fn(Builder $query) => $query->whereNotNull('initial_report_at')->whereNotNull('final_report_at')),
 
-            'deleted' => Tab::make()
+            'deleted' => Tab::make('Deleted')
                 ->label(__('Deleted'))
                 ->badgeColor('danger')
                 ->icon('heroicon-o-trash')
-                ->modifyQueryUsing(fn(Builder $query) => $query
-                    ->withoutGlobalScopes([SoftDeletingScope::class])
-                    ->whereNotNull('matters.deleted_at')
-                )
+                ->modifyQueryUsing(fn(Builder $query) => $query->onlyTrashed())
                 ->visible(fn() => auth()->user()->can('ViewTrashed:Matter'))
                 ->badge(fn() => auth()->user()->can('ViewAny:Matter')
                     ? Matter::onlyTrashed()->count()
