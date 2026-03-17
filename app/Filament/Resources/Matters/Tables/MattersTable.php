@@ -7,6 +7,7 @@ use App\Filament\Resources\Matters\MatterResource;
 use App\Models\Matter;
 use App\Models\Type;
 use Carbon\Carbon;
+use Filament\Actions\BulkAction;
 use Filament\Actions\ExportAction;
 use App\Filament\Exports\MatterExporter;
 use Filament\Actions\BulkActionGroup;
@@ -32,6 +33,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class MattersTable
 {
@@ -459,13 +461,6 @@ class MattersTable
                     ->visible(fn($record) => $record->trashed() && auth()->user()->can('restore', $record)),
                 ForceDeleteAction::make()->iconButton()
                     ->visible(fn($record) => $record->trashed() && auth()->user()->can('forceDelete', $record)),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => auth()->user()->can('deleteAny', Matter::class)),
-                    RestoreBulkAction::make()->visible(fn() => auth()->user()->can('restoreAny', Matter::class)),
-                    ForceDeleteBulkAction::make()->visible(fn() => auth()->user()->can('forceDeleteAny', Matter::class)),
-                ]),
             ]);
     }
 }

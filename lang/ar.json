@@ -271,5 +271,8 @@
     "Total": "إجمالي",
     "Sum Allocations": "إجمالي التحصيلات",
     "export_completed": "{0} لم يتم تصدير أي صفوف|{1} تم تصدير صف واحد|{2} تم تصدير صفين|[3,10] تم تصدير :count صفوف|[11,*] تم تصدير :count صفاً",
-    "export_failed": "{1} فشل تصدير صف واحد|{2} فشل تصدير صفين|[3,10] فشل تصدير :count صفوف|[11,*] فشل تصدير :count صفاً"
+    "export_failed": "{1} فشل تصدير صف واحد|{2} فشل تصدير صفين|[3,10] فشل تصدير :count صفوف|[11,*] فشل تصدير :count صفاً",
+    "Final Report Submission": "تسليم التقرير النهائي",
+    "Are you sure you want to submit the final report?": "هل أنت متأكد من أنك تريد تسليم التقرير النهائي؟",
+    "Final report submission finished for selected matters.": "تم الانتهاء عملية تسليم التقرير النهائي للملفات المحددة."
 }

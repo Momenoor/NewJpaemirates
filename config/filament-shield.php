@@ -173,6 +173,12 @@ return [
                 'delete',
             ],
             \App\Filament\Resources\Matters\MatterResource::class => [
+                'deleteAny',
+                'viewOwn',
+                'viewTrashed',
+                'updateInitialReportDate',
+                'updateFinalReportDate',
+                'bulkUpdateFinalReportDate',
                 'export',
                 'import',
                 'initialReport',
@@ -202,10 +208,7 @@ return [
                 'createAttachment',
                 'deleteAttachment',
 
-                'viewOwn',
-                'viewTrashed',
-                'updateInitialReportDate',
-                'updateFinalReportDate'
+
             ]
         ],
         'exclude' => [

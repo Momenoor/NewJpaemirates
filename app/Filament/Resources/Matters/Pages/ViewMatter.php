@@ -135,13 +135,7 @@ class ViewMatter extends ViewRecord
 
     private function finalReportSubmit($record, array $data): void
     {
-        if($record->initial_report_at === null)
-        {
-            $record->initial_report_at = now();
-
-        }
-        $record->final_report_at = $data['date'] ?? now();
-        $record->save();
+        $record->finalReportSubmission();
     }
 
     private function initialReportSubmit($record, array $data): void

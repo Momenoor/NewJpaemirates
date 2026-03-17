@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 
 /**
@@ -20,7 +22,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Matter extends Model
 {
     use SoftDeletes;
+    use LogsActivity;
 
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll();
+    }
     protected static function booted(): void
     {
         static::creating(function (Matter $matter) {
@@ -317,6 +325,20 @@ class Matter extends Model
     public function requests(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Request::class);
+    }
+
+    public function finalReportSubmission(): void
+    {
+        if (!$this->initial_report_at) {
+            $this->initial_report_at = now();
+        }
+        $this->final_report_at = now();
+        $this->saveQuietly();
+    }
+
+    public function hasFinalReport(): bool
+    {
+        return $this->final_report_at !== null;
     }
 
 }

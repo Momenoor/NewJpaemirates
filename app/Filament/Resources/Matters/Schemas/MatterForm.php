@@ -265,6 +265,7 @@ class MatterForm
                                                             })
                                                             ->preload()
                                                             ->required()
+                                                            ->searchable()
                                                             ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                                             ->columnSpanFull(),
 

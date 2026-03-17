@@ -9,7 +9,13 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Court extends Model
 {
-    use HasFactory;
+    use LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll();
+    }
 
     protected $fillable = [
         'name',

@@ -6,13 +6,19 @@ use App\Filament\Exports\MatterExporter;
 use App\Filament\Resources\Matters\MatterResource;
 use App\Enums\MatterStatus;
 use App\Models\Matter;
+use Filament\Actions\BulkAction;
 use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\ExportAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Support\Colors\Color;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Collection;
 
 class ListMatters extends ListRecords
 {
@@ -77,6 +83,50 @@ class ListMatters extends ListRecords
                 ->columnMappingColumns(3),
             CreateAction::make(),
 
+        ];
+    }
+
+    protected function getTableBulkActions(): array
+    {
+        return [
+            DeleteBulkAction::make()
+                ->visible(
+                    fn() => auth()->user()->can('DeleteAny:Matter', Matter::class)
+                        && $this->activeTab !== 'deleted'
+                ),
+            ForceDeleteBulkAction::make()
+                ->visible(
+                    fn() => auth()->user()->can('forceDeleteAny', Matter::class)
+                        && $this->activeTab === 'deleted'
+                ),
+            RestoreBulkAction::make()
+                ->visible(
+                    fn() => auth()->user()->can('restoreAny', Matter::class)
+                        && $this->activeTab === 'deleted'
+                )
+                ->defaultColor('success'),
+            BulkAction::make('final_report_submission')
+                ->label(__('Final Report Submission'))
+                ->defaultColor('primary')
+                ->icon('heroicon-o-document-text')
+                ->visible(
+                    fn() => auth()->user()->can('BulkUpdateFinalReportDate:Matter')
+                )
+                ->action(
+                    function (Collection $records) {
+                        $records->each(
+                            fn($record) => !$record->hasFinalReport()
+                                ? $record->finalReportSubmission()
+                                : null
+                        );
+                        Notification::make()
+                            ->success()
+                            ->title(__('Final Report Submission'))
+                            ->body(__('Final report submission finished for selected matters.'))
+                            ->send();
+                    }
+                )
+                ->requiresConfirmation(),
         ];
     }
 }
