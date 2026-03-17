@@ -1,0 +1,4 @@
+{
+    "export_completed": "Your matter export has completed and :count rows exported.",
+    "export_failed": ":count rows failed to export."
+}

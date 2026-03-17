@@ -263,5 +263,13 @@
     "Only selected type": "النوع المحدد فقط",
     "All without selected": "الكل باستثناء المحدد",
     "Select a type": "اختر نوعاً",
-    "All without": "الكل باستثناء"
+    "All without": "الكل باستثناء",
+    "Export": "تصدير",
+    "Exporting": "جاري التصدير",
+    "Total Fees (Without VAT)": "إجمالي الأتعاب (بدون ضريبة القيمة المضافة)",
+    "Total VAT": "إجمالي ضريبة القيمة المضافة",
+    "Total": "إجمالي",
+    "Sum Allocations": "إجمالي التحصيلات",
+    "export_completed": "{0} لا توجد صفوف|{1} تم تصدير صف واحد|[2,*] تم تصدير :count صفوف",
+    "export_failed": "فشل تصدير :count صف."
 }

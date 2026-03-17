@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources\Matters\Pages;
 
+use App\Filament\Exports\MatterExporter;
 use App\Filament\Resources\Matters\MatterResource;
 use App\Enums\MatterStatus;
 use App\Models\Matter;
 use Filament\Actions\CreateAction;
+use Filament\Actions\ExportAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Support\Colors\Color;
@@ -68,7 +70,13 @@ class ListMatters extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            ExportAction::make()
+                ->exporter(MatterExporter::class)
+                ->label(__('Export'))
+                ->color('warning')
+                ->columnMappingColumns(3),
             CreateAction::make(),
+
         ];
     }
 }

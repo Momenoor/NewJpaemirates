@@ -7,6 +7,8 @@ use App\Filament\Resources\Matters\MatterResource;
 use App\Models\Matter;
 use App\Models\Type;
 use Carbon\Carbon;
+use Filament\Actions\ExportAction;
+use App\Filament\Exports\MatterExporter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -35,10 +37,11 @@ class MattersTable
 {
     private static function splitSearch(string $search): array
     {
-        return array_values(array_filter(
-            preg_split('/[\s\/\\\\\-]+/', trim($search)),
-            fn($token) => strlen($token) > 0
-        ));
+        return $search
+                |> trim(...)
+                |> (fn($x) => preg_split('/[\s\/\\\\\-]+/', $x))
+                |> (fn($x) => array_filter($x, fn($token) => strlen($token) > 0))
+                |> array_values(...);
     }
 
     private static function applyMultiWordSearch(Builder $query, string $search, array $columns): Builder
@@ -90,13 +93,14 @@ class MattersTable
                                     $q->where(function ($inner) use ($token) {
                                         $inner->orWhere('year', $token)
                                             ->orWhere('number', $token)
-                                            ->orWhere('number', "0".$token);
+                                            ->orWhere('number', "0" . $token);
                                     });
                                 }
                             });
                         }
                         return static::applyMultiWordSearch($query, $search, ['year', 'number']);
                     })
+                    ->toggleable()
                     ->grow(false)
                     ->width('7%'),
 
@@ -107,6 +111,7 @@ class MattersTable
                     ->searchable(query: fn(Builder $query, string $search) => static::applyMultiWordSearch($query, $search, ['court.name', 'type.name'])
                     )
                     ->wrap()
+                    ->toggleable()
                     ->grow(false)
                     ->width('12%'),
 
@@ -121,6 +126,7 @@ class MattersTable
                     ->searchable(query: fn(Builder $query, string $search) => static::applyMultiWordSearch($query, $search, ['level', 'difficulty', 'commissioning'])
                     )
                     ->sortable()
+                    ->toggleable()
                     ->grow(false)
                     ->width('10%'),
 
@@ -208,15 +214,15 @@ class MattersTable
                     ->sortable()
                     ->width('10%'),
 
-                TextColumn::make('received_date')
+                TextColumn::make('received_at')
                     ->date()->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('reported_date')
+                TextColumn::make('initial_report_at')
                     ->date()->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('submitted_date')
+                TextColumn::make('final_report_at')
                     ->date()->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
@@ -226,6 +232,8 @@ class MattersTable
 
                 TextColumn::make('updated_at')
                     ->dateTime()->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('notes.text')
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
@@ -320,7 +328,7 @@ class MattersTable
                     })
                     ->columnSpan(3),
 
-                Filter::make('received_date')
+                Filter::make('received_at')
                     ->label(__('Received Date'))
                     ->schema([
                         Fieldset::make(__('Received Date'))->schema([
