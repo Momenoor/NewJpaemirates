@@ -23,6 +23,20 @@ class Matter extends Model
 
     protected static function booted(): void
     {
+        static::creating(function (Matter $matter) {
+            if (!$matter->collection_status) {
+                $matter->collection_status = MatterCollectionStatus::NO_FEES;
+            }
+        });
+
+        static::created(function (Matter $matter) {
+            $matter->updateCollectionStatus();
+        });
+
+        static::updated(function (Matter $matter) {
+            $matter->updateCollectionStatus();
+        });
+
         static::deleting(function (Matter $matter) {
 
 
@@ -252,8 +266,8 @@ class Matter extends Model
         if ($fees->isEmpty()) {
             $this->collection_status = MatterCollectionStatus::NO_FEES;
         } else {
-            $totalAmount = (float) $fees->sum('amount');
-            $totalAllocated = (float) $this->allocations()->sum('amount');
+            $totalAmount = (float)$fees->sum('amount');
+            $totalAllocated = (float)$this->allocations()->sum('amount');
 
             if ($totalAllocated <= 0) {
                 $this->collection_status = MatterCollectionStatus::UNPAID;
@@ -265,7 +279,7 @@ class Matter extends Model
         }
 
         if ($this->isDirty('collection_status')) {
-            $this->save();
+            $this->saveQuietly();
         }
     }
 
@@ -274,13 +288,14 @@ class Matter extends Model
         return $this->belongsTo(Type::class);
     }
 
-    public function status(): Attribute{
+    public function status(): Attribute
+    {
         return new Attribute(
-            get: function() {
+            get: function () {
                 if (!$this->initial_report_at) return 'In Progress';
-                if (!$this->final_report_at)  return 'Initial Report';
+                if (!$this->final_report_at) return 'Initial Report';
                 return 'Final Report';
-                }
+            }
         );
     }
 
@@ -299,7 +314,7 @@ class Matter extends Model
         return $this->hasMany(Attachment::class);
     }
 
-      public function requests(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function requests(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Request::class);
     }

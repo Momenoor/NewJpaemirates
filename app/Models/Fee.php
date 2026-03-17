@@ -41,6 +41,11 @@ class Fee extends Model
             if (!$fee->date) {
                 $fee->date = now();
             }
+
+        });
+
+        static::created(function (Fee $fee) {
+            $fee->matter?->updateCollectionStatus();
         });
 
         static::updated(function (Fee $fee) {
@@ -69,12 +74,12 @@ class Fee extends Model
 
     public function getTotalAllocatedAttribute(): float
     {
-        return (float) $this->allocations()->sum('amount');
+        return (float)$this->allocations()->sum('amount');
     }
 
     public function getBalanceAttribute(): float
     {
-        return (float) ($this->amount - $this->total_allocated);
+        return (float)($this->amount - $this->total_allocated);
     }
 
     /**
@@ -82,8 +87,8 @@ class Fee extends Model
      */
     public function updateStatus(): void
     {
-        $allocated = (float) $this->allocations()->sum('amount');
-        $total = (float) $this->amount;
+        $allocated = (float)$this->allocations()->sum('amount');
+        $total = (float)$this->amount;
 
         if ($allocated <= 0) {
             $this->status = FeeStatus::UNPAID;

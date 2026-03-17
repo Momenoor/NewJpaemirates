@@ -455,7 +455,7 @@ class MatterInfolist
                                         TextEntry::make('amount')
                                             ->label(__('Fee Amount'))
                                             ->numeric()
-                                            ->money()
+                                            ->money('AED')
                                             ->weight(FontWeight::SemiBold)
                                             ->icon('heroicon-o-banknotes'),
 
@@ -463,7 +463,7 @@ class MatterInfolist
                                         TextEntry::make('collected_amount')
                                             ->label(__('Collected'))
                                             ->numeric()
-                                            ->money()
+                                            ->money('AED')
                                             ->icon('heroicon-o-check-circle')
                                             ->color(fn($state, $record) => (float)$state >= (float)($record?->amount ?? 0)
                                                 ? 'success'
@@ -532,6 +532,7 @@ class MatterInfolist
                                                         TextInput::make('amount')
                                                             ->label(__('Amount to Collect'))
                                                             ->numeric()
+                                                            ->prefix('AED')
                                                             ->minValue(0.01)
                                                             ->maxValue($balance)
                                                             ->default($balance)
@@ -624,7 +625,7 @@ class MatterInfolist
                                                 TextEntry::make('amount')
                                                     ->label(__('Amount'))
                                                     ->numeric()
-                                                    ->money()
+                                                    ->money('AED')
                                                     ->weight(FontWeight::SemiBold)
                                                     ->color('success'),
                                                 TextEntry::make('date')
