@@ -1,4 +1,4 @@
 {
-    "export_completed": "Your matter export has completed and :count rows exported.",
-    "export_failed": ":count rows failed to export."
+    "export_completed": "{0} No rows exported|{1} 1 row exported|[2,*] :count rows exported",
+    "export_failed": "{1} 1 row failed to export|[2,*] :count rows failed to export"
 }

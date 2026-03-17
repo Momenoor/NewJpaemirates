@@ -12,6 +12,8 @@ use OpenSpout\Common\Entity\Style\CellAlignment;
 use OpenSpout\Common\Entity\Style\Color;
 use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Common\Exception\InvalidArgumentException;
+use OpenSpout\Writer\Exception\InvalidSheetNameException;
+use OpenSpout\Writer\Exception\WriterNotOpenedException;
 use OpenSpout\Writer\XLSX\Entity\SheetView;
 use OpenSpout\Writer\XLSX\Options;
 use OpenSpout\Writer\XLSX\Writer;
@@ -33,9 +35,9 @@ class MatterExporter extends Exporter
             ExportColumn::make('type.name')
                 ->label(__('Type')),
 
-            ExportColumn::make('level')
+            ExportColumn::make('matter_level')
                 ->label(__('Level'))
-            ->state(fn($record) => __($record->level)),
+                ->getStateUsing(fn($record) => $record->level?->getLabel()),
 
             ExportColumn::make('parties')
                 ->label(__('Parties'))
@@ -79,11 +81,15 @@ class MatterExporter extends Exporter
 
             ExportColumn::make('unpaid_amount')
                 ->label(__('Unpaid'))
-                ->state(fn($record) => number_format($record->fees->sum('amount')) - number_format($record->allocations->sum('amount'))),
+                ->getStateUsing(fn($record) => number_format($record->fees->sum('amount') - $record->allocations->sum('amount'))),
 
             ExportColumn::make('notes')
                 ->label(__('Notes'))
-                ->listAsJson(),
+                ->getStateUsing(fn($record) => $record->notes
+                    ->map(fn($note) => $note->text)
+                    ->filter()
+                    ->join("\n")
+                ),
 
             ExportColumn::make('status')
                 ->label(__('Status'))
@@ -97,10 +103,10 @@ class MatterExporter extends Exporter
 
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = __('exports.completed', ['count' => Number::format($export->successful_rows)]);
+        $body = trans_choice('export_completed', $export->successful_rows, ['count' => Number::format($export->successful_rows)]);
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' ' . __('exports.failed', ['count' => Number::format($failedRowsCount)]);
+            $body .= ' ' . trans_choice('export_failed', $failedRowsCount, ['count' => Number::format($failedRowsCount)]);
         }
 
         return $body;
@@ -108,7 +114,7 @@ class MatterExporter extends Exporter
 
     public function getXlsxCellStyle(): ?Style
     {
-        return (new Style())
+        return new Style()
             ->setFontSize(11)
             ->setFontName('Arial');
     }
@@ -118,7 +124,7 @@ class MatterExporter extends Exporter
      */
     public function getXlsxHeaderCellStyle(): ?Style
     {
-        return (new Style())
+        return new Style()
             ->setFontBold()
             ->setShouldWrapText()
             ->setFontSize(11)
@@ -149,6 +155,11 @@ class MatterExporter extends Exporter
         return $options;
     }
 
+    /**
+     * @throws InvalidSheetNameException
+     * @throws WriterNotOpenedException
+     * @throws InvalidArgumentException
+     */
     public function configureXlsxWriterBeforeClose(Writer $writer): Writer
     {
         $sheetView = new SheetView();
