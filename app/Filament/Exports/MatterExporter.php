@@ -77,11 +77,11 @@ class MatterExporter extends Exporter
                 ->label(__('Sum Allocations'))
                 ->getStateUsing(fn($record) => number_format($record->allocations->sum('amount'))),
 
-            ExportColumn::make('unpaidAmount')
+            ExportColumn::make('unpaid_amount')
                 ->label(__('Unpaid'))
-                ->state(fn($record) => number_format($record->fees->sum('amount') - $record->allocations->sum('amount'))),
+                ->state(fn($record) => number_format($record->fees->sum('amount')) - number_format($record->allocations->sum('amount'))),
 
-            ExportColumn::make('notes.text')
+            ExportColumn::make('notes')
                 ->label(__('Notes'))
                 ->listAsJson(),
 
@@ -97,10 +97,10 @@ class MatterExporter extends Exporter
 
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = trans('exports_completed', ['count' => Number::format($export->successful_rows)]);
+        $body = __('exports.completed', ['count' => Number::format($export->successful_rows)]);
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' ' . trans('exports_failed', ['count' => Number::format($failedRowsCount)]);
+            $body .= ' ' . __('exports.failed', ['count' => Number::format($failedRowsCount)]);
         }
 
         return $body;
