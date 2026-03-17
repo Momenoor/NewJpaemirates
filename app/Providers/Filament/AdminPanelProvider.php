@@ -2,18 +2,20 @@
 
 namespace App\Providers\Filament;
 
+use AlizHarb\ActivityLog\ActivityLogPlugin;
+use AlizHarb\ActivityLog\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Pages\Auth\CustomLogin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
-use Filament\Auth\Pages\EditProfile;
 use App\Events\FilamentActionEvent;
 use Filament\Actions\Action;
-use Filament\Actions\StaticAction;
+use Filament\Actions\BulkAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Models\Contracts\FilamentUser;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -21,7 +23,6 @@ use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
-use GeoSot\FilamentEnvEditor\FilamentEnvEditorPlugin;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Database\Eloquent\Model;
@@ -30,8 +31,10 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use TomatoPHP\FilamentUsers\Filament\Resources\Users\Schemas\UserForm;
-use TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\UserActions;
+use TomatoPHP\FilamentUsers\Filament\Resources\Users\UserResource;
 use TomatoPHP\FilamentUsers\FilamentUsersPlugin;
+use TomatoPHP\FilamentUsers\Services\FilamentUserServices;
+
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -77,6 +80,11 @@ class AdminPanelProvider extends PanelProvider
                 //FilamentEnvEditorPlugin::make(),
                 FilamentUsersPlugin::make(),
                 FilamentShieldPlugin::make(),
+                ActivityLogPlugin::make()
+                    ->label('Log')
+                    ->pluralLabel('Logs')
+                    ->navigationGroup('System')
+                ,
             ])
             ->databaseNotifications()
             ->databaseTransactions()
@@ -90,11 +98,20 @@ class AdminPanelProvider extends PanelProvider
                 FilamentActionEvent::dispatch($action, $record, $data);
             });
         });
+        BulkAction::configureUsing(function (BulkAction $action) {
+            $action->after(function (BulkAction $action, ?Model $record = null, array $data = []) {
+                FilamentActionEvent::dispatch($action, $record, $data);
+            });
+        });
 
         Select::configureUsing(fn(Select $select) => $select->native(false));
         UserForm::register([
             TextInput::make('display_name')->required(),
             Select::make('party')->searchable()->relationship('party', 'name'),
+        ]);
+
+        app(FilamentUserServices::class)->register([
+            ActivitiesRelationManager::class,
         ]);
     }
 }
