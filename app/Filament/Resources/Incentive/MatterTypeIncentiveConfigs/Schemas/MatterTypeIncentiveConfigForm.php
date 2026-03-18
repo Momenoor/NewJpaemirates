@@ -19,7 +19,7 @@ class MatterTypeIncentiveConfigForm
             ->components([
                 Section::make(__('Matter Type Configuration'))
                     ->schema([
-                        Select::make('matter_type_id')
+                        Select::make('type_id')
                             ->label(__('Matter Type'))
                             ->relationship('matterType', 'name')
                             ->required()

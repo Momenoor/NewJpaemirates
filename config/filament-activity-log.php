@@ -256,7 +256,7 @@ return [
     |
     */
     'widgets' => [
-        'enabled' => true,
+        'enabled' => false,
         'dashboard' => false,
         'widgets' => [
             \AlizHarb\ActivityLog\Widgets\ActivityChartWidget::class,

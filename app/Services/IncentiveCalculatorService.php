@@ -89,7 +89,7 @@ class IncentiveCalculatorService
                 ->where('status', 'paid')
                 ->whereNotIn('id', $alreadyCalculatedFeeIds)
                 ->whereHas('matter', function ($q) use ($calculation) {
-                    $q->whereBetween('initial_report_at', [
+                    $q->whereBetween('final_report_at', [
                         $calculation->period_start,
                         $calculation->period_end,
                     ])
