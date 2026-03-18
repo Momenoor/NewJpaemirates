@@ -80,6 +80,11 @@ class Fee extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function incentiveLines(): HasMany
+    {
+        return $this->hasMany(IncentiveLine::class);
+    }
+
     public function getTotalAllocatedAttribute(): float
     {
         return (float)$this->allocations()->sum('amount');

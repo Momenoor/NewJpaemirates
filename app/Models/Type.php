@@ -32,4 +32,9 @@ class Type extends Model
     {
         return $this->hasMany(Matter::class);
     }
+
+    public function incentiveConfig()
+    {
+        return $this->hasOne(MatterTypeIncentiveConfig::class);
+    }
 }

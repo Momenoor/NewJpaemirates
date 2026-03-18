@@ -50,6 +50,16 @@ class MatterForm
                                     DatePicker::make('final_report_at')
                                         ->label(__('Final Report Date'))
                                         ->visible(fn(string $operation, $record) => $operation === 'edit' && $record->final_report_at !== null && auth()->user()->can('UpdateFinalReportDate:Matter')),
+                                    DatePicker::make('final_report_memo_date')
+                                        ->label(__('Final Report Memo Date')),
+                                    TextInput::make('review_count')
+                                        ->label(__('Review Count'))
+                                        ->numeric()
+                                        ->default(0),
+                                    Toggle::make('has_substantive_changes')
+                                        ->label(__('Has Substantive Changes')),
+                                    Toggle::make('has_court_penalty')
+                                        ->label(__('Has Court Penalty')),
                                 ]),
 
                                 Section::make(__('Court Data'))->schema([

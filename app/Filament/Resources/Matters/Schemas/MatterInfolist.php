@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Matters\Schemas;
 
+use App\Enums\MatterCollectionStatus;
 use App\Enums\MatterCommissiong;
 use App\Filament\Resources\Matters\MatterResource;
 use App\Enums\MatterDifficulty;
@@ -86,6 +87,10 @@ class MatterInfolist
                                 TextEntry::make('next_session_date')->label(__('Next Session'))->date()->icon('heroicon-o-calendar')->placeholder('—'),
                                 TextEntry::make('initial_report_at')->label(__('Initial Report'))->date()->icon('heroicon-o-document-check')->placeholder('—'),
                                 TextEntry::make('final_report_at')->label(__('Final Report'))->date()->icon('heroicon-o-paper-airplane')->placeholder('—'),
+                                TextEntry::make('final_report_memo_date')->label(__('Final Report Memo Date'))->date()->placeholder('—'),
+                                TextEntry::make('review_count')->label(__('Review Count')),
+                                IconEntry::make('has_substantive_changes')->label(__('Has Substantive Changes'))->boolean(),
+                                IconEntry::make('has_court_penalty')->label(__('Has Court Penalty'))->boolean(),
                                 TextEntry::make('created_at')->label(__('Created'))->dateTime()->placeholder('—'),
                                 TextEntry::make('updated_at')->label(__('Updated'))->dateTime()->placeholder('—'),
                             ]),
@@ -704,7 +709,7 @@ class MatterInfolist
                                     ->icon('heroicon-o-plus')
                                     ->visible(fn($record) => auth()->user()->can('createAttachment', $record))
                                     ->modalHeading(__('Add New Attachments'))
-                                    ->form([
+                                    ->schema([
                                         Repeater::make('attachments_data')
                                             ->label(__('Files'))
                                             ->schema([
@@ -713,6 +718,7 @@ class MatterInfolist
                                                     ->disk('public')
                                                     ->directory('matter-attachments')
                                                     ->visibility('public')
+                                                    ->storeFileNamesIn('name')
                                                     ->required(),
                                                 Select::make('type')
                                                     ->label(__('Type'))
@@ -757,27 +763,19 @@ class MatterInfolist
                                         TextEntry::make('name')
                                             ->label(__('Name'))
                                             ->weight(FontWeight::SemiBold)
-                                            ->columnSpanFull()
+                                            ->columnSpan(4)
+                                            ->alignStart()
                                             ->icon('heroicon-o-document-text')
                                             ->url(fn($record) => Storage::disk('public')->url($record->path))
-                                            ->openUrlInNewTab(),
-                                        TextEntry::make('type')
-                                            ->label(__('Type'))
-                                            ->badge()
-                                            ->color('info')
-                                            ->formatStateUsing(fn($state) => __($state ? ucfirst(str_replace('_', ' ', __($state))) : '')),
-                                        TextEntry::make('extension')
-                                            ->label(__('Extension'))
-                                            ->badge()
-                                            ->color('gray'),
-                                        TextEntry::make('size')
-                                            ->label(__('Size'))
-                                            ->formatStateUsing(fn($state) => number_format($state / 1024, 2) . ' KB'),
-                                        TextEntry::make('created_at')
-                                            ->label(__('Date'))
-                                            ->dateTime()
-                                            ->icon('heroicon-o-calendar'),
+                                            ->openUrlInNewTab()
+                                            ->alignJustify(),
                                         Actions::make([
+                                            Action::make('download')
+                                                ->icon('heroicon-o-arrow-down-tray')
+                                                ->iconButton()
+                                                ->tooltip(__('Download'))
+                                                ->url(fn($record) => route('attachment.download', $record))
+                                                ->openUrlInNewTab(false),
                                             Action::make('deleteAttachment')
                                                 ->label(__('Delete'))
                                                 ->iconButton()
@@ -794,6 +792,27 @@ class MatterInfolist
                                                     $component->getLivewire()->dispatch('$refresh');
                                                 }),
                                         ])->alignEnd(),
+                                        TextEntry::make('type')
+                                            ->label(__('Type'))
+                                            ->badge()
+                                            ->color('info')
+                                            ->formatStateUsing(fn($state) => __($state ? $state
+                                                    |> __(...)
+                                                    |> (fn($x) => str_replace('_', ' ', $x))
+                                                    |> ucfirst(...) : '')),
+                                        TextEntry::make('extension')
+                                            ->label(__('Extension'))
+                                            ->badge()
+                                            ->color('gray'),
+                                        TextEntry::make('size')
+                                            ->label(__('Size'))
+                                            ->formatStateUsing(fn($state) => number_format($state / (1024 * 1024), 2) . ' MB'),
+                                        TextEntry::make('created_at')
+                                            ->label(__('Date'))
+                                            ->dateTime(format: 'M, d Y - H:i A')
+                                            ->columnSpan(2)
+                                            ->icon('heroicon-o-calendar'),
+
                                     ])
                                     ->columns(5)
                                     ->columnSpanFull()

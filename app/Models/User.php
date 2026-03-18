@@ -63,6 +63,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasOne(Party::class);
     }
 
+    public function incentiveCalculations(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(IncentiveCalculation::class, 'created_by');
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         return true;

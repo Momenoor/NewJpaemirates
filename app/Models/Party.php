@@ -124,6 +124,16 @@ class Party extends Model
         return $this->hasManyThrough(Matter::class, MatterParty::class, 'id', 'id', 'id', 'matter_id');
     }
 
+    public function incentiveAssistantLines(): HasMany
+    {
+        return $this->hasMany(IncentiveAssistantLine::class);
+    }
+
+    public function incentiveAssistantExtras(): HasMany
+    {
+        return $this->hasMany(IncentiveAssistantExtra::class);
+    }
+
     public function isExpert(): bool
     {
         // The accessor ensures 'role' is an array with a 'role' key.

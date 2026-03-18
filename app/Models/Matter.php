@@ -93,6 +93,10 @@ class Matter extends Model
         'level',
         'difficulty',
         'collection_status',
+        'review_count',
+        'has_substantive_changes',
+        'has_court_penalty',
+        'final_report_memo_date',
     ];
 
     protected $dates = [
@@ -110,6 +114,10 @@ class Matter extends Model
         'level' => MatterLevel::class,
         'collection_status' => MatterCollectionStatus::class,
         'commissioning' => MatterCommissiong::class,
+        'review_count' => 'integer',
+        'has_substantive_changes' => 'boolean',
+        'has_court_penalty' => 'boolean',
+        'final_report_memo_date' => 'date',
     ];
 
     public $timestamps = true;
@@ -320,6 +328,11 @@ class Matter extends Model
     public function attachments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Attachment::class);
+    }
+
+    public function incentiveLines(): HasMany
+    {
+        return $this->hasMany(IncentiveLine::class);
     }
 
     public function requests(): \Illuminate\Database\Eloquent\Relations\HasMany

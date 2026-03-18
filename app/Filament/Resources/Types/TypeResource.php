@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Types;
 
+use App\Filament\Resources\Incentive\MatterTypeIncentiveConfigs\RelationManagers\IncentiveConfigRelationManager;
 use App\Filament\Resources\Types\Pages\CreateType;
 use App\Filament\Resources\Types\Pages\EditType;
 use App\Filament\Resources\Types\Pages\ListTypes;
@@ -57,7 +58,7 @@ class TypeResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            IncentiveConfigRelationManager::class,
         ];
     }
 
