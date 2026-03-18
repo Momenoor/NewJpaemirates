@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         //
     })
-    ->withSchedule(function (Schedule $schedule): void {
+    ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule): void {
         $schedule->command('queue:work --stop-when-empty')->everyFifteenSeconds()->withoutOverlapping();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
