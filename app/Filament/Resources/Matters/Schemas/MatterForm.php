@@ -337,7 +337,7 @@ class MatterForm
                                                     ->label(__('Amount'))
                                                     ->numeric()
                                                     ->required()
-                                                    ->prefix(fn(Get $get) => $get('type')?->isNegative() ? '-' : 'AED')
+                                                    ->prefix(fn(Get $get) => $get('type')?->isNegative() ? '-' : '+')
                                                     ->live(onBlur: true)
                                                     ->afterStateUpdated(function ($state, Set $set, Get $get) {
                                                         if (!$get('including_vat')) return;

@@ -336,6 +336,7 @@ class MatterInfolist
             ->icon('heroicon-o-banknotes')
             ->headerActions([
                 Action::make('create_fee')
+                    ->visible(fn($record) => auth()->user()->can('CreateFee:Matter'))
                     ->label(__('Add Fee'))
                     ->icon('heroicon-o-plus')
                     ->schema([
@@ -346,13 +347,14 @@ class MatterInfolist
                         TextInput::make('amount')
                             ->label(__('Amount'))
                             ->numeric()
-                            ->prefix(fn(Get $get) => $get('type')?->isNegative() ? '-' : 'AED')
+                            ->prefix(fn(Get $get) => $get('type')?->isNegative() ? '-' : '+')
                             ->live()
                             ->required(),
                         Textarea::make('description')
                             ->label(__('Description')),
                     ])->action(function (array $data, $record, $component) {
                         $record->fees()->create($data);
+                        $record->updateCollectionStatus();
                         $record->refresh();
                         $component->getLivewire()->refresh();
                     })
@@ -563,7 +565,7 @@ class MatterInfolist
                 . ' · ' . __('Remaining balance') . ': ' . number_format(static::feeBalance($record), 2)
             )
             ->modalWidth('md')
-            ->form(fn($record) => [
+            ->schema(fn($record) => [
                 TextInput::make('amount')
                     ->label(__('Amount to Collect'))
                     ->numeric()
