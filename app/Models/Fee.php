@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\FeeStatus;
+use App\Enums\FeeType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -34,6 +35,7 @@ class Fee extends Model
         'date' => 'date',
         'status' => FeeStatus::class,
         'amount' => 'decimal:2',
+        'type' => FeeType::class,
     ];
 
     protected static function boot()
@@ -50,6 +52,12 @@ class Fee extends Model
                 $fee->date = now();
             }
 
+        });
+
+        static::saving(function (Fee $fee) {
+            if ($fee->type?->isNegative() && $fee->amount > 0) {
+                $fee->amount = -abs($fee->amount);
+            }
         });
 
         static::created(function (Fee $fee) {

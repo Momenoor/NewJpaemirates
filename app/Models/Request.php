@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\RequestStatus;
+use App\Enums\RequestType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
@@ -32,12 +34,14 @@ class Request extends Model
     protected $casts = [
         'extra' => 'array',
         'approved_at' => 'datetime',
+        'type' => RequestType::class,
+        'status' => RequestStatus::class,
     ];
 
     protected static function booted(): void
     {
         static::deleting(function (Request $request) {
-            $request->attachments()->delete();
+            $request->matter->decrement('review_count');
         });
     }
 

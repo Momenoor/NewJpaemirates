@@ -29,6 +29,7 @@ class Matter extends Model
         return LogOptions::defaults()
             ->logAll();
     }
+
     protected static function booted(): void
     {
         static::creating(function (Matter $matter) {
@@ -97,9 +98,10 @@ class Matter extends Model
         'has_substantive_changes',
         'has_court_penalty',
         'final_report_memo_date',
+        'is_office_work'
     ];
 
-    protected $dates = [
+    protected array $dates = [
         'received_at',
         'next_session_date',
         'initial_report_at',
@@ -118,15 +120,10 @@ class Matter extends Model
         'has_substantive_changes' => 'boolean',
         'has_court_penalty' => 'boolean',
         'final_report_memo_date' => 'date',
+        'is_office_work' => 'boolean',
     ];
 
     public $timestamps = true;
-
-    public int $commissionAmount = 0;
-
-    public int $commissionPercent = 0;
-
-    public int $commissionCompeletionPeriod = 0;
 
     public function children(): HasMany
     {
@@ -179,6 +176,17 @@ class Matter extends Model
         return $this->hasMany(MatterParty::class, 'matter_id')
             ->where(fn($q) => $q->whereNull('parent_id')->orWhere('parent_id', 0))
             ->where('role', 'expert');
+    }
+
+    public function assistantsOnly(): HasMany
+    {
+        return $this->hasMany(MatterParty::class, 'matter_id')
+            ->where(['role' => 'expert', 'type' => 'assistant']);
+    }
+
+    public function isOfficeWork(): bool
+    {
+        return $this->is_office_work;
     }
 
     // -----------------------------------------------------------------------

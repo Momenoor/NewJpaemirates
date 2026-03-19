@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Matters\Schemas;
 
+use App\Enums\FeeType;
 use App\Enums\MatterDifficulty;
 use App\Enums\MatterLevel;
 use App\Filament\Resources\Parties\Schemas\PartyForm;
@@ -329,18 +330,14 @@ class MatterForm
                                             ->schema([
                                                 Select::make('type')
                                                     ->label(__('Type'))
-                                                    ->options([
-                                                        'expert' => __('Expert Fee'),
-                                                        'marketing' => __('Marketing'),
-                                                        'vat' => __('VAT'),
-                                                        'other' => __('Other'),
-                                                    ])
+                                                    ->options(FeeType::class)
                                                     ->required(),
 
                                                 TextInput::make('amount')
                                                     ->label(__('Amount'))
                                                     ->numeric()
                                                     ->required()
+                                                    ->prefix(fn(Get $get) => $get('type')?->isNegative() ? '-' : 'AED')
                                                     ->live(onBlur: true)
                                                     ->afterStateUpdated(function ($state, Set $set, Get $get) {
                                                         if (!$get('including_vat')) return;

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Incentive\MatterTypeIncentiveConfigs\Schemas;
 
+use App\Enums\MatterCommissiong;
 use App\Enums\MatterDifficulty;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
@@ -58,21 +59,11 @@ class MatterTypeIncentiveConfigForm
                             ->required(fn(Get $get) => $get('calculation_type') === 'fixed')
                             ->helperText(__('e.g. 8 for 8% on all fees for this matter type')),
 
-                        Radio::make('committee_source')
-                            ->label(__('Committee Source'))
-                            ->options([
-                                'office'   => __('Office Committee (+2%)'),
-                                'external' => __('External Committee (−2%)'),
-                            ])
-                            ->visible(fn(Get $get) => $get('calculation_type') === 'committee')
-                            ->required(fn(Get $get) => $get('calculation_type') === 'committee')
-                            ->inline(),
-
                     ])->columns(2),
 
                 Section::make(__('Completion Day Tiers'))
                     ->description(__('Working days from received date to initial report, by difficulty level'))
-                    ->visible(fn(Get $get) => in_array($get('calculation_type'), ['tiered', 'committee']))
+                    ->visible(fn(Get $get) => in_array($get('calculation_type'), ['tiered', MatterCommissiong::COMMITTEE->value]))
                     ->schema([
                         Repeater::make('tiers')
                             ->relationship()

@@ -4,12 +4,12 @@ namespace App\Filament\Resources\Incentive\MatterTypeIncentiveConfigs\RelationMa
 
 use App\Filament\Resources\Incentive\MatterTypeIncentiveConfigs\Schemas\MatterTypeIncentiveConfigForm;
 use App\Models\MatterTypeIncentiveConfig;
+use Filament\Actions\CreateAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
-use Filament\Tables\Actions\CreateAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
 use Filament\Tables\Columns\TextColumn;
 
 class IncentiveConfigRelationManager extends RelationManager

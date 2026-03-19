@@ -93,16 +93,16 @@ class AdminPanelProvider extends PanelProvider
 
     public function boot(): void
     {
-        Action::configureUsing(function (Action $action) {
-            $action->after(function (Action $action, ?Model $record = null, array $data = []) {
-                FilamentActionEvent::dispatch($action, $record, $data);
-            });
-        });
-        BulkAction::configureUsing(function (BulkAction $action) {
-            $action->after(function (BulkAction $action, ?Model $record = null, array $data = []) {
-                FilamentActionEvent::dispatch($action, $record, $data);
-            });
-        });
+//        Action::configureUsing(function (Action $action) {
+//            $action->after(function (Action $action, ?Model $record = null, array $data = []) {
+//                FilamentActionEvent::dispatch($action, $record, $data);
+//            });
+//        });
+//        BulkAction::configureUsing(function (BulkAction $action) {
+//            $action->after(function (BulkAction $action, ?Model $record = null, array $data = []) {
+//                FilamentActionEvent::dispatch($action, $record, $data);
+//            });
+//        });
 
         Select::configureUsing(fn(Select $select) => $select->native(false));
         UserForm::register([

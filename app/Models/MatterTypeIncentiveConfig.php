@@ -16,7 +16,6 @@ class MatterTypeIncentiveConfig extends Model
         'type_id',
         'calculation_type',
         'fixed_percentage',
-        'committee_source',
         'assistant_rate',
     ];
 
@@ -33,7 +32,7 @@ class MatterTypeIncentiveConfig extends Model
 
     public function matterType(): BelongsTo
     {
-        return $this->belongsTo(Type::class);
+        return $this->belongsTo(Type::class, 'type_id');
     }
 
     public function tiers(): HasMany

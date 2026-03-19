@@ -466,13 +466,13 @@ class MattersTable
             ->filtersLayout(FiltersLayout::Modal)
             ->filtersFormWidth(Width::FourExtraLarge)
             ->recordActions([
-                ViewAction::make()->iconButton()->visible(fn($record) => auth()->user()->can('view', $record)),
-                EditAction::make()->iconButton()->visible(fn($record) => auth()->user()->can('update', $record)),
-                DeleteAction::make()->iconButton()->visible(fn($record) => auth()->user()->can('delete', $record)),
+                ViewAction::make()->iconButton()->visible(fn($record) => auth()->user()->can('View:Matter')),
+                EditAction::make()->iconButton()->visible(fn($record) => auth()->user()->can('Update:Matter')),
+                DeleteAction::make()->iconButton()->visible(fn($record) => auth()->user()->can('Delete:Matter')),
                 RestoreAction::make()->iconButton()
-                    ->visible(fn($record) => $record->trashed() && auth()->user()->can('restore', $record)),
+                    ->visible(fn($record) => $record->trashed() && auth()->user()->can('Restore:Matter')),
                 ForceDeleteAction::make()->iconButton()
-                    ->visible(fn($record) => $record->trashed() && auth()->user()->can('forceDelete', $record)),
+                    ->visible(fn($record) => $record->trashed() && auth()->user()->can('ForceDelete:Matter')),
             ]);
     }
 }
