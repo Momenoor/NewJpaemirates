@@ -458,5 +458,9 @@
     "End At": "تاريخ الانتهاء",
     "Location": "الموقع",
     "Calendar": "التقويم",
-    "Calendars": "التقويمات"
+    "Calendars": "التقويمات",
+    ":count events imported/updated.": "تم استيراد/تحديث :count أحداث.",
+    "Import successful": "تم استيراد البيانات بنجاح",
+    "Import failed": "فشل استيراد البيانات"
+
 }

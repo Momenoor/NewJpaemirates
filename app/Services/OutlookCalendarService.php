@@ -13,7 +13,7 @@ class OutlookCalendarService
 
     private function calendarEmail(): string
     {
-        return config('services.microsoft.calendar_email', 'info@jpaemirates.com');
+        return config('services.microsoft.calendar_email');
     }
 
     private function getAccessToken(): string
@@ -275,6 +275,9 @@ class OutlookCalendarService
             'location' => [
                 'displayName' => $matter->court?->name ?? '',
             ],
+
+            'isOnlineMeeting'          => true,
+            'onlineMeetingProvider'    => 'teamsForBusiness',
         ];
     }
 

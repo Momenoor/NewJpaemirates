@@ -21,6 +21,8 @@ return new class extends Migration {
             $table->dateTime('end_at')->nullable()->comment('End time of the event');
             $table->string('location')->nullable()->comment('Location of the event');
             $table->text('description')->nullable()->comment('Description of the event');
+            $table->boolean('is_all_day')->default(false)->comment('Whether the event is all-day');
+            $table->string('teams_meeting_url')->nullable()->comment('Teams meeting URL');
             $table->timestamps();
         });
     }
