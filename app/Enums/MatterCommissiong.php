@@ -31,8 +31,8 @@ enum MatterCommissiong: string implements HasLabel, HasColor, HasIcon
     public function getIcon(): Heroicon
     {
         return match ($this) {
-            self::INDIVIDUAL => Heroicon::UserGroup,
-            self::COMMITTEE => Heroicon::Users,
+            self::INDIVIDUAL => Heroicon::Users,
+            self::COMMITTEE => Heroicon::UserGroup,
         };
     }
 }

@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use AlizHarb\ActivityLog\ActivityLogPlugin;
 use AlizHarb\ActivityLog\RelationManagers\ActivitiesRelationManager;
+use App\Filament\Pages\AdminDashboard;
 use App\Filament\Pages\Auth\CustomLogin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use App\Events\FilamentActionEvent;
@@ -23,6 +24,7 @@ use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
+use Guava\Calendar\Filament\CalendarWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Database\Eloquent\Model;
@@ -30,6 +32,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 use TomatoPHP\FilamentUsers\Filament\Resources\Users\Schemas\UserForm;
 use TomatoPHP\FilamentUsers\Filament\Resources\Users\UserResource;
 use TomatoPHP\FilamentUsers\FilamentUsersPlugin;
@@ -55,14 +58,15 @@ class AdminPanelProvider extends PanelProvider
             ->profile()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
-            ->pages([
-                Dashboard::class,
-            ])
+//            ->pages([
+//                AdminDashboard::class,
+//            ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
-            ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
-            ])
+//            ->widgets([
+//                AccountWidget::class,
+//                FilamentInfoWidget::class,
+//                CalendarWidget::class,
+//            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -80,6 +84,10 @@ class AdminPanelProvider extends PanelProvider
                 //FilamentEnvEditorPlugin::make(),
                 FilamentUsersPlugin::make(),
                 FilamentShieldPlugin::make(),
+                FilamentFullCalendarPlugin::make()
+                    ->timezone('Asia/Muscat')
+                    ->editable()
+                    ->selectable(),
                 ActivityLogPlugin::make()
                     ->label('Log')
                     ->pluralLabel('Logs')
@@ -88,6 +96,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->databaseNotifications()
             ->databaseTransactions()
+            ->globalSearch(false)
             ->maxContentWidth(Width::Full);
     }
 

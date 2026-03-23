@@ -21,8 +21,8 @@ class RequestResource extends Resource
 {
     protected static ?string $model = Request::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::Newspaper;
+    protected static ?int $navigationSort = 5;
 
     public static function getPluralModelLabel(): string
     {

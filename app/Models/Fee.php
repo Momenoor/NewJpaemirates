@@ -52,11 +52,15 @@ class Fee extends Model
                 $fee->date = now();
             }
 
+
         });
 
         static::saving(function (Fee $fee) {
             if ($fee->type?->isNegative() && $fee->amount > 0) {
                 $fee->amount = -abs($fee->amount);
+            }
+            if ($fee->type === FeeType::COURT_PENALITY) {
+                $fee->matter->update(['has_court_penalty'=> true]);
             }
         });
 
@@ -69,6 +73,17 @@ class Fee extends Model
         });
 
         static::deleted(function (Fee $fee) {
+            if ($fee->type === FeeType::COURT_PENALITY) {
+                // Only clear if no other court penalty fees remain
+                $hasOtherPenalties = $fee->matter->fees()
+                    ->where('type', FeeType::COURT_PENALITY)
+                    ->where('id', '!=', $fee->id)
+                    ->exists();
+
+                if (!$hasOtherPenalties) {
+                    $fee->matter->update(['has_court_penalty' => false]);
+                }
+            }
             $fee->matter?->updateCollectionStatus();
         });
     }

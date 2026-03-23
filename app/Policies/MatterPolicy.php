@@ -11,7 +11,7 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class MatterPolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:Matter');
@@ -19,23 +19,6 @@ class MatterPolicy
 
     public function view(AuthUser $authUser, Matter $matter): bool
     {
-        if ($matter->trashed() && !$authUser->can('ViewTrashed:Matter')) return false;
-
-        if ($authUser->can('ViewAny:Matter')) return true;
-
-        if ($authUser->can('ViewOwn:Matter') && $authUser->party) {
-            // Use loaded relation — no extra query
-            if ($matter->relationLoaded('matterParties')) {
-                return $matter->matterParties
-                    ->contains('party_id', $authUser->party->id);
-            }
-
-            // Fallback if relation not loaded (e.g. direct URL access)
-            return $matter->matterParties()
-                ->where('party_id', $authUser->party->id)
-                ->exists();
-        }
-
         return $authUser->can('View:Matter');
     }
 
@@ -82,6 +65,36 @@ class MatterPolicy
     public function reorder(AuthUser $authUser): bool
     {
         return $authUser->can('Reorder:Matter');
+    }
+
+    public function deleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('DeleteAny:Matter');
+    }
+
+    public function viewOwn(AuthUser $authUser, Matter $matter): bool
+    {
+        return $authUser->can('ViewOwn:Matter');
+    }
+
+    public function viewTrashed(AuthUser $authUser, Matter $matter): bool
+    {
+        return $authUser->can('ViewTrashed:Matter');
+    }
+
+    public function updateInitialReportDate(AuthUser $authUser, Matter $matter): bool
+    {
+        return $authUser->can('UpdateInitialReportDate:Matter');
+    }
+
+    public function updateFinalReportDate(AuthUser $authUser, Matter $matter): bool
+    {
+        return $authUser->can('UpdateFinalReportDate:Matter');
+    }
+
+    public function bulkUpdateFinalReportDate(AuthUser $authUser, Matter $matter): bool
+    {
+        return $authUser->can('BulkUpdateFinalReportDate:Matter');
     }
 
     public function export(AuthUser $authUser, Matter $matter): bool
@@ -172,15 +185,6 @@ class MatterPolicy
     public function deleteAttachment(AuthUser $authUser, Matter $matter): bool
     {
         return $authUser->can('DeleteAttachment:Matter');
-    }
-
-    public function viewOwn(AuthUser $authUser, Matter $matter): bool
-    {
-        return $authUser->can('ViewOwn:Matter');
-    }
-
-    public function viewTrashed(AuthUser $authUser): bool{
-        return $authUser->can('ViewTrashed:Matter');
     }
 
 }

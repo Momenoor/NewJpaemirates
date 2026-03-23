@@ -112,7 +112,7 @@ class MatterInfolist
 
     private static function identitySection(): Section
     {
-        return Section::make(__('Identity'))
+        return Section::make(__('Basic Information'))
             ->icon('heroicon-o-hashtag')
             ->columns(2)
             ->schema([
@@ -122,14 +122,14 @@ class MatterInfolist
                     ->formatStateUsing(fn($state) => __($state))
                     ->badge()->columnSpan(2),
                 TextEntry::make('collection_status')->label(__('Collection'))->badge(),
+                IconEntry::make('has_court_penalty')->label(__('Has Court Penalty'))->boolean(),
                 TextEntry::make('commissioning')->label(__('Commissioning'))
                     ->formatStateUsing(fn($state) => __($state->getLabel())),
-                IconEntry::make('is_committee')
-                    ->label(__('Is Committee?'))
-                    ->getStateUsing(fn($record) => $record->commissioning === MatterCommissiong::COMMITTEE)
-                    ->boolean(),
                 IconEntry::make('is_office_work')
-                    ->label(__('Is Office Work')),
+                    ->label(__('Is Office Work'))
+                    ->boolean(),
+                TextEntry::make('review_count')->label(__('Review Count')),
+                IconEntry::make('has_substantive_changes')->label(__('Has Substantive Changes'))->boolean(),
                 TextEntry::make('parent_id')
                     ->label(__('Parent Matter'))
                     ->numeric()
@@ -168,7 +168,7 @@ class MatterInfolist
             ->schema([
                 TextEntry::make('received_at')->label(__('Received'))->date()
                     ->icon('heroicon-o-arrow-down-tray')->placeholder('—'),
-                TextEntry::make('next_session_date')->label(__('Next Session'))->date()
+                TextEntry::make('next_session_date')->label(__('Next Session'))->dateTime()
                     ->icon('heroicon-o-calendar')->placeholder('—'),
                 TextEntry::make('initial_report_at')->label(__('Initial Report'))->date()
                     ->icon('heroicon-o-document-check')->placeholder('—'),
@@ -176,11 +176,8 @@ class MatterInfolist
                     ->icon('heroicon-o-paper-airplane')->placeholder('—'),
                 TextEntry::make('final_report_memo_date')->label(__('Final Report Memo Date'))
                     ->date()->placeholder('—'),
-                TextEntry::make('review_count')->label(__('Review Count')),
-                IconEntry::make('has_substantive_changes')->label(__('Has Substantive Changes'))->boolean(),
-                IconEntry::make('has_court_penalty')->label(__('Has Court Penalty'))->boolean(),
-                TextEntry::make('created_at')->label(__('Created'))->dateTime()->placeholder('—'),
-                TextEntry::make('updated_at')->label(__('Updated'))->dateTime()->placeholder('—'),
+                TextEntry::make('created_at')->label(__('Created'))->date()->placeholder('—'),
+                TextEntry::make('updated_at')->label(__('Updated'))->date()->placeholder('—'),
             ]);
     }
 
@@ -343,6 +340,7 @@ class MatterInfolist
                         Select::make('type')
                             ->label(__('Type'))
                             ->options(FeeType::class)
+                            ->afterStateUpdated(fn($state, $component) => $state?->isNegative() ? $component->getLivewire()->refresh() : null)
                             ->required(),
                         TextInput::make('amount')
                             ->label(__('Amount'))

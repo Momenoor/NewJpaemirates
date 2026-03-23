@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Models\IncentiveCalculation;
 use Illuminate\Foundation\Auth\User as AuthUser;
+use App\Models\IncentiveCalculation;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class IncentiveCalculationPolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:IncentiveCalculation');
     }
 
-    public function view(AuthUser $authUser, IncentiveCalculation $calculation): bool
+    public function view(AuthUser $authUser, IncentiveCalculation $incentiveCalculation): bool
     {
-        return $authUser->can('View:IncentiveCalculation') || $authUser->can('ViewAny:IncentiveCalculation');
+        return $authUser->can('View:IncentiveCalculation');
     }
 
     public function create(AuthUser $authUser): bool
@@ -27,38 +27,44 @@ class IncentiveCalculationPolicy
         return $authUser->can('Create:IncentiveCalculation');
     }
 
-    public function update(AuthUser $authUser, IncentiveCalculation $calculation): bool
+    public function update(AuthUser $authUser, IncentiveCalculation $incentiveCalculation): bool
     {
         return $authUser->can('Update:IncentiveCalculation');
     }
 
-    public function delete(AuthUser $authUser, IncentiveCalculation $calculation): bool
+    public function delete(AuthUser $authUser, IncentiveCalculation $incentiveCalculation): bool
     {
         return $authUser->can('Delete:IncentiveCalculation');
     }
 
-    public function restore(AuthUser $authUser, IncentiveCalculation $calculation): bool
+    public function restore(AuthUser $authUser, IncentiveCalculation $incentiveCalculation): bool
     {
         return $authUser->can('Restore:IncentiveCalculation');
     }
 
-    public function forceDelete(AuthUser $authUser, IncentiveCalculation $calculation): bool
+    public function forceDelete(AuthUser $authUser, IncentiveCalculation $incentiveCalculation): bool
     {
         return $authUser->can('ForceDelete:IncentiveCalculation');
     }
 
-    public function runCalculation(AuthUser $authUser, IncentiveCalculation $calculation): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $authUser->can('RunCalculation:IncentiveCalculation');
+        return $authUser->can('ForceDeleteAny:IncentiveCalculation');
     }
 
-    public function finalize(AuthUser $authUser, IncentiveCalculation $calculation): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $authUser->can('Finalize:IncentiveCalculation');
+        return $authUser->can('RestoreAny:IncentiveCalculation');
     }
 
-    public function print(AuthUser $authUser, IncentiveCalculation $calculation): bool
+    public function replicate(AuthUser $authUser, IncentiveCalculation $incentiveCalculation): bool
     {
-        return $authUser->can('Print:IncentiveCalculation') || $authUser->can('View:IncentiveCalculation');
+        return $authUser->can('Replicate:IncentiveCalculation');
     }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:IncentiveCalculation');
+    }
+
 }

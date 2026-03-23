@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('matters', function (Blueprint $table) {
-            $table->boolean('is_office_work')->default(true);
+            $table->dateTime('next_session_date')->nullable()->change();
         });
     }
 
@@ -21,7 +21,7 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('matters', function (Blueprint $table) {
-            $table->dropColumn('is_office_work');
+            $table->date('next_session_date')->nullable()->change();
         });
     }
 };

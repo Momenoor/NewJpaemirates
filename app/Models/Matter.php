@@ -32,52 +32,119 @@ class Matter extends Model
 
     protected static function booted(): void
     {
+        // ── Creating ──────────────────────────────────────────────────────────────
         static::creating(function (Matter $matter) {
-            if (!$matter->collection_status) {
-                $matter->collection_status = MatterCollectionStatus::NO_FEES;
+            $matter->collection_status ??= MatterCollectionStatus::NO_FEES;
+        });
+
+        // ── Created / Updated ─────────────────────────────────────────────────────
+        static::created(fn(Matter $matter) => $matter->updateCollectionStatus());
+        static::updated(fn(Matter $matter) => $matter->updateCollectionStatus());
+
+        // ── Saved → Outlook sync ──────────────────────────────────────────────────
+        static::saved(function (Matter $matter) {
+            // Only sync if next_session_date changed or no event synced yet
+            if (
+                !$matter->next_session_date
+                || (!$matter->wasChanged('next_session_date') && $matter->outlook_event_id)
+            ) {
+                return;
+            }
+
+            try {
+                $eventId = app(\App\Services\OutlookCalendarService::class)
+                    ->upsertSessionEvent($matter);
+
+                if ($eventId && $eventId !== $matter->outlook_event_id) {
+                    Matter::withoutEvents(fn() =>
+                    $matter->updateQuietly(['outlook_event_id' => $eventId])
+                    );
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error(
+                    '[Outlook] Sync failed for matter #' . $matter->id . ': ' . $e->getMessage()
+                );
+                // Never break matter saving due to calendar failure
             }
         });
 
-        static::created(function (Matter $matter) {
-            $matter->updateCollectionStatus();
+        // ── Updating → clear Outlook event if session date removed ───────────────
+        static::updating(function (Matter $matter) {
+            if (
+                $matter->isDirty('next_session_date')
+                && !$matter->next_session_date
+                && $matter->outlook_event_id
+            ) {
+                try {
+                    app(\App\Services\OutlookCalendarService::class)
+                        ->deleteSessionEvent($matter);
+                    $matter->outlook_event_id = null;
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::warning(
+                        '[Outlook] Delete on date clear failed: ' . $e->getMessage()
+                    );
+                }
+            }
         });
 
-        static::updated(function (Matter $matter) {
-            $matter->updateCollectionStatus();
-        });
-
+        // ── Deleting → cascade soft delete + Outlook cleanup ─────────────────────
         static::deleting(function (Matter $matter) {
-
-
-            // Cascade soft delete to children
             $matter->children()->delete();
+
+            // Remove Outlook event on soft delete
+            if ($matter->outlook_event_id) {
+                try {
+                    app(\App\Services\OutlookCalendarService::class)
+                        ->deleteSessionEvent($matter);
+                    Matter::withoutEvents(fn() =>
+                    $matter->updateQuietly(['outlook_event_id' => null])
+                    );
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::warning(
+                        '[Outlook] Delete on matter delete failed: ' . $e->getMessage()
+                    );
+                }
+            }
         });
 
+        // ── Restoring → cascade restore ───────────────────────────────────────────
         static::restoring(function (Matter $matter) {
-            // Cascade restore to children
             $matter->children()->onlyTrashed()->restore();
         });
 
+        // ── Force Deleting → cascade all relations ────────────────────────────────
         static::forceDeleting(function (Matter $matter) {
-            // Children — force delete recursively so their own relations also fire
+            // Children recursively (fires their own observers)
             $matter->children()->withTrashed()->each(
                 fn(Matter $child) => $child->forceDelete()
             );
 
-            // Pivot rows (matter_party — parties, experts, representatives)
+            // Pivot rows
             $matter->matterParties()->delete();
 
-            // Fees and their allocations
+            // Fees + their allocations
             $matter->fees()->each(function ($fee) {
                 $fee->allocations()->delete();
                 $fee->delete();
             });
 
-            // Other relations
+            // Remaining relations
             $matter->allocations()->delete();
             $matter->notes()->delete();
             $matter->attachments()->delete();
             $matter->requests()->delete();
+
+            // Outlook event
+            if ($matter->outlook_event_id) {
+                try {
+                    app(\App\Services\OutlookCalendarService::class)
+                        ->deleteSessionEvent($matter);
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::warning(
+                        '[Outlook] Delete on force delete failed: ' . $e->getMessage()
+                    );
+                }
+            }
         });
     }
 
@@ -98,7 +165,8 @@ class Matter extends Model
         'has_substantive_changes',
         'has_court_penalty',
         'final_report_memo_date',
-        'is_office_work'
+        'is_office_work',
+        'outlook_event_id',
     ];
 
     protected array $dates = [
@@ -121,6 +189,7 @@ class Matter extends Model
         'has_court_penalty' => 'boolean',
         'final_report_memo_date' => 'date',
         'is_office_work' => 'boolean',
+        'created_at' => 'date:Y-m-d',
     ];
 
     public $timestamps = true;

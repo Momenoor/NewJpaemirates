@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Matters\Pages;
 
 use App\Enums\MatterCollectionStatus;
 use App\Enums\MatterStatus;
+use App\Filament\Actions\SyncToOutlookAction;
 use App\Filament\Resources\Matters\MatterResource;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -26,6 +27,7 @@ class ViewMatter extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            SyncToOutlookAction::make(),
             Action::make('initial_report')
                 ->label(__('Initial Report'))
                 ->color(fn($record) => $record->initial_report_at === null ? 'warning' : Color::Stone)

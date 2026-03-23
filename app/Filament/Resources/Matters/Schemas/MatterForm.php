@@ -10,6 +10,7 @@ use App\Models\Matter;
 use App\Models\Party;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -43,26 +44,51 @@ class MatterForm
                                         ->required(),
                                     DatePicker::make('received_at')
                                         ->label(__('Received Date')),
-                                    DatePicker::make('next_session_date')
+                                    DateTimePicker::make('next_session_date')
+                                        ->required()
+                                        ->format('Y-m-d h:m')
+                                        ->seconds(false)
+                                        ->afterOrEqual('received_at')
                                         ->label(__('Next Session Date')),
                                     DatePicker::make('initial_report_at')
                                         ->label(__('Initial Report Date'))
-                                        ->visible(fn(string $operation, $record) => $operation === 'edit' && $record->initial_report_at !== null && auth()->user()->can('UpdateInitialReportDate:Matter')),
+                                        ->visible(fn(string $operation, $record) => $operation === 'edit'
+                                            && $record->initial_report_at !== null
+                                            && auth()->user()->can('UpdateInitialReportDate:Matter')
+                                        ),
                                     DatePicker::make('final_report_at')
                                         ->label(__('Final Report Date'))
-                                        ->visible(fn(string $operation, $record) => $operation === 'edit' && $record->final_report_at !== null && auth()->user()->can('UpdateFinalReportDate:Matter')),
+                                        ->visible(fn(string $operation, $record) => $operation === 'edit'
+                                            && $record->final_report_at !== null
+                                            && auth()->user()->can('UpdateFinalReportDate:Matter')
+                                        ),
                                     DatePicker::make('final_report_memo_date')
-                                        ->label(__('Final Report Memo Date')),
+                                        ->label(__('Final Report Memo Date'))
+                                        ->visible(fn(string $operation, $record) => $operation === 'edit'
+                                            && $record->final_report_at !== null
+                                            && auth()->user()->can('UpdateFinalReportDate:Matter')
+                                        ),
                                     TextInput::make('review_count')
                                         ->label(__('Review Count'))
                                         ->numeric()
+                                        ->visible(fn(string $operation, $record) => $operation === 'edit'
+                                            && $record->review_count !== null
+                                            && auth()->user()->can('Update:Matter')
+                                        )
                                         ->default(0),
                                     Toggle::make('has_substantive_changes')
-                                        ->label(__('Has Substantive Changes')),
+                                        ->label(__('Has Substantive Changes'))
+                                        ->visible(fn(string $operation, $record) => $operation === 'edit'
+                                            && $record->review_count !== null
+                                            && auth()->user()->can('Update:Matter')
+                                        ),
                                     Toggle::make('has_court_penalty')
-                                        ->label(__('Has Court Penalty')),
+                                        ->label(__('Has Court Penalty'))
+                                        ->visible(fn(string $operation, $record) => $operation === 'edit'
+                                            && $record->review_count !== null
+                                            && auth()->user()->can('Update:Matter')
+                                        ),
                                 ]),
-
                                 Section::make(__('Court Data'))->schema([
                                     Select::make('court_id')
                                         ->label(__('Court'))

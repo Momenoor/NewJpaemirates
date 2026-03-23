@@ -13,7 +13,7 @@ enum FeeType: string implements HasLabel, HasColor
     case VAT = 'VAT';
     case COURT_PENALITY = 'court penalty';
 
-    case OFFICE_SHARER = 'office sharer';
+    case OFFICE_SHARE = 'office share';
     case OTHER = 'other';
 
     public function getLabel(): ?string
@@ -23,7 +23,7 @@ enum FeeType: string implements HasLabel, HasColor
             self::MARKETING => __('Marketing'),
             self::VAT => __('VAT'),
             self::COURT_PENALITY => __('Court Penalty'),
-            self::OFFICE_SHARER => __('Office Sharer'),
+            self::OFFICE_SHARE => __('Office Sharer'),
             self::OTHER => __('Other'),
         };
     }
@@ -34,7 +34,7 @@ enum FeeType: string implements HasLabel, HasColor
             self::EXPERT_FEE => 'success',
             self::MARKETING => 'warning',
             self::VAT => 'info',
-            self::COURT_PENALITY, self::OFFICE_SHARER => 'danger',
+            self::COURT_PENALITY, self::OFFICE_SHARE => 'danger',
             self::OTHER => 'gray',
         };
     }
@@ -42,7 +42,7 @@ enum FeeType: string implements HasLabel, HasColor
     public function isNegative(): bool
     {
         return match ($this) {
-            self::COURT_PENALITY, self::OFFICE_SHARER => true,
+            self::COURT_PENALITY, self::OFFICE_SHARE => true,
             default              => false,
         };
     }

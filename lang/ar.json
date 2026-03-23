@@ -1,5 +1,4 @@
 {
-
     "Yes": "نعم",
     "No": "لا",
     "All": "الكل",
@@ -30,7 +29,6 @@
     "Are you sure?": "هل أنت متأكد؟",
     "By": "بواسطة",
     "AED": "د.إ",
-
     "Matters": "القضايا",
     "Courts": "المحاكم",
     "Matter Types": "أنواع القضايا",
@@ -39,7 +37,6 @@
     "Roles & Expertise": "الأدوار والخبرات",
     "Roles": "الأدوار",
     "Additional Info": "معلومات إضافية",
-
     "View": "عرض",
     "Edit": "تعديل",
     "Delete": "حذف",
@@ -48,7 +45,6 @@
     "View Trashed": "عرض المحذوف",
     "Export": "تصدير",
     "Exporting": "جارٍ التصدير",
-
     "Basic Data": "البيانات الأساسية",
     "Matter": "القضية",
     "Year": "السنة",
@@ -59,14 +55,12 @@
     "Redirecting to the new matter...": "جارٍ إعادة التوجيه إلى القضية الجديدة...",
     "Assigned": "مكلف",
     "External Rate": "السعر الخارجي",
-
     "Current": "قيد التداول",
     "Reported": "تم إيداع التقرير",
     "Submitted": "تم التسليم النهائي",
     "In Progress": "قيد العمل",
     "Initial Prepared": "تم إعداد التقرير المبدئي",
     "Final Submitted": "تم التسليم النهائي",
-
     "Court Data": "بيانات المحكمة",
     "Court": "المحكمة",
     "Court / Type": "المحكمة / النوع",
@@ -76,7 +70,6 @@
     "First Instance": "ابتدائي",
     "Appeal": "استئناف",
     "Congestion": "تمييز / طعن",
-
     "Difficulty": "درجة الصعوبة",
     "Easy": "سهل",
     "Medium": "متوسط",
@@ -85,18 +78,15 @@
     "Normal": "عادي",
     "Normal / Average": "عادي / متوسط",
     "Exceptional": "استثنائي",
-
     "Commissioning": "قرار الندب / التكليف",
     "Is Committee?": "هل هي لجنة؟",
     "Individual": "خبير فردي",
     "Committee": "لجنة خبراء",
-
     "Office Work": "عمل المكتب",
     "Work Location": "موقع العمل",
     "Office Work (+2%)": "عمل المكتب (+2%)",
     "External Work (−2%)": "عمل خارجي (−2%)",
     "Enable if the expert work was carried out within the office (+2% incentive). Disable for external work (−2%).": "فعّل إذا كان عمل الخبير داخل المكتب (حافز +2%). أوقف التفعيل إذا كان العمل خارجياً (−2%).",
-
     "Parties & Experts": "الأطراف والخبراء",
     "Parties Involved": "الأطراف المعنية",
     "Party Name": "اسم الطرف",
@@ -113,14 +103,12 @@
     "Plaintiffs": "المدعون",
     "Defendants": "المدعى عليهم",
     "Add Party": "إضافة طرف",
-
     "Representatives": "الممثلون القانونيون",
     "Legal Representatives": "الممثلون القانونيون",
     "Representatives / Lawyers": "الممثلون / المحامون",
     "Representative": "ممثل قانوني",
     "Representative Name": "اسم الوكيل / المحامي",
     "Add Representative": "إضافة ممثل",
-
     "Experts": "الخبراء المنتدبون",
     "Experts Assigned": "الخبراء المكلفون",
     "Expert": "خبير",
@@ -141,7 +129,6 @@
     "Add Expert": "إضافة خبير",
     "Certified experts, assistants, and external appointments": "الخبراء المعتمدون والمساعدون والتعيينات الخارجية",
     "Plaintiffs, defendants, and litigants with their representatives": "المدعون والمدعى عليهم والخصوم مع ممثليهم",
-
     "Expertise Area": "مجال الخبرة",
     "Expertise Field": "مجال الخبرة",
     "Accounting": "المحاسبة",
@@ -153,7 +140,6 @@
     "IT": "تقنية المعلومات",
     "Banking": "المصرفية",
     "Marketing": "تسويق",
-
     "Identity": "الهوية / الشخصية",
     "Classification": "التصنيف",
     "Role": "الصفة / الدور",
@@ -169,7 +155,6 @@
     "Total Matters": "إجمالي القضايا",
     "Extra": "إضافي",
     "viewOwn": "عرض الخاص",
-
     "Key Dates": "تواريخ هامة",
     "Received Date": "تاريخ القيد / الاستلام",
     "Received": "الاستلام",
@@ -199,7 +184,6 @@
     "Updated": "تاريخ التحديث",
     "Updated At": "تاريخ التعديل",
     "Created By": "أنشئ بواسطة",
-
     "Initial Report": "التقرير المبدئي",
     "Initial report": "التقرير المبدئي",
     "Initial Report Submitted": "تم تقديم التقرير المبدئي",
@@ -213,7 +197,6 @@
     "Are you sure you want to submit the final report?": "هل أنت متأكد من أنك تريد تسليم التقرير النهائي؟",
     "Final report submission finished for selected matters.": "تم الانتهاء من عملية تسليم التقرير النهائي للملفات المحددة.",
     "Screenshot": "لقطة شاشة",
-
     "Filter Mode": "طبيعة التصفية",
     "Only selected type": "النوع المحدد فقط",
     "All without selected": "الكل باستثناء المحدد",
@@ -224,7 +207,6 @@
     "Max Amount": "الحد الأقصى",
     "Fees min": "أدنى أتعاب",
     "Fees max": "أقصى أتعاب",
-
     "Collection": "التحصيل",
     "Collection Status": "حالة التحصيل",
     "Collected": "المحصل",
@@ -242,7 +224,6 @@
     "Fees Status": "حالة الأتعاب",
     "Fully Collected": "محصّل بالكامل",
     "Partially Collected": "محصّل جزئياً",
-
     "Fees & Payments": "الأتعاب والدفعات",
     "Fees & Collections": "الأتعاب والتحصيل",
     "Fees": "الأتعاب",
@@ -275,7 +256,6 @@
     "Allocation updated successfully.": "تم تحديث التخصيص بنجاح.",
     "Delete Allocation": "حذف الدفعة",
     "Allocation deleted.": "تم حذف الدفعة.",
-
     "Notes & Records": "الملاحظات والسجلات",
     "Note": "ملاحظة",
     "Add Note": "إضافة ملاحظة",
@@ -289,7 +269,6 @@
     "Note added successfully.": "تمت إضافة الملاحظة بنجاح.",
     "Note updated successfully.": "تم تحديث الملاحظة بنجاح.",
     "Note deleted.": "تم حذف الملاحظة.",
-
     "Attachments": "المرفقات",
     "Attachment": "المرفق",
     "Add Attachments": "إضافة مرفقات",
@@ -308,7 +287,6 @@
     "Attachments added successfully.": "تمت إضافة المرفقات بنجاح.",
     "Attachment deleted.": "تم حذف المرفق.",
     "Are you sure you want to delete this attachment?": "هل أنت متأكد من حذف هذا المرفق؟",
-
     "Add Request": "إضافة طلب",
     "Add New Request": "إضافة طلب جديد",
     "Submit New Request": "تقديم طلب جديد",
@@ -326,7 +304,6 @@
     "Requests Count": "عدد الطلبات",
     "Pending Requests": "الطلبات المعلّقة",
     "Request submitted successfully.": "تم تقديم الطلب بنجاح.",
-
     "Approve": "اعتماد",
     "Approve Request": "الموافقة على الطلب",
     "Reviewer Comment": "تعليق المراجع",
@@ -347,33 +324,26 @@
     "A new :type request has been created for matter #:number / :year": "تم تقديم طلب :type جديد للملف رقم #:number / :year",
     "Your :type request on matter #:number has been approved.": "تمت الموافقة على طلبك (:type) في الملف رقم #:number.",
     "Your :type request on matter #:number has been rejected. Reason: :reason": "تم رفض طلبك (:type) في الملف رقم #:number. السبب: :reason",
-
     "Activity": "النشاط",
     "Activity Over Time": "النشاط بمرور الوقت",
-
     "export_completed": "{0} لم يتم تصدير أي صفوف|{1} تم تصدير صف واحد|{2} تم تصدير صفين|[3,10] تم تصدير :count صفوف|[11,*] تم تصدير :count صفاً",
     "export_failed": "{1} فشل تصدير صف واحد|{2} فشل تصدير صفين|[3,10] فشل تصدير :count صفوف|[11,*] فشل تصدير :count صفاً",
-
     "Username or Email": "اسم المستخدم أو البريد الإلكتروني",
-
     "Incentive Calculations": "حسابات الحوافز",
     "Incentive Calculation": "حساب الحوافز",
     "Incentive Config": "إعدادات الحوافز",
     "Incentive Configs": "إعدادات الحوافز",
     "Extra % Rule": "قاعدة النسبة الإضافية",
     "Extra % Rules": "قواعد النسبة الإضافية",
-
     "New Calculation": "حساب جديد",
     "Calculation Name": "اسم الحساب",
     "e.g. Bi-Monthly Incentive — Aug/Sep 2025": "مثال: حوافز شهرية — أغسطس/سبتمبر 2025",
     "Calculation Period": "فترة الحساب",
     "Period Start": "بداية الفترة",
     "Period End": "نهاية الفترة",
-
     "Calculation Details": "تفاصيل الحساب",
     "Not finalized yet": "لم يُعتمد بعد",
     "Finalized At": "تاريخ الاعتماد",
-
     "Run Calculation": "تشغيل الحساب",
     "Run Incentive Calculation": "تشغيل حساب الحوافز",
     "Calculation Complete": "اكتمل الحساب",
@@ -396,7 +366,6 @@
     "Print": "طباعة",
     "Printed": "تاريخ الطباعة",
     "Incentive Calculation Report": "تقرير حساب الحوافز",
-
     "Matter Type Configuration": "إعدادات نوع القضية",
     "Calculation Type": "نوع الحساب",
     "Fixed": "ثابت",
@@ -416,7 +385,6 @@
     "External Committee (−2%)": "لجنة خارجية (−2%)",
     "Office (+2%)": "مكتب (+2%)",
     "External (−2%)": "خارجي (−2%)",
-
     "Completion Day Tiers": "شرائح أيام الإنجاز",
     "Working days from received date to initial report, by difficulty level": "أيام العمل من تاريخ الاستلام إلى التقرير المبدئي، حسب مستوى الصعوبة",
     "Add Tier": "إضافة شريحة",
@@ -428,7 +396,6 @@
     "Incentive %": "نسبة الحافز",
     "Per PDF: Simple 1–12 = 9%, 13–15 = 7%, 16–18 = 5%, 19–20 = 3%, 21–25 = 1%": "حسب وثيقة الشروط: بسيط 1–12 = 9%، 13–15 = 7%، 16–18 = 5%، 19–20 = 3%، 21–25 = 1%",
     "Tiers": "الشرائح",
-
     "Extra Percentage Rule": "قاعدة النسبة الإضافية",
     "Applies to tiered matters only. Per PDF: 5=1.5%, 6=2%, >6=3%. Minimum 6 matters required — below minimum deducts 2% per missing matter.": "تنطبق على القضايا المتدرجة فقط. حسب وثيقة الشروط: 5=1.5%، 6=2%، >6=3%. الحد الأدنى المطلوب 6 قضايا — أقل من الحد يُخصم 2% عن كل قضية ناقصة.",
     "Minimum Completed Matters": "الحد الأدنى للقضايا المنجزة",
@@ -444,7 +411,6 @@
     "Max Matters": "أقصى عدد قضايا",
     "Extra %": "نسبة إضافية",
     "No limit": "بدون حد",
-
     "Calculation Lines": "سطور الحساب",
     "One line per matter per paid fee": "سطر واحد لكل قضية لكل أتعاب مدفوعة",
     "Total Lines": "إجمالي السطور",
@@ -462,7 +428,6 @@
     "Deduction Details": "تفاصيل الخصومات",
     "Net Amount": "المبلغ الصافي",
     "Detail": "التفاصيل",
-
     "Assistant Summary": "ملخص المساعدين",
     "Per-assistant totals including extra % and minimum penalties": "إجمالي المساعدين شاملاً النسبة الإضافية والجزاءات الأدنى",
     "Completed Matters": "القضايا المنجزة",
@@ -474,7 +439,6 @@
     "Penalty": "الجزاء",
     "Share Total": "إجمالي الحصة",
     "Assistant extras": "إضافات المساعد",
-
     "Total Base Amount": "إجمالي المبلغ الأساسي",
     "Total Net Amount": "إجمالي المبلغ الصافي",
     "Total Assistant Incentive": "إجمالي حوافز المساعدين",
@@ -484,8 +448,15 @@
     "matter-request": "طلب القضية",
     "Review Count": "عدد المراجعات",
     "Final Report Memo Date": "تاريخ إعتماد التقرير النهائي",
-    "Has Court Penalty" : "غرامات من المحكمة",
+    "Has Court Penalty": "غرامات من المحكمة",
     "Is Office Work": "تمت المباشرة من خلال المكتب",
     "Has Substantive Changes": "تعديلات جوهرية",
-    "Request": "طلب"
+    "Request": "طلب",
+    "Basic Information": "البيانات الأساسية",
+    "Title": "العنوان",
+    "Start At": "تاريخ البدء",
+    "End At": "تاريخ الانتهاء",
+    "Location": "الموقع",
+    "Calendar": "التقويم",
+    "Calendars": "التقويمات"
 }

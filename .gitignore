@@ -22,3 +22,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+/tests/http/http-client.private.env.json
+
+/tests/http/http-client.env.json
+
