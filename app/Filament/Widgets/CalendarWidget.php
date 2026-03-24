@@ -67,7 +67,7 @@ class CalendarWidget extends FullCalendarWidget
             ],
             'initialView' => 'timeGridWeek',
             'eventDisplay' => 'block',
-            'timeZone' => 'Asia/Dubai',
+            'timeZone' => 'Asia/Mascut',
             'scrollTime' => '09:00:00',
         ];
     }

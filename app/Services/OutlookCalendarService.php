@@ -44,13 +44,13 @@ class OutlookCalendarService
             ],
             'start' => [
                 'dateTime' => Carbon::parse($eventData['start_datetime'])->toIso8601String(),
-                'timeZone' => 'Asia/Dubai',
+                'timeZone' => 'Asia/Mascut',
             ],
             'end' => [
                 'dateTime' => isset($eventData['end_datetime'])
                     ? Carbon::parse($eventData['end_datetime'])->toIso8601String()
                     : Carbon::parse($eventData['start_datetime'])->addHour()->toIso8601String(),
-                'timeZone' => 'Asia/Dubai',
+                'timeZone' => 'Asia/Mascut',
             ],
             'location' => [
                 'displayName' => $eventData['location'] ?? '',
@@ -83,13 +83,13 @@ class OutlookCalendarService
                 ],
                 'start' => [
                     'dateTime' => Carbon::parse($eventData['start_datetime'])->toIso8601String(),
-                    'timeZone' => 'Asia/Dubai',
+                    'timeZone' => 'Asia/Mascut',
                 ],
                 'end' => [
                     'dateTime' => isset($eventData['end_datetime'])
                         ? Carbon::parse($eventData['end_datetime'])->toIso8601String()
                         : Carbon::parse($eventData['start_datetime'])->addHour()->toIso8601String(),
-                    'timeZone' => 'Asia/Dubai',
+                    'timeZone' => 'Asia/Mascut',
                 ],
                 'location' => [
                     'displayName' => $eventData['location'] ?? '',

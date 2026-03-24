@@ -42,8 +42,8 @@ class ImportFromOutlookAction extends Action
                         $matterIds = $this->findMatterIdsFromText($event['subject']);
                         $CalendarEvent = CalendarEvent::create([
                             'title' => $event['subject'],
-                            'start_datetime' => Carbon::parse($event['start']['dateTime'], 'UTC')->timezone('Asia/Dubai'),
-                            'end_datetime' => Carbon::parse($event['end']['dateTime'], 'UTC')->timezone('Asia/Dubai'),
+                            'start_datetime' => Carbon::parse($event['start']['dateTime']),
+                            'end_datetime' => Carbon::parse($event['end']['dateTime']),
                             'outlook_event_id' => $event['id'],
                             'imported_from_outlook' => true,
                             'synced_to_outlook' => true,
