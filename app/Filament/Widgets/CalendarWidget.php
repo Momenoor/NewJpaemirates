@@ -20,7 +20,8 @@ use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
 class CalendarWidget extends FullCalendarWidget
 {
 
-    public Model | string | null $model = CalendarEvent::class;
+    public Model|string|null $model = CalendarEvent::class;
+
     /**
      * @param array $info
      * @throws ConnectionException
@@ -37,6 +38,7 @@ class CalendarWidget extends FullCalendarWidget
                 'title' => $event->title,
                 'start' => $event->start_datetime,
                 'end' => $event->end_datetime,
+                'defaultAllDay' => $event->is_all_day,
                 'extendedProps' => [
                     'location' => $event->location,
                     'description' => $event->description,
