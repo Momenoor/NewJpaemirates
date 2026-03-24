@@ -461,6 +461,8 @@
     "Calendars": "التقويمات",
     ":count events imported/updated.": "تم استيراد/تحديث :count أحداث.",
     "Import successful": "تم استيراد البيانات بنجاح",
-    "Import failed": "فشل استيراد البيانات"
-
+    "Import failed": "فشل استيراد البيانات",
+    "Pay Fee": "دفع الرسوم",
+    "Paid so far": "المدفوع حتى الآن",
+    "Collection recorded successfully.": "تم تسجيل التحصيل بنجاح"
 }

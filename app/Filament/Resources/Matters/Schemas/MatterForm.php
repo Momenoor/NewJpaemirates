@@ -49,7 +49,16 @@ class MatterForm
                                         ->format('Y-m-d h:m')
                                         ->seconds(false)
                                         ->afterOrEqual('received_at')
-                                        ->label(__('Next Session Date')),
+                                        ->label(__('Next Session Date'))
+                                        ->live()
+                                        ->afterStateUpdated(function ($state, $set, $get, $livewire) {
+                                            if ($state) {
+                                                $livewire->dispatch('mount-calendar-event-modal', [
+                                                    'matter_id' => $get('id'),
+                                                    'start_datetime' => $state
+                                                ]);
+                                            }
+                                        }),
                                     DatePicker::make('initial_report_at')
                                         ->label(__('Initial Report Date'))
                                         ->visible(fn(string $operation, $record) => $operation === 'edit'

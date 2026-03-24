@@ -24,130 +24,7 @@ class Matter extends Model
     use SoftDeletes;
     use LogsActivity;
 
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logAll();
-    }
-
-    protected static function booted(): void
-    {
-        // ── Creating ──────────────────────────────────────────────────────────────
-        static::creating(function (Matter $matter) {
-            $matter->collection_status ??= MatterCollectionStatus::NO_FEES;
-        });
-
-        // ── Created / Updated ─────────────────────────────────────────────────────
-        static::created(fn(Matter $matter) => $matter->updateCollectionStatus());
-        static::updated(fn(Matter $matter) => $matter->updateCollectionStatus());
-
-        // ── Saved → Outlook sync ──────────────────────────────────────────────────
-        static::saved(function (Matter $matter) {
-            // Only sync if next_session_date changed or no event synced yet
-            if (
-                !$matter->next_session_date
-                || (!$matter->wasChanged('next_session_date') && $matter->outlook_event_id)
-            ) {
-                return;
-            }
-
-            try {
-                $eventId = app(\App\Services\OutlookCalendarService::class)
-                    ->upsertSessionEvent($matter);
-
-                if ($eventId && $eventId !== $matter->outlook_event_id) {
-                    Matter::withoutEvents(fn() =>
-                    $matter->updateQuietly(['outlook_event_id' => $eventId])
-                    );
-                }
-            } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error(
-                    '[Outlook] Sync failed for matter #' . $matter->id . ': ' . $e->getMessage()
-                );
-                // Never break matter saving due to calendar failure
-            }
-        });
-
-        // ── Updating → clear Outlook event if session date removed ───────────────
-        static::updating(function (Matter $matter) {
-            if (
-                $matter->isDirty('next_session_date')
-                && !$matter->next_session_date
-                && $matter->outlook_event_id
-            ) {
-                try {
-                    app(\App\Services\OutlookCalendarService::class)
-                        ->deleteSessionEvent($matter);
-                    $matter->outlook_event_id = null;
-                } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::warning(
-                        '[Outlook] Delete on date clear failed: ' . $e->getMessage()
-                    );
-                }
-            }
-        });
-
-        // ── Deleting → cascade soft delete + Outlook cleanup ─────────────────────
-        static::deleting(function (Matter $matter) {
-            $matter->children()->delete();
-
-            // Remove Outlook event on soft delete
-            if ($matter->outlook_event_id) {
-                try {
-                    app(\App\Services\OutlookCalendarService::class)
-                        ->deleteSessionEvent($matter);
-                    Matter::withoutEvents(fn() =>
-                    $matter->updateQuietly(['outlook_event_id' => null])
-                    );
-                } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::warning(
-                        '[Outlook] Delete on matter delete failed: ' . $e->getMessage()
-                    );
-                }
-            }
-        });
-
-        // ── Restoring → cascade restore ───────────────────────────────────────────
-        static::restoring(function (Matter $matter) {
-            $matter->children()->onlyTrashed()->restore();
-        });
-
-        // ── Force Deleting → cascade all relations ────────────────────────────────
-        static::forceDeleting(function (Matter $matter) {
-            // Children recursively (fires their own observers)
-            $matter->children()->withTrashed()->each(
-                fn(Matter $child) => $child->forceDelete()
-            );
-
-            // Pivot rows
-            $matter->matterParties()->delete();
-
-            // Fees + their allocations
-            $matter->fees()->each(function ($fee) {
-                $fee->allocations()->delete();
-                $fee->delete();
-            });
-
-            // Remaining relations
-            $matter->allocations()->delete();
-            $matter->notes()->delete();
-            $matter->attachments()->delete();
-            $matter->requests()->delete();
-
-            // Outlook event
-            if ($matter->outlook_event_id) {
-                try {
-                    app(\App\Services\OutlookCalendarService::class)
-                        ->deleteSessionEvent($matter);
-                } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::warning(
-                        '[Outlook] Delete on force delete failed: ' . $e->getMessage()
-                    );
-                }
-            }
-        });
-    }
-
+    protected array $_cache = [];
     protected $fillable = [
         'year',
         'number',
@@ -166,7 +43,6 @@ class Matter extends Model
         'has_court_penalty',
         'final_report_memo_date',
         'is_office_work',
-        'outlook_event_id',
     ];
 
     protected array $dates = [
@@ -193,6 +69,12 @@ class Matter extends Model
     ];
 
     public $timestamps = true;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll();
+    }
 
     public function children(): HasMany
     {
@@ -291,7 +173,7 @@ class Matter extends Model
      * Used by RepeatableEntry::make('indexedParties') in the infolist.
      */
     // Add this at the top of the class — a plain PHP property, invisible to Eloquent
-    protected array $_cache = [];
+
 
     public function getIndexedPartiesAttribute()
     {
@@ -359,8 +241,9 @@ class Matter extends Model
         if ($fees->isEmpty()) {
             $this->collection_status = MatterCollectionStatus::NO_FEES;
         } else {
-            $totalAmount = (float)$fees->sum('amount');
-            $totalAllocated = (float)$this->allocations()->sum('amount');
+            $totalAmount = (float) $fees->sum(fn ($fee) => abs($fee->amount));
+
+            $totalAllocated = (float) $this->allocations->sum(fn ($allocation) => abs($allocation->amount));
 
             if ($totalAllocated <= 0) {
                 $this->collection_status = MatterCollectionStatus::UNPAID;
@@ -392,10 +275,6 @@ class Matter extends Model
         );
     }
 
-    public function procedures(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(Procedure::class);
-    }
 
     public function notes(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
@@ -429,6 +308,16 @@ class Matter extends Model
     public function hasFinalReport(): bool
     {
         return $this->final_report_at !== null;
+    }
+
+    public function calendarEvents(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(CalendarEvent::class);
+    }
+
+    public function bulkCalendarEvents(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(CalendarEvent::class, 'calendar_event_matter');
     }
 
 }

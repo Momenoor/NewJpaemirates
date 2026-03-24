@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\FeeStatus;
 use App\Enums\FeeType;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -46,16 +45,11 @@ class Fee extends Model
             $fee->allocations()->delete();
         });
 
-        static::creating(function (Fee $fee) {
+        static::saving(function (Fee $fee) {
             $fee->user_id = auth()->id();
             if (!$fee->date) {
                 $fee->date = now();
             }
-
-
-        });
-
-        static::saving(function (Fee $fee) {
             if ($fee->type?->isNegative() && $fee->amount > 0) {
                 $fee->amount = -abs($fee->amount);
             }
@@ -64,13 +58,10 @@ class Fee extends Model
             }
         });
 
-        static::created(function (Fee $fee) {
+        static::saved(function (Fee $fee) {
             $fee->matter?->updateCollectionStatus();
         });
 
-        static::updated(function (Fee $fee) {
-            $fee->matter?->updateCollectionStatus();
-        });
 
         static::deleted(function (Fee $fee) {
             if ($fee->type === FeeType::COURT_PENALITY) {

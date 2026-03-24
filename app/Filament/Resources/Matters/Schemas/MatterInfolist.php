@@ -8,6 +8,7 @@ use App\Enums\MatterCommissiong;
 use App\Enums\MatterDifficulty;
 use App\Enums\RequestStatus;
 use App\Enums\RequestType;
+use App\Filament\Actions\Fee\CollectFeeAction;
 use App\Filament\Actions\Request\ApproveRequestAction;
 use App\Filament\Actions\Request\CreateRequestAction;
 use App\Filament\Actions\Request\RejectRequestAction;
@@ -73,16 +74,6 @@ class MatterInfolist
             'external' => 'warning',
             default => 'gray',
         };
-    }
-
-    private static function collectedAmount($record): float
-    {
-        return (float)($record?->allocations?->sum('amount') ?? 0);
-    }
-
-    private static function feeBalance($record): float
-    {
-        return (float)($record?->amount ?? 0) - static::collectedAmount($record);
     }
 
     // ── Main configure ────────────────────────────────────────────────────────
@@ -341,6 +332,7 @@ class MatterInfolist
                             ->label(__('Type'))
                             ->options(FeeType::class)
                             ->afterStateUpdated(fn($state, $component) => $state?->isNegative() ? $component->getLivewire()->refresh() : null)
+                            ->live(onBlur: true)
                             ->required(),
                         TextInput::make('amount')
                             ->label(__('Amount'))
@@ -366,7 +358,8 @@ class MatterInfolist
                             ->label(__('Fee Amount'))
                             ->money('AED')
                             ->weight(FontWeight::SemiBold)
-                            ->icon('heroicon-o-banknotes'),
+                            ->icon('heroicon-o-banknotes')
+                            ->color(fn($state, Get $get) => $get('type')?->isNegative() ? 'danget' : null),
                         TextEntry::make('collected_amount')
                             ->label(__('Collected'))
                             ->money('AED')
@@ -534,66 +527,10 @@ class MatterInfolist
 
     private static function collectFeeAction(): Action
     {
-        return Action::make('collect')
-            ->label(fn($record) => match (true) {
-                static::collectedAmount($record) > (float)($record?->amount ?? 0) => __('Overpaid'),
-                static::collectedAmount($record) === (float)($record?->amount ?? 0) => __('Fully Paid'),
-                default => __('Collect Fee'),
-            })
-            ->size(Size::Large)
-            ->icon(fn($record) => static::collectedAmount($record) >= (float)($record?->amount ?? 0)
-                ? 'heroicon-o-check-badge'
-                : 'heroicon-o-plus-circle'
-            )
-            ->color(fn($record) => static::collectedAmount($record) > (float)($record?->amount ?? 0)
-                ? 'warning' : 'success'
-            )
-            ->visible(fn($record) => auth()->user()->can('collectFee', $record->matter))
-            ->disabled(fn($record) => static::collectedAmount($record) >= (float)($record?->amount ?? 0))
-            ->tooltip(fn($record) => match (true) {
-                static::collectedAmount($record) > (float)($record?->amount ?? 0)
-                => __('Overpaid by') . ' ' . number_format(static::collectedAmount($record) - (float)$record->amount, 2),
-                static::collectedAmount($record) === (float)($record?->amount ?? 0)
-                => __('This fee is fully paid'),
-                default
-                => __('Remaining balance') . ': ' . number_format(static::feeBalance($record), 2),
-            })
-            ->modalHeading(fn($record) => __('Collect Payment — Fee') . ': ' . number_format($record?->amount, 2))
-            ->modalDescription(fn($record) => __('Collected so far') . ': ' . number_format(static::collectedAmount($record), 2)
-                . ' · ' . __('Remaining balance') . ': ' . number_format(static::feeBalance($record), 2)
-            )
-            ->modalWidth('md')
-            ->schema(fn($record) => [
-                TextInput::make('amount')
-                    ->label(__('Amount to Collect'))
-                    ->numeric()
-                    ->prefix('AED')
-                    ->minValue(0.01)
-                    ->maxValue(static::feeBalance($record))
-                    ->default(static::feeBalance($record))
-                    ->required()
-                    ->helperText(__('Max allowed') . ': ' . number_format(static::feeBalance($record), 2)),
-                DatePicker::make('date')->label(__('Payment Date'))->default(now())->required(),
-                Textarea::make('description')
-                    ->label(__('Notes / Reference'))
-                    ->rows(2)
-                    ->placeholder(__('Cheque number, bank transfer ref, etc.')),
-            ])
-            ->action(function (array $data, $record, $component) {
-                Allocation::create([
-                    'matter_id' => $record->matter_id,
-                    'fee_id' => $record->id,
-                    'amount' => $data['amount'],
-                    'date' => $data['date'],
-                    'description' => $data['description'] ?? null,
-                ]);
+        return CollectFeeAction::make()->after(function ($component) {
+            static::refreshRecord($component);
+        });
 
-                $record->matter->updateCollectionStatus();
-                $record->refresh();
-                $record->unsetRelation('allocations');
-                static::refreshRecord($component);
-            })
-            ->successNotificationTitle(__('Payment recorded successfully.'));
     }
 
     private static function editFeeAction(): Action

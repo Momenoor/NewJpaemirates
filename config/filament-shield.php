@@ -207,9 +207,13 @@ return [
                 // Attachments
                 'createAttachment',
                 'deleteAttachment',
-
-
-            ]
+            ],
+            \App\Filament\Resources\CalendarEvents\CalendarEventResource::class => [
+                'createSingle',
+                'createBulk',
+                'importFromOutlook',
+                'syncToOutlook',
+            ],
         ],
         'exclude' => [
             //

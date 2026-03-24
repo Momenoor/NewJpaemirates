@@ -13,9 +13,9 @@ return new class extends Migration {
     {
         Schema::create('calendars', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Matter::class)->nullable()->constrained()->cascadeOnDelete();
-            $table->string('outlook_event_id')->nullable()->unique()
+            $table->text('outlook_event_id')->nullable()
                 ->comment('Microsoft Graph event ID for the shared Outlook calendar');
+            $table->foreignId('matter_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('title')->nullable()->comment('Title of the event');
             $table->dateTime('start_at')->nullable()->comment('Start time of the event');
             $table->dateTime('end_at')->nullable()->comment('End time of the event');
@@ -23,7 +23,20 @@ return new class extends Migration {
             $table->text('description')->nullable()->comment('Description of the event');
             $table->boolean('is_all_day')->default(false)->comment('Whether the event is all-day');
             $table->string('teams_meeting_url')->nullable()->comment('Teams meeting URL');
+            $table->enum('event_type', ['single', 'group'])
+                ->default('single')
+                ->comment('single = one matter | group = multiple matters same type+date');
+
             $table->timestamps();
+        });
+
+        Schema::create('calendar_matter', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('calendar_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('matter_id')->constrained()->cascadeOnDelete();
+            $table->timestamps();
+
+            $table->unique(['calendar_id', 'matter_id']);
         });
     }
 
@@ -33,5 +46,6 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('calendars');
+        Schema::dropIfExists('calendar_matter');
     }
 };

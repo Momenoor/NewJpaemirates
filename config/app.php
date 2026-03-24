@@ -65,7 +65,7 @@ return [
     |
     */
 
-    'timezone' => 'Asia/Muscat',
+    'timezone' => env('APP_TIMEZONE', 'UTC'),
 
     /*
     |--------------------------------------------------------------------------
@@ -80,7 +80,7 @@ return [
 
     'locale' => env('APP_LOCALE', 'en'),
 
-    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'ar_SA'),
+    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'ar_AE'),
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 

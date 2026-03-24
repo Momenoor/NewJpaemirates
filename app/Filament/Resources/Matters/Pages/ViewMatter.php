@@ -3,8 +3,7 @@
 namespace App\Filament\Resources\Matters\Pages;
 
 use App\Enums\MatterCollectionStatus;
-use App\Enums\MatterStatus;
-use App\Filament\Actions\SyncToOutlookAction;
+use App\Filament\Actions\Calendar\SyncToOutlookAction;
 use App\Filament\Resources\Matters\MatterResource;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;

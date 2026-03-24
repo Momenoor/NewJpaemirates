@@ -42,7 +42,7 @@ enum FeeType: string implements HasLabel, HasColor
     public function isNegative(): bool
     {
         return match ($this) {
-            self::COURT_PENALITY, self::OFFICE_SHARE => true,
+            self::COURT_PENALITY, self::OFFICE_SHARE, self::MARKETING => true,
             default              => false,
         };
     }

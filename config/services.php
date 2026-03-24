@@ -34,11 +34,12 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-    'microsoft' => [
-        'client_id'     => env('MICROSOFT_CLIENT_ID'),
-        'client_secret' => env('MICROSOFT_CLIENT_SECRET'),
-        'tenant_id'     => env('MICROSOFT_TENANT_ID'),
-        'calendar_email' => env('MICROSOFT_CALENDAR_EMAIL'),
-    ],
 
+    'outlook' => [
+        'client_id' => env('MICROSOFT_CLIENT_ID'),
+        'client_secret' => env('MICROSOFT_CLIENT_SECRET'),
+        'tenant_id' => env('MICROSOFT_TENANT_ID'),
+        'redirect_uri' => env('MICROSOFT_REDIRECT_URI'),
+        'user_email' => env('MICROSOFT_CALENDAR_EMAIL'),
+    ],
 ];
