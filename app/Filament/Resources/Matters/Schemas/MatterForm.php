@@ -51,14 +51,17 @@ class MatterForm
                                         ->afterOrEqual('received_at')
                                         ->label(__('Next Session Date'))
                                         ->live()
-                                        ->afterStateUpdated(function ($state, $set, $get, $livewire) {
-                                            if ($state) {
-                                                $livewire->dispatch('mount-calendar-event-modal', [
-                                                    'matter_id' => $get('id'),
-                                                    'start_datetime' => $state
-                                                ]);
-                                            }
-                                        }),
+//                                        ->afterStateUpdated(function ($state, $record, $livewire, $operation) {
+//                                            if ($state) {
+//                                                if ($operation === 'edit') {
+//                                                    $livewire->dispatch('mount-calendar-event-modal', [
+//                                                        'matter_id' => $record->id,
+//                                                        'start_datetime' => $state
+//                                                    ]);
+//                                                }
+//                                            }
+//                                        })
+                                    ,
                                     DatePicker::make('initial_report_at')
                                         ->label(__('Initial Report Date'))
                                         ->visible(fn(string $operation, $record) => $operation === 'edit'

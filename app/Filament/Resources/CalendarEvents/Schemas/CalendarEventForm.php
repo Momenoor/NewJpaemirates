@@ -52,7 +52,7 @@ class CalendarEventForm
     /**
      * @return array
      */
-    public static function getFormSchema(): array
+    public static function getFormSchema(int $matterId = null): array
     {
         return [
 
@@ -64,6 +64,8 @@ class CalendarEventForm
                     ->placeholder(__('Select Matter'))
                     ->searchable()
                     ->preload()
+                    ->hidden((fn($record) => $record instanceof Matter))
+                    ->disabled(fn($record) => $record instanceof Matter)
                     ->live()
                     ->afterStateUpdated(function (?int $state, Set $set) {
                         if (!$state) return;
@@ -84,6 +86,7 @@ class CalendarEventForm
                         $set('description', self::buildDescription($matter));
                     })
                     ->columnSpanFull(),
+
 
                 TextInput::make('title')
                     ->label(__('Title'))
@@ -155,7 +158,7 @@ class CalendarEventForm
                         Action::make('openUrl')
                             ->icon('heroicon-m-arrow-top-right-on-square')
                             ->tooltip(__('Join Meeting'))
-                            ->url(fn ($state) => $state)
+                            ->url(fn($state) => $state)
                             ->openUrlInNewTab()
                     ),
             ]),
