@@ -14,7 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule): void {
-        $schedule->command('queue:work --stop-when-empty --rest=1 --max-runtime=55')->everyMinute()->withoutOverlapping();
+        $schedule->command('queue:work --stop-when-empty --rest=1 --timeout=60')->everyMinute()->withoutOverlapping();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
