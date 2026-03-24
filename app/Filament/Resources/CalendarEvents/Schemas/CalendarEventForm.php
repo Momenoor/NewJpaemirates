@@ -4,8 +4,10 @@ namespace App\Filament\Resources\CalendarEvents\Schemas;
 
 use App\Models\Matter;
 use Carbon\Carbon;
+use Filament\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -57,9 +59,9 @@ class CalendarEventForm
             Section::make(__('Event Details'))->schema([
                 Select::make('matter_id')
                     ->label(__('Matter'))
-                    ->relationship('matters', 'year', fn($query) => $query->whereNull(['final_report_at']))
+                    ->relationship('matter', 'year')
                     ->getOptionLabelFromRecordUsing(fn($record) => $record?->year . '/' . $record?->number . ' - ' . ($record?->court?->name ?? '') . ' - ' . ($record?->type?->name ?? ''))
-                    ->placeholder('Select Matter')
+                    ->placeholder(__('Select Matter'))
                     ->searchable()
                     ->preload()
                     ->live()
@@ -111,7 +113,7 @@ class CalendarEventForm
                     ->label(__('Location'))
                     ->columnSpanFull(),
 
-                MarkdownEditor::make('description')
+                RichEditor::make('description')
                     ->label(__('Description'))
                     ->columnSpanFull(),
 
@@ -121,8 +123,7 @@ class CalendarEventForm
 
                 Toggle::make('sync_to_outlook')
                     ->label(__('Sync to Outlook Calendar'))
-                    ->default(true)
-                    ->live(),
+                    ->default(true),
 
             ])->columns(2),
 
@@ -142,13 +143,21 @@ class CalendarEventForm
                     })
                     ->helperText(__('Creates a Microsoft Teams meeting link with this event')),
 
-                TextInput::make('teams_meeting_url')
+                TextInput::make('online_meeting_url')
                     ->label(__('Teams Meeting URL'))
                     ->url()
                     ->disabled()
+                    ->dehydrated(false) // Ensures it doesn't try to save back to DB if disabled
                     ->placeholder(__('Generated after sync'))
                     ->suffixIcon('heroicon-o-video-camera')
-                    ->visible(fn(Get $get) => filled($get('teams_meeting_url'))),
+                    ->visible(fn($state) => !empty($state))
+                    ->suffixAction(
+                        Action::make('openUrl')
+                            ->icon('heroicon-m-arrow-top-right-on-square')
+                            ->tooltip(__('Join Meeting'))
+                            ->url(fn ($state) => $state)
+                            ->openUrlInNewTab()
+                    ),
             ]),
 
         ];

@@ -8,7 +8,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
 
-class CalendarEventInfolist
+class CalendarEventBulkInfolist
 {
     public static function configure(Schema $schema): Schema
     {
@@ -20,16 +20,10 @@ class CalendarEventInfolist
                     ->weight(\Filament\Support\Enums\FontWeight::Bold)
                     ->columnSpanFull(),
 
-                TextEntry::make('matter')
-                    ->label(__('Matter'))
-                    ->formatStateUsing(fn($state) => $state
-                        ? $state->year . '/' . $state->number
-                        : '—'
-                    )
-                    ->url(fn($record) => $record->matter_id
-                        ? \App\Filament\Resources\Matters\MatterResource::getUrl('view', ['record' => $record->matter_id])
-                        : null
-                    ),
+                TextEntry::make('matters')
+                    ->label(__('Matters'))
+                    ->formatStateUsing(fn($state) => $state->number . '/' . $state->year)
+                    ->bulleted(),
 
                 TextEntry::make('start_datetime')
                     ->label(__('Start At'))

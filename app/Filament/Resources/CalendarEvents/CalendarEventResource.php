@@ -47,6 +47,15 @@ class CalendarEventResource extends Resource
     protected static ?string $recordTitleAttribute = 'title';
     protected static ?int $navigationSort = 4;
 
+    public static function getModelLabel(): string
+    {
+        return __('Calendar Event');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Calendar Events');
+    }
     public static function form(Schema $schema): Schema
     {
         return CalendarEventForm::configure($schema);

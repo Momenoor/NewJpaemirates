@@ -30,6 +30,7 @@ class CalendarEvent extends Model
         'is_teams_meeting',
         'online_meeting_url',
         'created_by',
+        'is_all_day',
     ];
 
     protected $casts = [

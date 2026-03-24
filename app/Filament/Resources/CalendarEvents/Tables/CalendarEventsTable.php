@@ -6,6 +6,8 @@ use App\Filament\Actions\Calendar\CreateBulkCalendarEventAction;
 use App\Filament\Actions\Calendar\CreateSingleCalendarEventAction;
 use App\Filament\Actions\Calendar\ImportFromOutlookAction;
 use App\Filament\Actions\Calendar\SyncToOutlookAction;
+use App\Filament\Resources\CalendarEvents\Schemas\CalendarEventBulkInfolist;
+use App\Filament\Resources\CalendarEvents\Schemas\CalendarEventForm;
 use App\Filament\Resources\CalendarEvents\Schemas\CalendarEventInfolist;
 use App\Models\CalendarEvent;
 use App\Services\OutlookCalendarService;
@@ -43,14 +45,15 @@ class CalendarEventsTable
                     ->weight(\Filament\Support\Enums\FontWeight::SemiBold)
                     ->description(fn($record) => $record->location ?: null),
 
-                TextColumn::make('matter')
+                TextColumn::make('matters')
                     ->label(__('Matter'))
-                    ->getStateUsing(fn($record) => $record->matter
-                        ? $record->matter->year . '/' . $record->matter->number
-                        : '—'
-                    )
-                    ->searchable()
-                    ->sortable(),
+                    ->bulleted()
+                    ->searchable(['number', 'year']) // Ensure search works on these fields
+                    ->sortable()
+                    ->formatStateUsing(function ($state) {
+                        // $state is the collection of related Matter models
+                        return "{$state->number}/{$state->year}";
+                    }),
 
                 TextColumn::make('type')
                     ->badge()
@@ -100,11 +103,13 @@ class CalendarEventsTable
                     ->query(fn(Builder $query) => $query->where('start_datetime', '>=', now()))
                     ->default(),
                 SelectFilter::make('type')
+                    ->label(__('Type'))
                     ->options([
                         'single' => __('Single'),
                         'bulk' => __('Bulk'),
                     ]),
-                TernaryFilter::make('synced_to_outlook'),
+                TernaryFilter::make('synced_to_outlook')
+                    ->label(__('Synced to Outlook')),
                 TrashedFilter::make(),
             ])
             ->headerActions([
@@ -118,8 +123,8 @@ class CalendarEventsTable
             ->recordActions([
                 SyncToOutlookAction::make()
                     ->visible(fn($record) => $record instanceof CalendarEvent && auth()->user()->can('SyncToOutlook:CalendarEvent') && !$record->synced_to_outlook),
-                ViewAction::make()->schema(fn(Schema $schema) => CalendarEventInfolist::configure($schema))->iconButton(),
-                EditAction::make()->iconButton(),
+                ViewAction::make()->schema(fn(Schema $schema,$record) => $record->type == 'single' ? CalendarEventInfolist::configure($schema) : CalendarEventBulkInfolist::configure($schema))->iconButton(),
+                EditAction::make()->iconButton()->schema(fn(Schema $schema) => CalendarEventForm::configure($schema)),
                 DeleteAction::make()->iconButton(),
             ])
             ->toolbarActions([

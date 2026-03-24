@@ -94,6 +94,11 @@ class OutlookCalendarService
                 'location' => [
                     'displayName' => $eventData['location'] ?? '',
                 ],
+                'isOnlineMeeting' => $eventData['is_teams_meeting'] ?? false,
+                'onlineMeeting' => [
+                    'joinUrl' => $eventData['online_meeting_url'] ?? '',
+                ],
+                'isAllDay' => $eventData['is_all_day'] ?? false,
             ]);
 
         if ($response->failed()) {
@@ -106,19 +111,34 @@ class OutlookCalendarService
     /**
      * @throws ConnectionException
      */
+    public function deleteEvent(string $eventId): void
+    {
+        $response = Http::withToken($this->getAccessToken())
+            ->delete(
+                "https://graph.microsoft.com/v1.0/users/{$this->getUserEmail()}/events/{$eventId}"
+            );
+
+        if ($response->failed() && $response->status() !== 404) {
+            throw new \RuntimeException('Outlook event deletion failed: ' . $response->json('error.message'));
+        }
+    }
+
+    /**
+     * @throws ConnectionException
+     */
     public function importEvents(?Carbon $from = null): array
     {
         $url = "https://graph.microsoft.com/v1.0/users/{$this->getUserEmail()}/events";
 
         $params = [
-            '$select' => 'subject,body,start,end,location,id,isOnlineMeeting,onlineMeeting,webLink',
+            '$select' => 'subject,body,start,end,location,id,isOnlineMeeting,onlineMeeting,onlineMeetingUrl,isAllDay',
+            '$top'    => 50,
         ];
         if ($from) {
             $params['$filter'] = "start/dateTime ge '" . $from->toIso8601String() . "'";
         }
 
         $response = Http::withToken($this->getAccessToken())->get($url, $params);
-
         if ($response->failed()) {
             throw new \RuntimeException('Failed to import Outlook events: ' . $response->body());
         }

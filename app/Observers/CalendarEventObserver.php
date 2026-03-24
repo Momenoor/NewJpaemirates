@@ -3,6 +3,8 @@
 namespace App\Observers;
 
 use App\Models\CalendarEvent;
+use App\Services\OutlookCalendarService;
+use Illuminate\Http\Client\ConnectionException;
 
 class CalendarEventObserver
 {
@@ -11,7 +13,6 @@ class CalendarEventObserver
         if ($event->imported_from_outlook) {
             return; // Imported from Outlook — do not re-sync
         }
-        // Any other post-create logic here (notifications, logs, etc.)
     }
 
     public function updated(CalendarEvent $event): void
@@ -19,6 +20,14 @@ class CalendarEventObserver
         if ($event->imported_from_outlook) {
             return; // Imported from Outlook — do not re-sync
         }
-        // Any other post-update logic here
+    }
+
+    /**
+     * @throws ConnectionException
+     */
+    public function deleted(CalendarEvent $event): void
+    {
+        $outlookService = app(OutlookCalendarService::class);
+        $outlookService->deleteEvent($event->outlook_event_id);
     }
 }
