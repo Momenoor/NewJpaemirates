@@ -196,11 +196,11 @@ class MatterInfolist
                         TextEntry::make('comment')->label(__('Comment'))->columnSpanFull(),
                         TextEntry::make('approvedBy.name')
                             ->label(__('Reviewed By'))
-                            ->visible(fn($record) => $record->status !== RequestStatus::PENDING),
+                            ->visible(fn($record) => $record->status !== RequestStatus::PENDING && $record->status !== RequestStatus::DISPUTED),
                         TextEntry::make('approved_at')
                             ->label(__('Date'))
                             ->dateTime()
-                            ->visible(fn($record) => $record->status !== RequestStatus::PENDING),
+                            ->visible(fn($record) => $record->status !== RequestStatus::PENDING && $record->status !== RequestStatus::DISPUTED),
                         TextEntry::make('approved_comment')
                             ->label(__('Reviewer Comment'))
                             ->columnSpanFull()
