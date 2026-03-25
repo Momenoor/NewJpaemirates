@@ -91,7 +91,7 @@ class CalendarEventInfolist
                     ->openUrlInNewTab()
                     ->icon('heroicon-o-video-camera')
                     ->iconColor('info')
-                    ->visible(fn($record) => filled($record->teams_meeting_url)),
+                    ->visible(fn($record) => $record->teams_meeting_url),
 
             ])->columns(2),
 
