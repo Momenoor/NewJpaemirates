@@ -488,5 +488,6 @@
     "Sync Status": "حالة المزامنة",
     "Outlook Event": "موعد Outlook",
     "Import events from date": "استيراد المواعيد من تاريخ",
-    "Import Calendar Events from Outlook": "استيراد مواعيد الأجندة من Outlook"
+    "Import Calendar Events from Outlook": "استيراد مواعيد الأجندة من Outlook",
+    "Create Calendar Event": "إنشاء موعد بالأجندة"
 }

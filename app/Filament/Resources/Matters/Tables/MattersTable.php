@@ -177,12 +177,24 @@ class MattersTable
                     ->label(__('Experts'))
                     ->listWithLineBreaks()
                     ->getStateUsing(fn($record) => $record->indexedExperts
-                        ->map(fn($mp) => sprintf(
-                            '%s #%d — %s',
-                            __($mp->type ? ucfirst(str_replace('-', ' ', $mp->type)) : ''),
-                            $mp->role_index,
-                            $mp->party?->name ?? '—'
-                        ))
+                        ->map(function ($mp) {
+                            $type = $mp->type ? ucfirst(str_replace('-', ' ', $mp->type)) : '';
+                            $color = match ($mp->type) {
+                                'certified' => 'primary',
+                                'assistant' => 'info',
+                                'external' => 'warning',
+                                'external-assistant' => 'success',
+                                default => 'gray',
+                            };
+
+                            return sprintf(
+                                '<span class="inline-flex items-center gap-1 text-xs">
+                                                <span class="fi-color fi-color-%s fi-text-color-600 dark:fi-text-color-200 fi-badge fi-size-sm">%s #%d</span>
+                                                %s
+                                            </span>',
+                                $color, __($type), $mp->role_index, e($mp->party?->name ?? '—')
+                            );
+                        })
                         ->toArray()
                     )
                     ->searchable(query: function (Builder $query, string $search) {
