@@ -197,6 +197,7 @@ class MattersTable
                         })
                         ->toArray()
                     )
+                    ->html()
                     ->searchable(query: function (Builder $query, string $search) {
                         $tokens = static::splitSearch($search);
                         foreach ($tokens as $token) {
