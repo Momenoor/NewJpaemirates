@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="{{asset('fonts/Boutros.css')}}">
     <title>{{ __('Matter Received Date Confirmation') }}</title>
     <style>
+        *{
+            font-family: 'Boutros' !important;
+        }
         body {
             font-family: 'Boutros', serif !important;
             background: #f4f4f7;
