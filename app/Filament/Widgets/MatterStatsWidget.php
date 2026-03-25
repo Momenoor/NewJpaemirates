@@ -11,20 +11,20 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class MatterStatsWidget extends StatsOverviewWidget
 {
-    protected int | string | array $columnSpan = 2;
-    public function getColumns(): int | array
+    protected int|string|array $columnSpan = 2;
+
+    public function getColumns(): int|array
     {
         return 4;
     }
+
     protected function getStats(): array
     {
         $matters = Matter::all();
         $totalCount = $matters->count();
-        $unpaidCount = $matters->filter(function ($matter) {
-            return $matter->collection_status === MatterCollectionStatus::UNPAID;
-        })->count();
-        $currentCount = $matters->filter(fn ($matter) => $matter->status === MatterStatus::IN_PROGRESS)->count();
-        $submittedCount = $matters->filter(fn ($matter) => $matter->status === MatterStatus::FINALIZED)->count();
+        $unpaidCount = Matter::whereIn('collection_status', [MatterCollectionStatus::UNPAID, MatterCollectionStatus::PARTIAL])->whereNotNull('final_report_at')->count();
+        $currentCount = $matters->filter(fn($matter) => $matter->status === MatterStatus::IN_PROGRESS)->count();
+        $submittedCount = $matters->filter(fn($matter) => $matter->status === MatterStatus::FINALIZED)->count();
         return [
             Stat::make(__('Total Matters'), $totalCount)
                 ->description(__('Total matters in the system'))
