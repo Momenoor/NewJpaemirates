@@ -23,7 +23,7 @@ enum FeeType: string implements HasLabel, HasColor
             self::MARKETING => __('Marketing'),
             self::VAT => __('VAT'),
             self::COURT_PENALITY => __('Court Penalty'),
-            self::OFFICE_SHARE => __('Office Sharer'),
+            self::OFFICE_SHARE => __('Office Share'),
             self::OTHER => __('Other'),
         };
     }
