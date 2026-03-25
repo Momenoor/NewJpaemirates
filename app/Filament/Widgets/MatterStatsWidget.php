@@ -33,7 +33,8 @@ class MatterStatsWidget extends StatsOverviewWidget
             Stat::make(__('Unpaid Matters'), $unpaidCount)
                 ->description(__('Total Matters pending payment'))
                 ->descriptionIcon('heroicon-m-banknotes')
-                ->color('danger'),
+                ->color('danger')
+            ->url('https://new.jpaemirates.com/admin/matters?tab=final_submitted&filters[collection_status][values][0]=unpaid&filters[collection_status][values][1]=partial&filters[type][type_filter_mode]=only_selected'),
             Stat::make(__('In Progress Matters'), $currentCount)
                 ->description(__('Total Ongoing matters'))
                 ->descriptionIcon('heroicon-m-clock')
