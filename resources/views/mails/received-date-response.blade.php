@@ -7,8 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{{asset('fonts/Boutros.css')}}">
     <style>
+        * {
+            font-family: 'Boutros MBC Dinkum' !important;
+        }
         body {
-            font-family: 'Boutros', serif !important;
+            font-family: 'Boutros MBC Dinkum', serif !important;
         }
     </style>
 </head>
@@ -40,10 +43,14 @@
     @endif
 
     <p class="text-gray-600 text-sm leading-relaxed">{{ $message }}</p>
+    <div class="mt-8 pt-6 border-t border-gray-100 text-[10px] text-gray-400">
+        {{ config('app.name') }} · {{ now()->format('Y') }}<br>
+        {{ __('All rights reserved.') }}
+    </div>
 
     @if($matter)
         <div class="mt-4 bg-gray-50 rounded-lg p-3 text-xs text-gray-500">
-            {{ __('Matter') }}: {{ $matter->year }}/{{ $matter->number }}
+            {{ __('Matter') }}: <span class="font-semibold">{{ $matter->year }}/{{ $matter->number }}</span>
         </div>
     @endif
 

@@ -7,8 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{{asset('fonts/Boutros.css')}}">
     <style>
+        * {
+            font-family: 'Boutros MBC Dinkum' !important;
+        }
         body {
-            font-family: 'Boutros', serif !important;
+            font-family: 'Boutros MBC Dinkum', serif !important;
         }
     </style>
 </head>
@@ -76,6 +79,10 @@
             {{ __('Submit Dispute') }}
         </button>
     </form>
+
+    <div class="mt-8 pt-6 border-t border-gray-100 text-[10px] text-gray-400 text-center">
+        {{ config('app.name') }} · {{ now()->format('Y') }} · {{ __('All rights reserved.') }}
+    </div>
 
 </div>
 </body>

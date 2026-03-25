@@ -8,7 +8,7 @@
     <title>{{ __('Matter Received Date Confirmation') }}</title>
     <style>
         *{
-            font-family: 'Boutros' !important;
+            font-family: 'Boutros MBC Dinkum' !important;
         }
         body {
             font-family: 'Boutros', serif !important;
@@ -100,16 +100,17 @@
             font-weight: bold;
             text-decoration: none;
             margin: 0 8px;
+            text-align: center;
         }
 
         .btn-accept {
             background: #16a34a;
-            color: #fff;
+            color: #ffffff !important;
         }
 
         .btn-dispute {
             background: #dc2626;
-            color: #fff;
+            color: #ffffff !important;
         }
 
         .footer {
@@ -140,7 +141,7 @@
     </div>
 
     <div class="body">
-        <p>{{ __('Dear') }} <strong>{{ $assistant->name }}</strong>،</p>
+        <p><strong>{{ __('Dear :name', ['name' => $assistant->name]) }}،</strong></p>
         <p>
             {{ __('A new matter has been assigned to you. Please review the received date below and confirm or dispute it.') }}
         </p>
@@ -148,19 +149,19 @@
         <div class="info-box">
             <table>
                 <tr>
-                    <td>{{ __('Matter') }}:</td>
+                    <td>{{ __('Matter:') }}</td>
                     <td>{{ $matter->year }}/{{ $matter->number }}</td>
                 </tr>
                 <tr>
-                    <td>{{ __('Court') }}:</td>
+                    <td>{{ __('Court:') }}</td>
                     <td>{{ $matter->court?->name ?? '—' }}</td>
                 </tr>
                 <tr>
-                    <td>{{ __('Type') }}:</td>
+                    <td>{{ __('Type:') }}</td>
                     <td>{{ $matter->type?->name ?? '—' }}</td>
                 </tr>
                 <tr>
-                    <td>{{ __('Received Date') }}:</td>
+                    <td>{{ __('Received Date:') }}</td>
                     <td>{{ \Carbon\Carbon::parse($matter->received_at)->locale('ar')->translatedFormat('d F Y') }}</td>
                 </tr>
             </table>
@@ -182,6 +183,7 @@
 
     <div class="footer">
         {{ config('app.name') }} · {{ now()->format('Y') }}<br>
+        {{ __('All rights reserved.') }}<br>
         {{ __('This email was sent automatically. Do not reply.') }}
     </div>
 </div>
