@@ -84,14 +84,14 @@ class CalendarEventInfolist
                     ->badge()
                     ->color(fn($state) => $state ? 'success' : 'gray'),
 
-                TextEntry::make('teams_meeting_url')
+                TextEntry::make('online_meeting_url')
                     ->label(__('Teams Meeting'))
                     ->placeholder(__('No meeting link'))
                     ->url(fn($state) => $state)
                     ->openUrlInNewTab()
                     ->icon('heroicon-o-video-camera')
                     ->iconColor('info')
-                    ->visible(fn($record) => $record->teams_meeting_url),
+                    ->visible(fn($record) => $record->online_meeting_url),
 
             ])->columns(2),
 
