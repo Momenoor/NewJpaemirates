@@ -21,7 +21,7 @@ class MattersPerYearWidget extends ChartWidget
         $data = Trend::model(Matter::class)
             ->dateColumn('received_at')
             ->between(
-                start: now()->subYears(10)->startOfYear(),
+                start: now()->subYears(9)->startOfYear(),
                 end: now()->endOfYear(),
             )
             ->perYear()
