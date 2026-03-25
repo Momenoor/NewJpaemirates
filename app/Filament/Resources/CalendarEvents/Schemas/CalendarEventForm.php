@@ -122,7 +122,8 @@ class CalendarEventForm
 
                 Toggle::make('update_next_session_date')
                     ->label(__("Update matter's next session date"))
-                    ->default(true),
+                    ->default(true)
+                    ->disabled(fn(Get $get) => empty($get('matter_id'))),
 
                 Toggle::make('sync_to_outlook')
                     ->label(__('Sync to Outlook Calendar'))

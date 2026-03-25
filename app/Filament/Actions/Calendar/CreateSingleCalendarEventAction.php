@@ -33,7 +33,6 @@ class CreateSingleCalendarEventAction extends Action
             ->action(function (array $data, OutlookCalendarService $outlookService) {
                 $data['type'] = 'single';
                 $data['created_by'] = Auth::id();
-                dd($data);
                 $event = CalendarEvent::create($data);
 
                 if ($data['update_next_session_date'] && $event->matter_id) {
