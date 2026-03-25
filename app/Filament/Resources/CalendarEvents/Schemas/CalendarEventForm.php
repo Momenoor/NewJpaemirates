@@ -98,7 +98,6 @@ class CalendarEventForm
                     ->seconds(false)
                     ->required()
                     ->minutesStep(15)
-                    ->native(false)
                     ->live(onBlur: true)
                     ->afterStateUpdated(fn(Set $set, ?string $state) => $set('end_datetime', $state ? Carbon::parse($state)->addHour()->format('Y-m-d H:i:s') : null)
                     ),
@@ -107,7 +106,6 @@ class CalendarEventForm
                     ->label(__('End At'))
                     ->seconds(false)
                     ->minutesStep(15)
-                    ->native(false)
                     ->afterOrEqual('start_datetime')
                     ->required(),
 
