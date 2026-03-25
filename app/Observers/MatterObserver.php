@@ -14,13 +14,10 @@ class MatterObserver
     {
         $matter->collection_status ??= MatterCollectionStatus::NO_FEES;
     }
-
     public function created(Matter $matter): void
     {
-// Dispatch as a queued job so it doesn't block the request
+        // Dispatch the notification check after the response to ensure relations are saved (e.g. assistants)
         dispatch(function () use ($matter) {
-            // Re-load with relations needed for the email
-            $matter->load(['assistantsOnly.party', 'court', 'type']);
             app(NewMatterNotification::class)->sendToAssistants($matter);
         })->afterResponse();
     }
@@ -28,6 +25,7 @@ class MatterObserver
     public function saved(Matter $matter): void
     {
         $matter->updateCollectionStatus();
+
     }
 
     public function deleted(Matter $matter): void

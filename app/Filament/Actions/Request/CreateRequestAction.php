@@ -31,9 +31,9 @@ class CreateRequestAction extends Action
     {
         parent::setUp();
         $this
-            ->label(__('Add Request'))
+            ->label(__('Add Matter Request'))
             ->icon('heroicon-o-plus')
-            ->visible(fn($record) => auth()->user()->can('CreateRequest:Request') || auth()->user()->can('CreateRequest:Matter'))
+            ->visible(fn($record) => auth()->user()->can('CreateRequest:MatterRequest') || auth()->user()->can('CreateRequest:Matter'))
             ->modalHeading(__('Submit New Request'))
             ->successNotificationTitle(__('Request submitted successfully.'))
             ->action(BaseRequestService::getDefaultCreateAction());
@@ -44,7 +44,7 @@ class CreateRequestAction extends Action
 
         return $schema->components([
             Select::make('type')
-                ->label(__('Request Type'))
+                ->label(__('MatterRequest Type'))
                 ->options(RequestType::class)
                 ->required()
                 ->disableOptionWhen(fn(string $value, $record): bool => $record->requests()->where('type', $value)->whereNot('status', RequestStatus::REJECTED)->exists())

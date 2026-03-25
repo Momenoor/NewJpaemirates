@@ -6,7 +6,7 @@ use App\Enums\MatterDifficulty;
 use App\Enums\RequestStatus;
 use App\Enums\RequestType;
 use App\Filament\Resources\Matters\MatterResource;
-use App\Models\Request;
+use App\Models\MatterRequest;
 use App\Services\Requests\BaseRequestService;
 use App\Services\Requests\RequestServiceFactory;
 use Filament\Actions\Action;
@@ -38,7 +38,7 @@ class RejectRequestAction extends Action
             ->requiresConfirmation()
             ->visible(fn($record) => $record->status === RequestStatus::PENDING
                 && (
-                    auth()->user()->can('EditRequest:Request')
+                    auth()->user()->can('EditRequest:MatterRequest')
                     || auth()->user()->can('RejectRequest:Matter')
                 )
             )

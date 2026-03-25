@@ -48,7 +48,8 @@ class MatterForm
                                         ->label(__('Number'))
                                         ->required(),
                                     DatePicker::make('received_at')
-                                        ->label(__('Received Date')),
+                                        ->label(__('Received Date'))
+                                        ->required(),
                                     DateTimePicker::make('next_session_date')
                                         ->required()
                                         ->format('Y-m-d h:m')

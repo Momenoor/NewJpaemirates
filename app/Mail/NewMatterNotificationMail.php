@@ -4,7 +4,7 @@ namespace App\Mail;
 
 use App\Models\Matter;
 use App\Models\Party;
-use App\Models\Request as MatterRequest;
+use App\Models\MatterRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -29,13 +29,13 @@ class NewMatterNotificationMail extends Mailable
 
         $this->acceptUrl = URL::signedRoute(
             'matter.received.accept',
-            ['matter' => $matter->id, 'request' => $matterRequest->id],
+            ['matter' => $matter->id, 'matterRequest' => $matterRequest->id],
             now()->addDays(7)
         );
 
         $this->disputeUrl = URL::signedRoute(
             'matter.received.dispute',
-            ['matter' => $matter->id, 'request' => $matterRequest->id],
+            ['matter' => $matter->id, 'matterRequest' => $matterRequest->id],
             now()->addDays(7)
         );
     }
@@ -47,7 +47,7 @@ class NewMatterNotificationMail extends Mailable
     {
         return new Envelope(
             subject: __('New Matter Notification')
-            . ' — ' . $this->matter->year . '/' . $this->matter->number . '-' . $this->matter->type->name,
+            . ' — ' . $this->matter->year . '/' . $this->matter->number . ($this->matter->type ? ' — ' . $this->matter->type->name : ''),
         );
     }
 

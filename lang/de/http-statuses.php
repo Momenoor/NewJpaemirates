@@ -57,7 +57,7 @@ return [
     '444'          => 'Verbindung ohne Antwort geschlossen',
     '449'          => 'Wiederhole mit',
     '451'          => 'Aus rechtlichen Gründen nicht verfügbar',
-    '499'          => 'Client-Closed-Request',
+    '499'          => 'Client-Closed-MatterRequest',
     '500'          => 'Interner Serverfehler',
     '501'          => 'Nicht implementiert',
     '502'          => 'Fehlerhaftes Gateway',

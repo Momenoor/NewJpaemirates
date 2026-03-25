@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class Request extends Model
+class MatterRequest extends Model
 {
     use LogsActivity;
 
@@ -40,7 +40,7 @@ class Request extends Model
 
     protected static function booted(): void
     {
-        static::deleting(function (Request $request) {
+        static::deleting(function (MatterRequest $request) {
             $request->matter->decrement('review_count');
         });
     }
@@ -60,7 +60,7 @@ class Request extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
-    public function attachments(): Request|\Illuminate\Database\Eloquent\Relations\HasManyThrough
+    public function attachments(): MatterRequest|\Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
         return $this->hasManyThrough(Attachment::class, Matter::class, 'id', 'matter_id', 'id');
     }

@@ -8,12 +8,15 @@ enum RequestStatus: string implements \Filament\Support\Contracts\HasLabel, \Fil
     case REJECTED = 'rejected';
     case PENDING = 'pending';
 
+    case DISPUTED = 'disputed';
+
     public function getLabel(): ?string
     {
         return match ($this) {
             self::APPROVED => __('Approved'),
             self::REJECTED => __('Rejected'),
             self::PENDING => __('Pending'),
+            self::DISPUTED => __('Disputed'),
         };
     }
 
@@ -23,6 +26,7 @@ enum RequestStatus: string implements \Filament\Support\Contracts\HasLabel, \Fil
             self::APPROVED => 'success',
             self::REJECTED => 'danger',
             self::PENDING => 'warning',
+            self::DISPUTED => 'info',
         };
     }
 }

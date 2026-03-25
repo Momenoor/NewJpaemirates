@@ -7,6 +7,8 @@ use App\Enums\MatterCommissiong;
 use App\Enums\MatterStatus;
 use App\Enums\MatterDifficulty;
 use App\Enums\MatterLevel;
+use App\Observers\MatterObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -19,6 +21,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 /**
  * @property mixed $status
  */
+#[ObservedBy(MatterObserver::class)]
 class Matter extends Model
 {
     use SoftDeletes;
@@ -293,7 +296,7 @@ class Matter extends Model
 
     public function requests(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Request::class);
+        return $this->hasMany(MatterRequest::class);
     }
 
     public function finalReportSubmission(): void

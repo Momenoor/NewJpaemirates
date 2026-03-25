@@ -23,16 +23,16 @@ Route::get('incentive/calculations/{calculation}/print', IncentiveCalculationPri
 
 Route::prefix('matter/{matter}/received-date')->group(function () {
     // Accept link from email (GET — no auth required)
-    Route::get('accept', [MatterReceivedNotificationController::class, 'accept'])
+    Route::get('accept/{matterRequest}', [MatterReceivedNotificationController::class, 'accept'])
         ->name('matter.received.accept')
         ->middleware('signed');
 
     // Dispute link from email — shows form (GET — no auth required)
-    Route::get('dispute', [MatterReceivedNotificationController::class, 'disputeForm'])
+    Route::get('dispute/{matterRequest}', [MatterReceivedNotificationController::class, 'disputeForm'])
         ->name('matter.received.dispute')
         ->middleware('signed');
 
     // Dispute form submission (POST — no auth required)
-    Route::post('dispute', [MatterReceivedNotificationController::class, 'disputeSubmit'])
+    Route::post('dispute/{matterRequest}', [MatterReceivedNotificationController::class, 'disputeSubmit'])
         ->name('matter.received.dispute.submit');
 });

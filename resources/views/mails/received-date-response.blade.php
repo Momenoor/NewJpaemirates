@@ -1,12 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ __('Response Recorded') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{asset('fonts/Boutros.css')}}">
+    <style>
+        body {
+            font-family: 'Boutros', serif !important;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6 text-right" dir="rtl">
 <div class="bg-white rounded-xl shadow-lg max-w-md w-full p-8 text-center">
 
     @if($type === 'accepted')

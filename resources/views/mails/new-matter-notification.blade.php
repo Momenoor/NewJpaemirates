@@ -1,16 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{{asset('fonts/Boutros.css')}}">
     <title>{{ __('Matter Received Date Confirmation') }}</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Boutros', serif !important;
             background: #f4f4f7;
             margin: 0;
             padding: 0;
             color: #333;
+            direction: rtl;
+            text-align: right;
         }
 
         .wrapper {
@@ -52,7 +56,8 @@
 
         .info-box {
             background: #f0f5fb;
-            border-left: 4px solid #1B3A5C;
+            border-right: 4px solid #1B3A5C;
+            border-left: none;
             border-radius: 4px;
             padding: 16px 20px;
             margin: 20px 0;
@@ -66,6 +71,7 @@
         .info-box td {
             padding: 6px 0;
             font-size: 14px;
+            text-align: right;
         }
 
         .info-box td:first-child {
@@ -125,12 +131,13 @@
 <body>
 <div class="wrapper">
     <div class="header">
+        <img src="{{ url('images/logo-dark-for-email.png') }}" alt="Logo" style="max-width:100px!important;width: 100px!important; height: auto;">
         <h1>{{ config('app.name') }}</h1>
         <p>{{ __('Matter Received Date Confirmation') }}</p>
     </div>
 
     <div class="body">
-        <p>{{ __('Dear') }} <strong>{{ $assistant->name }}</strong>,</p>
+        <p>{{ __('Dear') }} <strong>{{ $assistant->name }}</strong>،</p>
         <p>
             {{ __('A new matter has been assigned to you. Please review the received date below and confirm or dispute it.') }}
         </p>
@@ -151,7 +158,7 @@
                 </tr>
                 <tr>
                     <td>{{ __('Received Date') }}:</td>
-                    <td>{{ \Carbon\Carbon::parse($matter->received_at)->format('d M Y') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($matter->received_at)->locale('ar')->translatedFormat('d F Y') }}</td>
                 </tr>
             </table>
         </div>

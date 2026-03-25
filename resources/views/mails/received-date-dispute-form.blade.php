@@ -1,12 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ __('Dispute Received Date') }}</title>
+        <title>{{ __('Dispute Received Date') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{asset('fonts/Boutros.css')}}">
+    <style>
+        body {
+            font-family: 'Boutros', serif !important;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6 text-right" dir="rtl">
 <div class="bg-white rounded-xl shadow-lg max-w-lg w-full p-8">
 
     <div class="text-center mb-6">
@@ -19,19 +25,21 @@
         <h1 class="text-xl font-bold text-gray-800">{{ __('Dispute Received Date') }}</h1>
         <p class="text-sm text-gray-500 mt-1">
             {{ __('Matter') }}: <span class="font-semibold">{{ $matter->year }}/{{ $matter->number }}</span>
-            @if($matter->court) · {{ $matter->court->name }} @endif
+            @if($matter->court)
+                · {{ $matter->court->name }}
+            @endif
         </p>
     </div>
 
     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-sm text-blue-800">
         <strong>{{ __('Current Received Date') }}:</strong>
-        {{ \Carbon\Carbon::parse($matterRequest->extra['current_received_at'] ?? null)?->format('d M Y') ?? '—' }}
+        {{ \Carbon\Carbon::parse($matterRequest->extra['current_received_at'] ?? null)->locale('ar')->translatedFormat('d F Y') }}
     </div>
 
-    <form method="POST" action="{{ route('matter.received.dispute.submit', ['matter' => $matter->id]) }}" class="space-y-5">
+    <form method="POST"
+          action="{{ route('matter.received.dispute.submit', ['matter' => $matter->id,'matterRequest'=> $matterRequest]) }}"
+          class="space-y-5">
         @csrf
-        <input type="hidden" name="token" value="{{ $token }}">
-
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">
                 {{ __('Correct Received Date') }} <span class="text-red-500">*</span>

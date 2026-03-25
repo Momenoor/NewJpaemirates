@@ -21,6 +21,7 @@
         "filament/widgets": "^4.0",
         "flowframe/laravel-trend": "*",
         "geo-sot/filament-env-editor": "^1.0",
+        "jdavidbakr/mail-tracker": "^8.0",
         "jeffersongoncalves/filament-logo": "^2.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",

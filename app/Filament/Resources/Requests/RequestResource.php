@@ -9,7 +9,7 @@ use App\Filament\Resources\Requests\Pages\ViewRequest;
 use App\Filament\Resources\Requests\Schemas\RequestForm;
 use App\Filament\Resources\Requests\Schemas\RequestInfolist;
 use App\Filament\Resources\Requests\Tables\RequestsTable;
-use App\Models\Request;
+use App\Models\MatterRequest;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class RequestResource extends Resource
 {
-    protected static ?string $model = Request::class;
+    protected static ?string $model = MatterRequest::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Newspaper;
     protected static ?int $navigationSort = 5;
@@ -31,7 +31,7 @@ class RequestResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return __('Request');
+        return __('Requests');
     }
 
     public static function getRecordTitle(?Model $record): ?string

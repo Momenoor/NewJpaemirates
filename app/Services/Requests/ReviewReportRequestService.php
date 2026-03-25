@@ -3,7 +3,7 @@
 namespace App\Services\Requests;
 
 use App\Enums\RequestStatus;
-use App\Models\Request;
+use App\Models\MatterRequest;
 use App\Services\Requests\BaseRequestService;
 use Illuminate\Database\Eloquent\Model;
 

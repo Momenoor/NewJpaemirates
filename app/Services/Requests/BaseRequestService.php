@@ -117,7 +117,7 @@ abstract class BaseRequestService
             if ($data['type'] === RequestType::CHANGE_DIFFICULTY && !empty($data['new_difficulty'])) {
 
                 $difficulty = $data['new_difficulty'];
-                $comment = __('New Difficulty Request') . ': ' . $difficulty->getLabel() . '. ' . $comment;
+                $comment = __('New Difficulty MatterRequest') . ': ' . $difficulty->getLabel() . '. ' . $comment;
                 $extra = ['new_difficulty' => $difficulty->value];
             } elseif ($data['type'] === RequestType::REVIEW_REPORT) {
                 $extra = ['review_report' => $record->id];

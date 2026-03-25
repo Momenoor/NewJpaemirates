@@ -5,66 +5,66 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use Illuminate\Foundation\Auth\User as AuthUser;
-use App\Models\Request;
+use App\Models\MatterRequest;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class RequestPolicy
 {
     use HandlesAuthorization;
-    
+
     public function viewAny(AuthUser $authUser): bool
     {
-        return $authUser->can('ViewAny:Request');
+        return $authUser->can('ViewAny:MatterRequest');
     }
 
-    public function view(AuthUser $authUser, Request $request): bool
+    public function view(AuthUser $authUser, MatterRequest $request): bool
     {
-        return $authUser->can('View:Request');
+        return $authUser->can('View:MatterRequest');
     }
 
     public function create(AuthUser $authUser): bool
     {
-        return $authUser->can('Create:Request');
+        return $authUser->can('Create:MatterRequest');
     }
 
-    public function update(AuthUser $authUser, Request $request): bool
+    public function update(AuthUser $authUser, MatterRequest $request): bool
     {
-        return $authUser->can('Update:Request');
+        return $authUser->can('Update:MatterRequest');
     }
 
-    public function delete(AuthUser $authUser, Request $request): bool
+    public function delete(AuthUser $authUser, MatterRequest $request): bool
     {
-        return $authUser->can('Delete:Request');
+        return $authUser->can('Delete:MatterRequest');
     }
 
-    public function restore(AuthUser $authUser, Request $request): bool
+    public function restore(AuthUser $authUser, MatterRequest $request): bool
     {
-        return $authUser->can('Restore:Request');
+        return $authUser->can('Restore:MatterRequest');
     }
 
-    public function forceDelete(AuthUser $authUser, Request $request): bool
+    public function forceDelete(AuthUser $authUser, MatterRequest $request): bool
     {
-        return $authUser->can('ForceDelete:Request');
+        return $authUser->can('ForceDelete:MatterRequest');
     }
 
     public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $authUser->can('ForceDeleteAny:Request');
+        return $authUser->can('ForceDeleteAny:MatterRequest');
     }
 
     public function restoreAny(AuthUser $authUser): bool
     {
-        return $authUser->can('RestoreAny:Request');
+        return $authUser->can('RestoreAny:MatterRequest');
     }
 
-    public function replicate(AuthUser $authUser, Request $request): bool
+    public function replicate(AuthUser $authUser, MatterRequest $request): bool
     {
-        return $authUser->can('Replicate:Request');
+        return $authUser->can('Replicate:MatterRequest');
     }
 
     public function reorder(AuthUser $authUser): bool
     {
-        return $authUser->can('Reorder:Request');
+        return $authUser->can('Reorder:MatterRequest');
     }
 
 }

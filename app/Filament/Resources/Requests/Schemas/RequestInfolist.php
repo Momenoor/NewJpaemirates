@@ -11,26 +11,39 @@ class RequestInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('matter.id')
-                    ->label('Matter'),
-                TextEntry::make('request_by')
+                TextEntry::make('matter')
+                    ->url(fn($record) => route('filament.admin.resources.matters.view', $record->matter_id))
+                    ->formatStateUsing(fn($state) => $state->number . '/' . $state->year)
+                    ->label(__('Matter')),
+                TextEntry::make('requestBy.name')
+                    ->label(__('Request By'))
                     ->numeric(),
-                TextEntry::make('status'),
+                TextEntry::make('status')
+                ->badge()
+                ->label(__('Status')),
                 TextEntry::make('comment')
+                    ->label(__('Comment'))
                     ->placeholder('-'),
-                TextEntry::make('approved_by')
+                TextEntry::make('approvedBy.name')
                     ->numeric()
+                    ->label(__('Approved By'))
                     ->placeholder('-'),
                 TextEntry::make('approved_at')
+                    ->label(__('Approved At'))
                     ->dateTime()
                     ->placeholder('-'),
                 TextEntry::make('approved_comment')
+                    ->label(__('Approved Comment'))
                     ->placeholder('-'),
-                TextEntry::make('type'),
+                TextEntry::make('type')
+                ->badge()
+                ->label(__('Type')),
                 TextEntry::make('created_at')
+                    ->label(__('Created'))
                     ->dateTime()
                     ->placeholder('-'),
                 TextEntry::make('updated_at')
+                    ->label(__('Updated'))
                     ->dateTime()
                     ->placeholder('-'),
             ]);

@@ -38,7 +38,7 @@ class ApproveRequestAction extends Action
             ->requiresConfirmation()
             ->visible(fn($record) => $record->status === RequestStatus::PENDING
                 && (
-                    auth()->user()->can('EditRequest:Request')
+                    auth()->user()->can('EditRequest:MatterRequest')
                     || auth()->user()->can('ApproveRequest:Matter')
                 )
             )
