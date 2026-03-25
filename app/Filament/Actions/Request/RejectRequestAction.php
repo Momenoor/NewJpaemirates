@@ -36,7 +36,7 @@ class RejectRequestAction extends Action
             ->icon('heroicon-o-x-circle')
             ->color('danger')
             ->requiresConfirmation()
-            ->visible(fn($record) => $record->status === RequestStatus::PENDING
+            ->visible(fn($record) => $record->status === RequestStatus::PENDING || $record->status === RequestStatus::DISPUTED
                 && (
                     auth()->user()->can('EditRequest:MatterRequest')
                     || auth()->user()->can('RejectRequest:Matter')
