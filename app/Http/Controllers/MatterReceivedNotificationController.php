@@ -34,7 +34,8 @@ class MatterReceivedNotificationController
 
     public function disputeForm(Request $httpRequest, Matter $matter, MatterRequest $matterRequest)
     {
-        if ($matterRequest->status !== RequestStatus::PENDING && $matterRequest->status !== RequestStatus::DISPUTED) {
+        if ($matterRequest->status !== RequestStatus::PENDING
+        ) {
             return $this->alreadyUsed($matterRequest);
         }
 
