@@ -372,7 +372,7 @@ class MatterInfolist
                             }),
                         TextEntry::make('type')->badge(),
 
-                        TextEntry::make('created_at')->label(__('Date'))
+                        TextEntry::make('date')->label(__('Date'))
                             ->date()->icon('heroicon-o-calendar'),
 
                         Actions::make([
