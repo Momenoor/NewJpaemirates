@@ -43,13 +43,13 @@ class OutlookCalendarService
                 'content' => $eventData['description'] ?? '',
             ],
             'start' => [
-                'dateTime' => Carbon::parse($eventData['start_datetime'])->toIso8601String(),
+                'dateTime' => Carbon::parse($eventData['start_datetime'], 'Asia/Muscat')->toIso8601String(),
                 'timeZone' => 'Asia/Muscat',
             ],
             'end' => [
                 'dateTime' => isset($eventData['end_datetime'])
-                    ? Carbon::parse($eventData['end_datetime'])->toIso8601String()
-                    : Carbon::parse($eventData['start_datetime'])->addHour()->toIso8601String(),
+                    ? Carbon::parse($eventData['end_datetime'], 'Asia/Muscat')->toIso8601String()
+                    : Carbon::parse($eventData['start_datetime'], 'Asia/Muscat')->addHour()->toIso8601String(),
                 'timeZone' => 'Asia/Muscat',
             ],
             'location' => [
@@ -132,7 +132,7 @@ class OutlookCalendarService
 
         $params = [
             '$select' => 'subject,body,start,end,location,id,isOnlineMeeting,onlineMeeting,onlineMeetingUrl,isAllDay',
-            '$top'    => 50,
+            '$top' => 50,
         ];
         if ($from) {
             $params['$filter'] = "start/dateTime ge '" . $from->toIso8601String() . "'";
