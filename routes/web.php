@@ -21,7 +21,7 @@ Route::get('incentive/calculations/{calculation}/print', IncentiveCalculationPri
     ->name('incentive.calculation.print')
     ->middleware(['auth']);
 
-Route::prefix('matter/{matter}/received-date')->group(function () {
+Route::prefix('admin/matter/{matter}/received-date')->group(function () {
     // Accept link from email (GET — no auth required)
     Route::get('accept/{matterRequest}', [MatterReceivedNotificationController::class, 'accept'])
         ->name('matter.received.accept')
