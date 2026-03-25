@@ -44,12 +44,13 @@ class OutlookCalendarService
             ],
             'start' => [
                 'dateTime' => Carbon::parse($eventData['start_datetime'])->toIso8601String(),
-
+                'timeZone' => 'UTC',
             ],
             'end' => [
                 'dateTime' => isset($eventData['end_datetime'])
                     ? Carbon::parse($eventData['end_datetime'])->toIso8601String()
                     : Carbon::parse($eventData['start_datetime'])->addHour()->toIso8601String(),
+                'timeZone' => 'UTC',
             ],
             'location' => [
                 'displayName' => $eventData['location'] ?? '',
