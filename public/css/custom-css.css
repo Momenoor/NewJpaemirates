@@ -18,9 +18,9 @@
         padding: 0.5rem !important;
     }
 }
-@media (min-width: 1981px) {
+@media (min-width: 1280px) {
     .type-label { display: inline; }
 }
-@media (max-width: 1980px) {
+@media (max-width: 1279px) {
     .type-label { display: none; }
 }
