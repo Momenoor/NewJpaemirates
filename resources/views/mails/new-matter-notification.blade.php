@@ -149,19 +149,19 @@
         <div class="info-box">
             <table>
                 <tr>
-                    <td>{{ __('Matter'): }}</td>
+                    <td>{{ __('Matter') }}:</td>
                     <td>{{ $matter->year }}/{{ $matter->number }}</td>
                 </tr>
                 <tr>
-                    <td>{{ __('Court'): }}</td>
+                    <td>{{ __('Court') }}:</td>
                     <td>{{ $matter->court?->name ?? '—' }}</td>
                 </tr>
                 <tr>
-                    <td>{{ __('Type'): }}</td>
+                    <td>{{ __('Type') }}:</td>
                     <td>{{ $matter->type?->name ?? '—' }}</td>
                 </tr>
                 <tr>
-                    <td>{{ __('Received Date'): }}</td>
+                    <td>{{ __('Received Date') }}:</td>
                     <td>{{ \Carbon\Carbon::parse($matter->received_at)->locale('ar')->translatedFormat('d F Y') }}</td>
                 </tr>
             </table>
