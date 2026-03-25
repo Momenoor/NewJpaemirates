@@ -35,7 +35,7 @@ class CreateSingleCalendarEventAction extends Action
                 $data['created_by'] = Auth::id();
                 $event = CalendarEvent::create($data);
 
-                if ($data['update_next_session_date'] && $event->matter_id) {
+                if (isset($data['update_next_session_date']) && $event->matter_id) {
                     $event->matter->update(['next_session_date' => $data['start_datetime']]);
                 }
 
