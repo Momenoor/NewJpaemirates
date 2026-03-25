@@ -38,6 +38,11 @@ class MatterForm
                                 Section::make(__('Basic Data'))->schema([
                                     TextInput::make('year')
                                         ->label(__('Year'))
+                                        ->minValue(now()->subYears(5)->year)
+                                        ->maxValue(now()->year)
+                                        ->length(4)
+                                        ->numeric()
+                                        ->rules(['digits:4'])
                                         ->required(),
                                     TextInput::make('number')
                                         ->label(__('Number'))

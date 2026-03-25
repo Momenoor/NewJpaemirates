@@ -10,6 +10,8 @@ use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use App\Events\FilamentActionEvent;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
+use Filament\FontProviders\GoogleFontProvider;
+use Filament\FontProviders\LocalFontProvider;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Http\Middleware\Authenticate;
@@ -20,8 +22,12 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Support\Assets\Css;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
+use Filament\Support\Facades\FilamentAsset;
+use Filament\Support\Facades\FilamentTimezone;
+use Filament\Tables\Table;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Guava\Calendar\Filament\CalendarWidget;
@@ -48,9 +54,11 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login(CustomLogin::class)
+            ->sidebarWidth('15rem')
             ->colors([
                 'primary' => Color::Blue,
             ])
+            ->font('Boutros MBC Dinkum', asset('fonts/Boutros.css'), provider: LocalFontProvider::class)
             ->brandLogo(asset('images/logo.png'))
             ->darkModeBrandLogo(asset('images/logo-dark.png'))
             ->brandLogoHeight('4rem')
@@ -62,6 +70,7 @@ class AdminPanelProvider extends PanelProvider
 //                AdminDashboard::class,
 //            ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
+            ->discoverWidgets(in: app_path('Livewire'), for: 'App\Livewire')
 //            ->widgets([
 //                AccountWidget::class,
 //                FilamentInfoWidget::class,
@@ -118,9 +127,13 @@ class AdminPanelProvider extends PanelProvider
             TextInput::make('display_name')->required(),
             Select::make('party')->searchable()->relationship('party', 'name'),
         ]);
-
+        Table::configureUsing(fn(Table $table) => $table->striped()->stackedOnMobile());
         app(FilamentUserServices::class)->register([
             ActivitiesRelationManager::class,
+        ]);
+        FilamentTimezone::set('Asia/Muscat');
+        FilamentAsset::register([
+            Css::make('custom-css', asset('css/custom-css.css')),
         ]);
     }
 }

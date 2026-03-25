@@ -21,7 +21,7 @@ class CalendarWidget extends FullCalendarWidget
 {
 
     public Model|string|null $model = CalendarEvent::class;
-
+    protected int | string | array $columnSpan = 1;
     /**
      * @param array $info
      * @throws ConnectionException
@@ -63,14 +63,16 @@ class CalendarWidget extends FullCalendarWidget
         return [
             'firstDay' => 1,
             'headerToolbar' => [
-                'left' => 'timeGridDay,timeGridWeek',
+                'left' => 'timeGridDay,timeGridWeek,dayGridMonth,listWeek',
                 'center' => 'title',
                 'right' => 'prev,next today',
             ],
-            'initialView' => 'timeGridWeek',
-            'eventDisplay' => 'block',
-            'timeZone' => 'Asia/Mascut',
+            'initialView' => 'listWeek',
+            //'eventDisplay' => 'block',
             'scrollTime' => '09:00:00',
+            'timeZone' => 'Asia/Muscat', // Or 'local'
+            'slotMinTime' => '00:00:00', // Start workday at 8 AM
+            'slotMaxTime' => '20:00:00',
         ];
     }
 
@@ -97,8 +99,14 @@ class CalendarWidget extends FullCalendarWidget
         ];
     }
 
-    public function getFormSchema(): array
+
+    protected function getOptions(): array
     {
-        return S;
+        return [
+            'timeZone' => 'Asia/Muscat', // Or 'local'
+            'firstDay' => 0, // Sunday (Common for Gulf region)
+            'slotMinTime' => '08:00:00', // Start workday at 8 AM
+            'slotMaxTime' => '20:00:00', // End at 8 PM
+        ];
     }
 }

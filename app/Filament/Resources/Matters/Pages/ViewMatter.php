@@ -45,6 +45,7 @@ class ViewMatter extends ViewRecord
                         ->label(__('Date'))
                         ->visible(auth()->user()->can('UpdateInitialReportDate:Matter')),
                 ])
+                ->requiresConfirmation()
                 ->action(fn($record, array $data) => $this->initialReportSubmit($record, $data)),
 
             Action::make('final_report')
@@ -57,6 +58,7 @@ class ViewMatter extends ViewRecord
                         ->label(__('Date'))
                         ->visible(auth()->user()->can('UpdateFinalReportDate:Matter')),
                 ])
+                ->requiresConfirmation()
                 ->action(fn($record, array $data) => $this->finalReportSubmit($record, $data)),
 
             Action::make('clone')

@@ -268,9 +268,9 @@ class Matter extends Model
     {
         return new Attribute(
             get: function () {
-                if (!$this->initial_report_at) return 'In Progress';
-                if (!$this->final_report_at) return 'Initial Report';
-                return 'Final Report';
+                if (!$this->initial_report_at) return MatterStatus::IN_PROGRESS;
+                if (!$this->final_report_at) return MatterStatus::INITIALED;
+                return MatterStatus::FINALIZED;
             }
         );
     }

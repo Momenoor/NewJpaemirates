@@ -110,7 +110,7 @@ class MatterInfolist
                 TextEntry::make('year')->label(__('Year')),
                 TextEntry::make('number')->label(__('Number')),
                 TextEntry::make('status')->label(__('Status'))
-                    ->formatStateUsing(fn($state) => __($state))
+                    ->formatStateUsing(fn($state) => $state->getLabel())
                     ->badge()->columnSpan(2),
                 TextEntry::make('collection_status')->label(__('Collection'))->badge(),
                 IconEntry::make('has_court_penalty')->label(__('Has Court Penalty'))->boolean(),

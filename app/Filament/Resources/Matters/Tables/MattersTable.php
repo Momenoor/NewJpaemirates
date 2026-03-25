@@ -68,8 +68,10 @@ class MattersTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->striped(false)
-            ->extraAttributes(['class' => '[&_td]:py-1 [&_th]:py-1 [&_table]:text-sm [&_table]:table-fixed [&_table]:w-full'])
+            ->striped()
+            ->extraAttributes([
+                'class' => 'custom-compact-table [&_td]:py-1 [&_th]:py-1 [&_table]:text-sm [&_table]:w-full'
+            ])
             ->columns([
 
                 // ── Reference ─────────────────────────────────────────────────
@@ -77,10 +79,8 @@ class MattersTable
                     ->label(__('Matter'))
                     ->getStateUsing(fn($record) => $record->year . '/' . $record->number)
                     ->weight(FontWeight::Bold)
-                    ->description(fn($record) => collect([
-                        __($record->status),
-                        $record->collection_status?->getLabel(),
-                    ])->filter()->join(' · '))
+                    ->description(fn($record) => $record->status->getLabel())
+                    ->html()
                     ->prefix(fn($record) => $record->parent_id ? (app()->getLocale() === 'en' ? '↳ ' : ' ↲') : '')
                     ->color(fn($record) => $record->parent_id ? 'primary' : null)
                     ->extraAttributes(fn($record) => $record->parent_id
@@ -119,7 +119,7 @@ class MattersTable
 
                 // ── Level ──────────────────────────────────────────────────────
                 TextColumn::make('level')
-                    ->label(__('Level / Difficulty'))
+                    ->label(__('Level'))
                     ->badge()
                     ->description(fn($record) => collect([
                         $record->difficulty?->getLabel(),
@@ -149,16 +149,19 @@ class MattersTable
                                 };
 
                                 return sprintf(
-                                    '<span class="inline-flex items-center gap-1 text-xs">
-                                                <span class="fi-color fi-color-%s fi-text-color-600 dark:fi-text-color-200 fi-badge fi-size-sm">%s #%d</span>
-                                                %s
-                                            </span>',
+                                    '<span class="inline-flex items-center gap-1 text-xs">'
+                                    . '<span class="fi-color fi-color-%s fi-text-color-600 dark:fi-text-color-200 fi-badge fi-size-sm">'
+                                    . '<span class="type-label">%s</span> #%d'
+                                    . '</span>'
+                                    . '%s'
+                                    . '</span>',
                                     $color, __($type), $mp->role_index, e($mp->party?->name ?? '—')
                                 );
                             })
                             ->toArray()
                     )
                     ->html()
+                    ->grow()
                     ->color(fn($record) => $record->parent_id ? 'gray' : null)
                     ->searchable(query: function (Builder $query, string $search) {
                         $tokens = static::splitSearch($search);
@@ -188,10 +191,12 @@ class MattersTable
                             };
 
                             return sprintf(
-                                '<span class="inline-flex items-center gap-1 text-xs">
-                                                <span class="fi-color fi-color-%s fi-text-color-600 dark:fi-text-color-200 fi-badge fi-size-sm">%s #%d</span>
-                                                %s
-                                            </span>',
+                                '<span class="inline-flex items-center gap-1 text-xs">'
+                                . '<span class="fi-color fi-color-%s fi-text-color-600 dark:fi-text-color-200 fi-badge fi-size-sm">'
+                                . '<span class="type-label">%s</span> #%d'
+                                . '</span>'
+                                . '%s'
+                                . '</span>',
                                 $color, __($type), $mp->role_index, e($mp->party?->name ?? '—')
                             );
                         })
@@ -212,7 +217,7 @@ class MattersTable
 
                 // ── Fees ───────────────────────────────────────────────────────
                 TextColumn::make('fees_summary')
-                    ->label(__('Fees / Collected'))
+                    ->label(__('Fees'))
                     ->getStateUsing(fn($record) => number_format($record->fees->sum('amount'), 2))
                     ->description(fn($record) => number_format(
                         $record->fees->sum(fn($fee) => $fee->allocations->sum('amount')), 2
@@ -234,16 +239,13 @@ class MattersTable
                 TextColumn::make('next_session_date')
                     ->label(__('Next Session'))
                     ->date()
-                    ->description(fn($record) => $record->last_action_date
-                        ? __('Last') . ': ' . Carbon::parse($record->last_action_date)->format('M d, Y')
+                    ->description(fn($record) => $record->received_at
+                        ? __('Report') . ': ' . Carbon::parse($record->received_at)->format('M d, Y')
                         : null
                     )
                     ->sortable()
+                    ->grow(false)
                     ->width('10%'),
-
-                TextColumn::make('received_at')
-                    ->date()->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('initial_report_at')
                     ->date()->sortable()
