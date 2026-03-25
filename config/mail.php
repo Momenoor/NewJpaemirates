@@ -37,6 +37,12 @@ return [
 
     'mailers' => [
 
+        'microsoft-graph' => [
+            'transport' => 'microsoft-graph',
+            'tenant_id' => env('MICROSOFT_GRAPH_TENANT_ID'),
+            'client_id' => env('MICROSOFT_GRAPH_CLIENT_ID'),
+            'client_secret' => env('MICROSOFT_GRAPH_CLIENT_SECRET'),
+        ],
         'smtp' => [
             'transport' => 'smtp',
             'scheme' => env('MAIL_SCHEME'),
@@ -46,7 +52,7 @@ return [
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
             'timeout' => null,
-            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string)env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
 
         'ses' => [
@@ -96,6 +102,7 @@ return [
             ],
             'retry_after' => 60,
         ],
+
 
     ],
 

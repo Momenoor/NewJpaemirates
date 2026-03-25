@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7b55d66f461f7c5fbfcf87e8572d39d2",
+    "content-hash": "f88895c97eb4d1265e7871d4f73996db",
     "packages": [
         {
             "name": "alizharb/filament-activity-log",
@@ -4340,6 +4340,91 @@
             "time": "2026-02-26T00:58:19+00:00"
         },
         {
+            "name": "maize-tech/laravel-msgraph-mailer",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/maize-tech/laravel-msgraph-mailer.git",
+                "reference": "19df8dedf71a951839ff12780cb78c6fd255f1dc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/maize-tech/laravel-msgraph-mailer/zipball/19df8dedf71a951839ff12780cb78c6fd255f1dc",
+                "reference": "19df8dedf71a951839ff12780cb78c6fd255f1dc",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/psr7": "^2.7",
+                "illuminate/contracts": "^11.0||^12.0",
+                "microsoft/microsoft-graph": "^2.53",
+                "php": "^8.3",
+                "saloonphp/cache-plugin": "^3.0",
+                "saloonphp/saloon": "^3.14",
+                "spatie/laravel-package-tools": "^1.16",
+                "symfony/mailer": "^7.0||^6.0",
+                "symfony/mime": "^7.0||^6.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.14",
+                "nunomaduro/collision": "^8.8",
+                "orchestra/testbench": "^10.0.0||^9.0.0",
+                "pestphp/pest": "^4.0",
+                "pestphp/pest-plugin-arch": "^4.0",
+                "pestphp/pest-plugin-laravel": "^4.0",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Maize\\MsgraphMailer\\MsgraphMailerServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Maize\\MsgraphMailer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Enrico De Lazzari",
+                    "email": "enrico.delazzari@maize.io",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Laravel mail transport driver for sending emails via Microsoft Graph API with OAuth2 authentication",
+            "homepage": "https://github.com/maize-tech/laravel-msgraph-mailer",
+            "keywords": [
+                "azure",
+                "email",
+                "laravel",
+                "mail",
+                "microsoft-graph",
+                "oauth2",
+                "office-365",
+                "transport"
+            ],
+            "support": {
+                "issues": "https://github.com/maize-tech/laravel-msgraph-mailer/issues",
+                "source": "https://github.com/maize-tech/laravel-msgraph-mailer/tree/1.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/Maize",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-01-16T13:39:22+00:00"
+        },
+        {
             "name": "microsoft/kiota-abstractions",
             "version": "1.5.2",
             "source": {
@@ -7168,6 +7253,135 @@
                 }
             ],
             "time": "2026-03-11T13:40:39+00:00"
+        },
+        {
+            "name": "saloonphp/cache-plugin",
+            "version": "v3.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/saloonphp/cache-plugin.git",
+                "reference": "8ff15f9807e5027704eaf05c7f66a8c87f61f661"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/saloonphp/cache-plugin/zipball/8ff15f9807e5027704eaf05c7f66a8c87f61f661",
+                "reference": "8ff15f9807e5027704eaf05c7f66a8c87f61f661",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.2",
+                "saloonphp/saloon": "^3.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.13",
+                "league/flysystem": "^3.12.2",
+                "orchestra/testbench": "^9.15 || ^10.7",
+                "pestphp/pest": "^2.3 || ^4.0",
+                "psr/simple-cache": "^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Saloon\\CachePlugin\\": "src/",
+                    "Saloon\\CachePlugin\\Tests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sammyjo20",
+                    "email": "29132017+Sammyjo20@users.noreply.github.com"
+                }
+            ],
+            "description": "Official plugin for caching Saloon responses",
+            "support": {
+                "source": "https://github.com/saloonphp/cache-plugin/tree/v3.0.1"
+            },
+            "time": "2025-11-20T23:47:02+00:00"
+        },
+        {
+            "name": "saloonphp/saloon",
+            "version": "v3.15.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/saloonphp/saloon.git",
+                "reference": "8039c76132ca52d08c887407773a770c15ab04a0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/saloonphp/saloon/zipball/8039c76132ca52d08c887407773a770c15ab04a0",
+                "reference": "8039c76132ca52d08c887407773a770c15ab04a0",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.6",
+                "guzzlehttp/promises": "^1.5 || ^2.0",
+                "guzzlehttp/psr7": "^2.0",
+                "php": "^8.2",
+                "psr/http-factory": "^1.0",
+                "psr/http-message": "^1.1 || ^2.0"
+            },
+            "conflict": {
+                "sammyjo20/saloon": "*"
+            },
+            "require-dev": {
+                "ext-simplexml": "*",
+                "friendsofphp/php-cs-fixer": "^3.5",
+                "illuminate/collections": "^10.0 || ^11.0 || ^12.0",
+                "league/flysystem": "^3.0",
+                "pestphp/pest": "^2.36.0 || ^3.8.2 || ^4.1.4",
+                "phpstan/phpstan": "^2.1.13",
+                "saloonphp/xml-wrangler": "^1.1",
+                "spatie/invade": "^2.1",
+                "symfony/dom-crawler": "^6.0 || ^7.0",
+                "symfony/var-dumper": "^6.3 || ^7.0"
+            },
+            "suggest": {
+                "illuminate/collections": "Required for the response collect() method.",
+                "saloonphp/xml-wrangler": "Required for the response xmlReader() method.",
+                "symfony/dom-crawler": "Required for the response dom() method.",
+                "symfony/var-dumper": "Required for default debugging drivers."
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Saloon\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sam Carré",
+                    "email": "29132017+Sammyjo20@users.noreply.github.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Build beautiful API integrations and SDKs with Saloon",
+            "homepage": "https://github.com/saloonphp/saloon",
+            "keywords": [
+                "api",
+                "api-integrations",
+                "saloon",
+                "sammyjo20",
+                "sdk"
+            ],
+            "support": {
+                "issues": "https://github.com/saloonphp/saloon/issues",
+                "source": "https://github.com/saloonphp/saloon/tree/v3.15.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/sammyjo20",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-03-02T22:04:13+00:00"
         },
         {
             "name": "scrivo/highlight.php",

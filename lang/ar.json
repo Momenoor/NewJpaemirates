@@ -714,5 +714,7 @@
     "Unpaid Matters": "ملفات غير مدفوعة",
     "Matters Per Year": "الملفات سنويا",
     "Matters Received Per Year": "الملفات التي تم استلامها سنويا",
-    "Office Share": "حصة المكتب"
+    "Office Share": "حصة المكتب",
+    "Change Received Date Request": "طلب تغيير تاريخ الاستلام",
+    "Change Received Date": "تغيير تاريخ الاستلام"
 }

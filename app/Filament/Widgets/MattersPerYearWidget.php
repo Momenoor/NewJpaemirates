@@ -10,7 +10,8 @@ use Flowframe\Trend\TrendValue;
 
 class MattersPerYearWidget extends ChartWidget
 {
-    protected int | string | array $columnSpan = 1;
+    protected int|string|array $columnSpan = 1;
+
     public function getHeading(): string
     {
         return __('Matters Received Per Year');
@@ -36,10 +37,29 @@ class MattersPerYearWidget extends ChartWidget
                 [
                     'label' => __('Matters Per Year'),
                     'data' => $data->map(fn(TrendValue $value) => $value->aggregate),
-
+                    'backgroundColor' => array(
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(255, 205, 86, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(201, 203, 207, 0.2)'
+                    ),
+                    'borderColor' => [
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                        'rgb(255, 159, 64)',
+                        'rgb(75, 192, 192)',
+                        'rgb(255, 205, 86)',
+                        'rgb(153, 102, 255)',
+                        'rgb(201, 203, 207)'
+                    ],
+                    'borderWidth'=> 1
                 ],
             ],
             'labels' => $data->map(fn(TrendValue $value) => $value->date),
+
         ];
     }
 

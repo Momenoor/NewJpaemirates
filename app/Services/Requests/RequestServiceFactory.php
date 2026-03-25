@@ -13,6 +13,7 @@ class RequestServiceFactory
             RequestType::CHANGE_DIFFICULTY => new ChangeDifficultyRequestService($request),
             RequestType::REVIEW_INCENTIVE => new ReviewIncentiveRequestService($request),
             RequestType::REVIEW_REPORT => new ReviewReportRequestService($request),
+            RequestType::CHANGE_RECEIVED_DATE => new ChangeReceivedDateRequestService($request),
             default => throw new \InvalidArgumentException("Unsupported request type: {$request->type->value}"),
         };
     }

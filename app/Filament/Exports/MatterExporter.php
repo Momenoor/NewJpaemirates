@@ -93,7 +93,7 @@ class MatterExporter extends Exporter
 
             ExportColumn::make('status')
                 ->label(__('Status'))
-                ->getStateUsing(fn($record) => __($record->status)),
+                ->getStateUsing(fn($record) => $record->status?->getLabel()),
 
             ExportColumn::make('collection_status')
                 ->label(__('Collection Status'))

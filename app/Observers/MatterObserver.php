@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Enums\MatterCollectionStatus;
 use App\Models\Matter;
+use App\Services\NewMatterNotification;
 
 class MatterObserver
 {
@@ -12,6 +13,16 @@ class MatterObserver
     public function creating(Matter $matter): void
     {
         $matter->collection_status ??= MatterCollectionStatus::NO_FEES;
+    }
+
+    public function created(Matter $matter): void
+    {
+// Dispatch as a queued job so it doesn't block the request
+        dispatch(function () use ($matter) {
+            // Re-load with relations needed for the email
+            $matter->load(['assistantsOnly.party', 'court', 'type']);
+            app(NewMatterNotification::class)->sendToAssistants($matter);
+        })->afterResponse();
     }
 
     public function saved(Matter $matter): void
