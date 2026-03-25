@@ -22,7 +22,7 @@ Route::get('incentive/calculations/{calculation}/print', IncentiveCalculationPri
     ->middleware(['auth']);
 
 Route::prefix('admin/matter/{matter}/received-date')->group(function () {
-    App::setLocale('ar');
+
     // Accept link from email (GET — no auth required)
     Route::get('accept/{matterRequest}', [MatterReceivedNotificationController::class, 'accept'])
         ->name('matter.received.accept')
