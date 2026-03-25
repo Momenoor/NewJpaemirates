@@ -181,9 +181,9 @@ class MattersTable
                             $type = $mp->type ? ucfirst(str_replace('-', ' ', $mp->type)) : '';
                             $color = match ($mp->type) {
                                 'certified' => 'primary',
-                                'assistant' => 'info',
+                                'assistant' => 'success',
                                 'external' => 'warning',
-                                'external-assistant' => 'success',
+                                'external-assistant' => 'danger',
                                 default => 'gray',
                             };
 
