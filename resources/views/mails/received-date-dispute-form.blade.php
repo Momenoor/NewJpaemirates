@@ -11,7 +11,7 @@
             font-family: 'Boutros MBC Dinkum' !important;
         }
         body {
-            font-family: 'Boutros MBC Dinkum', serif !important;
+            font-family: 'Boutros MBC Dinkum' !important;
         }
     </style>
 </head>
