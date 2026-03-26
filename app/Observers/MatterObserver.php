@@ -14,9 +14,12 @@ class MatterObserver
     {
         $matter->collection_status ??= MatterCollectionStatus::NO_FEES;
     }
+
     public function created(Matter $matter): void
     {
         // Dispatch the notification check after the response to ensure relations are saved (e.g. assistants)
+        if ($matter->received_at <= now()->subDays(30)) return;
+
         dispatch(function () use ($matter) {
             app(NewMatterNotification::class)->sendToAssistants($matter);
         })->afterResponse();
