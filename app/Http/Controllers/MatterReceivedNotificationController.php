@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\RequestStatus;
 use App\Models\Matter;
 use App\Models\MatterRequest as MatterRequest;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class MatterReceivedNotificationController
@@ -53,7 +54,7 @@ class MatterReceivedNotificationController
         ]);
 
         $matterRequest->update([
-            'comment' => __('New Receive Date Request to') . ':' . $httpRequest->input('proposed_received_at') . ' - ' . $httpRequest->input('comment'),
+            'comment' => __('New Receive Date Request to') . ':' . Carbon::parse($httpRequest->input('proposed_received_at'))->format('M d, Y') . ' - ' . $httpRequest->input('comment'),
             'status' => RequestStatus::DISPUTED,
             'email_action' => 'dispute',
             'extra' => array_merge($matterRequest->extra ?? [], [
