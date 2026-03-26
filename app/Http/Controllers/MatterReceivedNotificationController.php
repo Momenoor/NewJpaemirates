@@ -53,7 +53,7 @@ class MatterReceivedNotificationController
         ]);
 
         $matterRequest->update([
-            'comment' => $httpRequest->input('comment'),
+            'comment' => __('New Receive Date Request') . ':' . $httpRequest->input('proposed_received_at') . ' - ' . $httpRequest->input('comment'),
             'status' => RequestStatus::DISPUTED,
             'email_action' => 'dispute',
             'extra' => array_merge($matterRequest->extra ?? [], [
