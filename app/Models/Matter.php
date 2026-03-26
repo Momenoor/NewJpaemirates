@@ -299,15 +299,6 @@ class Matter extends Model
         return $this->hasMany(MatterRequest::class);
     }
 
-    public function finalReportSubmission(): void
-    {
-        if (!$this->initial_report_at) {
-            $this->initial_report_at = now();
-        }
-        $this->final_report_at = now();
-        $this->saveQuietly();
-    }
-
     public function hasFinalReport(): bool
     {
         return $this->final_report_at !== null;

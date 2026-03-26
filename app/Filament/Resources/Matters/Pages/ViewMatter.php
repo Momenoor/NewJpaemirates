@@ -138,6 +138,11 @@ class ViewMatter extends ViewRecord
 
     private function finalReportSubmit($record, array $data): void
     {
+        if (!$record->initial_report_at) {
+            $record->initial_report_at = $date['date'] ?? now();
+        }
+        $record->final_report_at = $date['date'] ?? now();
+        $record->saveQuietly();
         $record->finalReportSubmission();
     }
 
