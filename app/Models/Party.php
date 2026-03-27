@@ -19,6 +19,7 @@ class Party extends Model
         return LogOptions::defaults()
             ->logAll();
     }
+
     protected $fillable = [
         'name',
         'phone',
@@ -35,6 +36,8 @@ class Party extends Model
     protected $casts = [
         'role' => 'array', // This tells Laravel to JSON encode/decode automatically
         'extra' => 'array',
+        'phone' => 'array',
+        'email' => 'array',
     ];
 
     public function getRoleAttribute($value)
@@ -121,7 +124,7 @@ class Party extends Model
 
     public function matters(): Party|\Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
-        return $this->hasManyThrough(Matter::class, MatterParty::class, 'id', 'id', 'id', 'matter_id');
+        return $this->hasManyThrough(Matter::class, MatterParty::class, 'party_id', 'id', 'id', 'matter_id');
     }
 
     public function incentiveAssistantLines(): HasMany
@@ -137,8 +140,7 @@ class Party extends Model
     public function isExpert(): bool
     {
         // The accessor ensures 'role' is an array with a 'role' key.
-        // We check if 'expert' exists inside that sub-array.
+        // We check if 'expert' exists inside that subarray.
         return isset($this->role['role']) && in_array('expert', (array)$this->role['role']);
     }
-
 }

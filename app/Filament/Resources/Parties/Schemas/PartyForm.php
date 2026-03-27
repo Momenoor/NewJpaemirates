@@ -2,13 +2,18 @@
 
 namespace App\Filament\Resources\Parties\Schemas;
 
+use App\Models\Party;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Validator;
 
 class PartyForm
 {
@@ -20,14 +25,26 @@ class PartyForm
                     ->schema([
                         TextInput::make('name')
                             ->label(__('Name'))
+                            ->datalist(fn() => Party::pluck('name'))
                             ->required()
                             ->columnSpanFull(),
-                        TextInput::make('phone')
+                        TagsInput::make('phone')
                             ->label(__('Phone'))
-                            ->tel(),
-                        TextInput::make('email')
-                            ->label(__('Email address'))
-                            ->email(),
+                            ->trim()
+                            ->splitKeys(['Tab', ' ', ',', 'Enter'])
+                            ->nestedRecursiveRules([
+                                'min:9',
+                                'max:10',
+                                'starts_with:050,052,053,054,055,056,057,058,02,03,04,06,07,08,09'
+                            ]),
+                        TagsInput::make('email')
+                            ->label(__('Email'))
+                            ->trim()
+                            ->placeholder(__('Enter email addresses separated by comma'))
+                            ->splitKeys(['Tab', ' ', ',', 'Enter'])
+                            ->nestedRecursiveRules([
+                                'email',
+                            ]),
                         TextInput::make('fax')
                             ->label(__('Fax')),
                         CheckboxList::make('role.role')
@@ -70,7 +87,7 @@ class PartyForm
                         Toggle::make('black_list')
                             ->label(__('Black List'))
                             ->default(false)
-                            ->dehydrateStateUsing(fn($state) => (bool) $state ? 1 : 0)
+                            ->dehydrateStateUsing(fn($state) => (bool)$state ? 1 : 0)
                             ->required(),
                         Textarea::make('address')
                             ->label(__('Address'))

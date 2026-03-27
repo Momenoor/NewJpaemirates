@@ -93,7 +93,7 @@ class IncentiveCalculatorService
                         $calculation->period_start,
                         $calculation->period_end,
                     ])
-                        ->whereNotNull('received_at'); // must have start date
+                        ->whereNotNull('distributed_at'); // must have start date
                 })
                 ->get();
 

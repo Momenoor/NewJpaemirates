@@ -11,7 +11,7 @@ enum FeeType: string implements HasLabel, HasColor
 
     case MARKETING = 'marketing';
     case VAT = 'VAT';
-    case COURT_PENALITY = 'court penalty';
+    case COURT_PENALITY = 'court penality';
 
     case OFFICE_SHARE = 'office share';
     case OTHER = 'other';
@@ -22,7 +22,7 @@ enum FeeType: string implements HasLabel, HasColor
             self::EXPERT_FEE => __('Expert Fee'),
             self::MARKETING => __('Marketing'),
             self::VAT => __('VAT'),
-            self::COURT_PENALITY => __('Court Penalty'),
+            self::COURT_PENALITY => __('Court Penality'),
             self::OFFICE_SHARE => __('Office Share'),
             self::OTHER => __('Other'),
         };

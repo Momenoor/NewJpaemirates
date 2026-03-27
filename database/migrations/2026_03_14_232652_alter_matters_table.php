@@ -22,7 +22,7 @@ return new class extends Migration {
             $table->dropColumn('status');
             $table->renameColumn('reported_date', 'initial_report_at');
             $table->renameColumn('submitted_date', 'final_report_at');
-            $table->renameColumn('received_date', 'received_at');
+            $table->renameColumn('received_date', 'distributed_at');
         });
         Schema::table('users', function (Blueprint $table) {
             $table->dropConstrainedForeignId('Account_id');

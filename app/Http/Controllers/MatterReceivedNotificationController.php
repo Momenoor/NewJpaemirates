@@ -49,16 +49,16 @@ class MatterReceivedNotificationController
     public function disputeSubmit(Request $httpRequest, Matter $matter, MatterRequest $matterRequest)
     {
         $httpRequest->validate([
-            'proposed_received_at' => 'required|date|before_or_equal:today',
+            'proposed_distributed_at' => 'required|date|before_or_equal:today',
             'comment' => 'required|string|min:10|max:500',
         ]);
 
         $matterRequest->update([
-            'comment' => __('New Receive Date Request to') . ':' . Carbon::parse($httpRequest->input('proposed_received_at'))->format('M d, Y') . ' - ' . $httpRequest->input('comment'),
+            'comment' => __('New Receive Date Request to') . ':' . Carbon::parse($httpRequest->input('proposed_distributed_at'))->format('M d, Y') . ' - ' . $httpRequest->input('comment'),
             'status' => RequestStatus::DISPUTED,
             'email_action' => 'dispute',
             'extra' => array_merge($matterRequest->extra ?? [], [
-                'proposed_received_at' => $httpRequest->input('proposed_received_at'),
+                'proposed_distributed_at' => $httpRequest->input('proposed_distributed_at'),
                 'dispute_comment' => $httpRequest->input('comment'),
             ]),
         ]);

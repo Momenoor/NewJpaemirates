@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Andreia\FilamentUiSwitcher\Models\Traits\HasUiPreferences;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,7 +16,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser
 {
-    use  HasFactory, Notifiable, HasRoles;
+    use  HasFactory, Notifiable, HasRoles, HasUiPreferences;
     use LogsActivity;
 
     public function getActivitylogOptions(): LogOptions
@@ -23,9 +24,6 @@ class User extends Authenticatable implements FilamentUser
         return LogOptions::defaults()
             ->logAll();
     }
-
-    public const DEFAULT_PASSWORD = 123456;
-
 
     protected $fillable = [
         'name',
@@ -55,6 +53,7 @@ class User extends Authenticatable implements FilamentUser
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'ui_preferences' => 'array'
     ];
 
 

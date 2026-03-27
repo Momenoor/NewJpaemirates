@@ -20,7 +20,7 @@ class MattersPerYearWidget extends ChartWidget
     protected function getData(): array
     {
         $data = Trend::model(Matter::class)
-            ->dateColumn('received_at')
+            ->dateColumn('distributed_at')
             ->between(
                 start: now()->subYears(9)->startOfYear(),
                 end: now()->endOfYear(),
@@ -28,7 +28,7 @@ class MattersPerYearWidget extends ChartWidget
             ->perYear()
             ->count();
 //            Matter::query()
-//            ->selectRaw('YEAR(received_at) as year, count(*) as total')
+//            ->selectRaw('YEAR(distributed_at) as year, count(*) as total')
 //            ->groupBy('year')
 //            ->orderBy('year', 'desc')
 //            ->get();

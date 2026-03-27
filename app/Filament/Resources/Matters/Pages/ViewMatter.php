@@ -82,7 +82,7 @@ class ViewMatter extends ViewRecord
             $newMatter = $record->replicate();
 
             // Clear all dates except received_date
-            $newMatter->received_at = now();
+            $newMatter->distributed_at = now();
             $newMatter->next_session_date = null;
             $newMatter->initial_report_at = null;
             $newMatter->final_report_at = null;

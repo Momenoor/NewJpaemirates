@@ -239,8 +239,8 @@ class MattersTable
                 TextColumn::make('next_session_date')
                     ->label(__('Next Session'))
                     ->date()
-                    ->description(fn($record) => $record->received_at
-                        ? __('Report') . ': ' . Carbon::parse($record->received_at)->format('M d, Y')
+                    ->description(fn($record) => $record->distributed_at
+                        ? __('Report') . ': ' . Carbon::parse($record->distributed_at)->format('M d, Y')
                         : null
                     )
                     ->sortable()
@@ -357,7 +357,7 @@ class MattersTable
                     })
                     ->columnSpan(3),
 
-                Filter::make('received_at')
+                Filter::make('distributed_at')
                     ->label(__('Received Date'))
                     ->schema([
                         Fieldset::make(__('Received Date'))->schema([
@@ -367,8 +367,8 @@ class MattersTable
                     ])
                     ->query(function (Builder $query, array $data) {
                         return $query
-                            ->when($data['received_from'], fn($q, $v) => $q->whereDate('received_at', '>=', $v))
-                            ->when($data['received_until'], fn($q, $v) => $q->whereDate('received_at', '<=', $v));
+                            ->when($data['received_from'], fn($q, $v) => $q->whereDate('distributed_at', '>=', $v))
+                            ->when($data['received_until'], fn($q, $v) => $q->whereDate('distributed_at', '<=', $v));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];

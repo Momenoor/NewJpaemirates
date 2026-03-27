@@ -162,7 +162,7 @@
                 </tr>
                 <tr>
                     <td>{{ __('Received Date') }}:</td>
-                    <td>{{ \Carbon\Carbon::parse($matter->received_at)->locale('ar')->translatedFormat('d F Y') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($matter->distributed_at)->locale('ar')->translatedFormat('d F Y') }}</td>
                 </tr>
             </table>
         </div>

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "13408a20c6362a69669e312fefafd914",
+    "content-hash": "e24b633c7b833537c8180bc19e11294b",
     "packages": [
         {
             "name": "alizharb/filament-activity-log",
@@ -92,6 +92,72 @@
                 }
             ],
             "time": "2026-02-07T01:00:28+00:00"
+        },
+        {
+            "name": "andreia/filament-ui-switcher",
+            "version": "v1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/andreia/filament-ui-switcher.git",
+                "reference": "2d2312f8c721add5213b2c8afc77a88dcb872a12"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/andreia/filament-ui-switcher/zipball/2d2312f8c721add5213b2c8afc77a88dcb872a12",
+                "reference": "2d2312f8c721add5213b2c8afc77a88dcb872a12",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^5.0|^4.1",
+                "illuminate/contracts": "^12.0|^11.0",
+                "livewire/livewire": "^4.0|^3.0",
+                "php": "^8.4|^8.3|^8.2",
+                "spatie/laravel-package-tools": "^1.92"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^10.0|^9.0",
+                "pestphp/pest": "^3.0|^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Andreia\\FilamentUiSwitcher\\FilamentUiSwitcherServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Andreia\\FilamentUiSwitcher\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andréia Bohner",
+                    "email": "andreiabohner@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Add a modal with options to switch between different UI layouts and styles (colors, fonts, font sizes).",
+            "homepage": "https://github.com/andreia/filament-ui-switcher",
+            "keywords": [
+                "customization",
+                "dashboard",
+                "filament",
+                "laravel",
+                "layout",
+                "switcher",
+                "ui"
+            ],
+            "support": {
+                "issues": "https://github.com/andreia/filament-ui-switcher/issues",
+                "source": "https://github.com/andreia/filament-ui-switcher"
+            },
+            "time": "2026-03-22T18:16:43+00:00"
         },
         {
             "name": "aws/aws-crt-php",

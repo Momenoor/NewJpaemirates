@@ -157,7 +157,7 @@ class MatterInfolist
             ->icon('heroicon-o-calendar-days')
             ->columns(2)
             ->schema([
-                TextEntry::make('received_at')->label(__('Received'))->date()
+                TextEntry::make('distributed_at')->label(__('Received'))->date()
                     ->icon('heroicon-o-arrow-down-tray')->placeholder('—'),
                 TextEntry::make('next_session_date')->label(__('Next Session'))->dateTime()
                     ->icon('heroicon-o-calendar')->placeholder('—'),

@@ -4,10 +4,12 @@ namespace App\Providers\Filament;
 
 use AlizHarb\ActivityLog\ActivityLogPlugin;
 use AlizHarb\ActivityLog\RelationManagers\ActivitiesRelationManager;
+use Andreia\FilamentUiSwitcher\FilamentUiSwitcherPlugin;
 use App\Filament\Pages\AdminDashboard;
 use App\Filament\Pages\Auth\CustomLogin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use App\Events\FilamentActionEvent;
+use CraftForge\FilamentLanguageSwitcher\FilamentLanguageSwitcherPlugin;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\FontProviders\GoogleFontProvider;
@@ -28,6 +30,7 @@ use Filament\Support\Enums\Width;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentTimezone;
 use Filament\Tables\Table;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Guava\Calendar\Filament\CalendarWidget;
@@ -101,8 +104,11 @@ class AdminPanelProvider extends PanelProvider
                 ActivityLogPlugin::make()
                     ->label('Log')
                     ->pluralLabel('Logs')
-                    ->navigationGroup('System')
-                ,
+                    ->navigationGroup('System'),
+                //FilamentUiSwitcherPlugin::make(),
+                FilamentLanguageSwitcherPlugin::make()
+                ->locales(['en', 'ar'])
+
             ])
             ->databaseNotifications()
             ->databaseTransactions()

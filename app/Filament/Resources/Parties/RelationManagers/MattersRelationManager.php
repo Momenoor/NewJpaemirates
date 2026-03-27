@@ -8,6 +8,8 @@ use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class MattersRelationManager extends RelationManager
 {
@@ -24,9 +26,15 @@ class MattersRelationManager extends RelationManager
     {
         return MattersTable::configure($table)
             ->headerActions([])
-            ->actions([
+            ->recordActions([
                 ViewAction::make(),
             ])
-            ->bulkActions([]);
+            ->toolbarActions([])
+            ->emptyStateHeading(__('No matters found for this party'));
     }
+
+//    public function getTableQuery(): Builder|Relation|null
+//    {
+//        return parent::getTableQuery()->where('party_id', $this->ownerRecord->id);
+//    }
 }

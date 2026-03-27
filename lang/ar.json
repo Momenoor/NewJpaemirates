@@ -9,8 +9,6 @@
     "Accept": "موافقة",
     "Accepted": "تمت الموافقة",
     "Approved": "معتمد",
-    "Pending": "قيد الانتظار",
-    "Rejected": "مرفوض",
     "Accounting": "المحاسبة",
     "Action": "الإجراء",
     "Actions": "الإجراءات",
@@ -75,8 +73,7 @@
     "Applies to tiered matters only. Per PDF: 5=1.5%, 6=2%, >6=3%. Minimum 6 matters required — below minimum deducts 2% per missing matter.": "تنطبق على القضايا المتدرجة فقط. حسب وثيقة الشروط: 5=1.5%، 6=2%، >6=3%. الحد الأدنى المطلوب 6 قضايا — أقل من الحد يُخصم 2% عن كل قضية ناقصة.",
     "Approve": "اعتماد",
     "Approve Request": "الموافقة على الطلب",
-    "Approved": "معتمد",
-    "Architecture": "العمارة",
+        "Architecture": "العمارة",
     "Archive": "أرشفة",
     "Are you sure you want to approve this request?": "هل أنت متأكد من اعتماد هذا الطلب؟",
     "Are you sure you want to delete this attachment?": "هل أنت متأكد من حذف هذا المرفق؟",
@@ -756,5 +753,12 @@
     "Request By": "طلب من",
     "Current Received Date": "تاريخ الاستلام الحالي",
     "New Receive Date Request to": "طلب تغيير تاريخ الاستلام إلى",
-    "Add Request": "إضافة طلب"
+    "Add Request": "إضافة طلب",
+    "Court Penality": "غرامة المحكمة",
+    "Email": "البريد الإلكتروني",
+    "No matters found for this party": "لم يتم العثور على ملفات لهذا الطرف",
+    "Assistant Assigning Date": "تاريخ تعيين المساعد",
+    "Court Assigning Date": "تاريخ الإحالة من المحكمة",
+    "Change Distributed Date": "تغيير تاريخ التوزيع"
+
 }

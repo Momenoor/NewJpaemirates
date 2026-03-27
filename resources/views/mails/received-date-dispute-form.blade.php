@@ -36,7 +36,7 @@
 
     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-sm text-blue-800">
         <strong>{{ __('Current Received Date') }}:</strong>
-        {{ \Carbon\Carbon::parse($matterRequest->extra['current_received_at'] ?? null)->locale('ar')->translatedFormat('d F Y') }}
+        {{ \Carbon\Carbon::parse($matterRequest->extra['current_distributed_at'] ?? null)->locale('ar')->translatedFormat('d F Y') }}
     </div>
 
     <form method="POST"
@@ -48,12 +48,12 @@
                 {{ __('Correct Received Date') }} <span class="text-red-500">*</span>
             </label>
             <input type="date"
-                   name="proposed_received_at"
+                   name="proposed_distributed_at"
                    max="{{ now()->format('Y-m-d') }}"
-                   value="{{ old('proposed_received_at') }}"
+                   value="{{ old('proposed_distributed_at') }}"
                    required
                    class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            @error('proposed_received_at')
+            @error('proposed_distributed_at')
             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
             @enderror
         </div>

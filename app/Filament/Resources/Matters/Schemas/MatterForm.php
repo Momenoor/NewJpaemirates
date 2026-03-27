@@ -12,10 +12,12 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
@@ -48,7 +50,11 @@ class MatterForm
                                         ->label(__('Number'))
                                         ->required(),
                                     DatePicker::make('received_at')
-                                        ->label(__('Received Date'))
+                                        ->label(__('Court Assigning Date'))
+                                        ->required(),
+                                    DatePicker::make('distributed_at')
+                                        ->label(__('Assistant Assigning Date'))
+                                        ->afterOrEqual('received_at')
                                         ->required(),
                                     DateTimePicker::make('next_session_date')
                                         ->required()
@@ -174,6 +180,8 @@ class MatterForm
                                                 Repeater\TableColumn::make(__('Type'))->width(250),
                                                 Repeater\TableColumn::make(__('Name')),
                                             ])
+                                            ->defaultItems(1)
+                                            ->default([['type' => 'certified', 'party_id' => 7358]])
                                             ->compact()
                                             ->schema([
                                                 Select::make('type')
@@ -252,6 +260,7 @@ class MatterForm
                                             ->relationship('mainPartiesOnly')
                                             ->label(__('Parties'))
                                             ->columns(3)
+                                            ->itemNumbers()
                                             ->schema([
                                                 Select::make('type')
                                                     ->label(__('Type'))
@@ -275,6 +284,7 @@ class MatterForm
                                                         $query->whereJsonContains('role', [['role' => 'party']]);
                                                     })
                                                     ->createOptionForm(fn(Schema $schema) => PartyForm::configure($schema))
+                                                    ->editOptionForm(fn(Schema $schema) => PartyForm::configure($schema))
                                                     ->createOptionAction(function (Action $action) {
                                                         return $action->fillForm([
                                                             'role' => [
@@ -298,9 +308,12 @@ class MatterForm
                                                     ->relationship('representatives')
                                                     ->label(__('Representatives / Lawyers'))
                                                     ->table([
-                                                        Repeater\TableColumn::make(__('Name')),
+                                                        Repeater\TableColumn::make(__('Name'))->width('60%'),
+                                                        Repeater\TableColumn::make(__('Email'))->width('25%'),
+                                                        Repeater\TableColumn::make(__('Phone'))->width('15%'),
                                                     ])
-                                                    ->compact()
+                                                    ->columns(2)
+                                                    //->compact()
                                                     ->schema([
                                                         Select::make('party_id')
                                                             ->label(__('Representative'))
@@ -308,6 +321,7 @@ class MatterForm
                                                                 $query->whereJsonContains('role', [['role' => 'representative']]);
                                                             })
                                                             ->createOptionForm(fn(Schema $schema) => PartyForm::configure($schema))
+                                                            ->editOptionForm(fn(Schema $schema) => PartyForm::configure($schema))
                                                             ->createOptionAction(function (Action $action) {
                                                                 return $action->fillForm([
                                                                     'role' => [
@@ -318,12 +332,19 @@ class MatterForm
                                                             ->createOptionUsing(function (array $data) {
                                                                 return Party::create($data)->id;
                                                             })
+                                                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                                                $party = Party::find($get('party_id'));
+                                                                $set('party_email', $party->email);
+                                                                $set('party_phone', $party->phone);
+                                                            })
+                                                            ->live(onBlur: true)
                                                             ->preload()
                                                             ->required()
                                                             ->searchable()
                                                             ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                                             ->columnSpanFull(),
-
+                                                        TextInput::make('party_email')->disabled(),
+                                                        TextInput::make('party_phone')->disabled(),
                                                         Hidden::make('role')->default('representative'),
 
                                                         Hidden::make('type')

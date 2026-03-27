@@ -22,12 +22,16 @@ class PartiesTable
                     ->searchable(),
                 TextColumn::make('phone')
                     ->label(__('Phone'))
+                    ->badge()
+                    ->listWithLineBreaks()
                     ->searchable(),
                 TextColumn::make('fax')
                     ->label(__('Fax'))
                     ->searchable(),
                 TextColumn::make('email')
                     ->label(__('Email address'))
+                    ->badge()
+                    ->listWithLineBreaks()
                     ->searchable(),
                 TextColumn::make('role')
                     ->label(__('Role'))

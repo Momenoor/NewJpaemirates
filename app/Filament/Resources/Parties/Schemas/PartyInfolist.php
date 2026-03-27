@@ -127,6 +127,8 @@ class PartyInfolist
                                             ->label(__('Phone'))
                                             ->icon('heroicon-o-phone')
                                             ->placeholder('—')
+                                            ->badge()
+                                            ->listWithLineBreaks()
                                             ->copyable(),
 
                                         TextEntry::make('fax')
@@ -138,6 +140,8 @@ class PartyInfolist
                                             ->label(__('Email'))
                                             ->icon('heroicon-o-envelope')
                                             ->placeholder('—')
+                                            ->badge()
+                                            ->listWithLineBreaks()
                                             ->copyable(),
 
                                         TextEntry::make('address')

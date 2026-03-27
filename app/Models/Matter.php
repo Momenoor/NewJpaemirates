@@ -32,7 +32,7 @@ class Matter extends Model
         'year',
         'number',
         'commissioning',
-        'received_at',
+        'distributed_at',
         'next_session_date',
         'initial_report_at',
         'final_report_at',
@@ -46,13 +46,15 @@ class Matter extends Model
         'has_court_penalty',
         'final_report_memo_date',
         'is_office_work',
+        'received_at'
     ];
 
     protected array $dates = [
-        'received_at',
+        'distributed_at',
         'next_session_date',
         'initial_report_at',
         'final_report_at',
+        'received_at',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -244,9 +246,9 @@ class Matter extends Model
         if ($fees->isEmpty()) {
             $this->collection_status = MatterCollectionStatus::NO_FEES;
         } else {
-            $totalAmount = (float) $fees->sum(fn ($fee) => abs($fee->amount));
+            $totalAmount = (float)$fees->sum(fn($fee) => abs($fee->amount));
 
-            $totalAllocated = (float) $this->allocations->sum(fn ($allocation) => abs($allocation->amount));
+            $totalAllocated = (float)$this->allocations->sum(fn($allocation) => abs($allocation->amount));
 
             if ($totalAllocated <= 0) {
                 $this->collection_status = MatterCollectionStatus::UNPAID;
