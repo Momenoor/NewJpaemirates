@@ -9,7 +9,6 @@
         "php": "^8.5",
         "alizharb/filament-activity-log": "^1.3",
         "andreia/filament-ui-switcher": "^1.0",
-        "bezhansalleh/filament-language-switch": "4.1",
         "bezhansalleh/filament-shield": "^4.1",
         "craft-forge/filament-language-switcher": "*",
         "filament/actions": "^4.0",
