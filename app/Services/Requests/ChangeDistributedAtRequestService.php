@@ -13,7 +13,6 @@ class ChangeDistributedAtRequestService extends BaseRequestService
 
         // Apply the proposed received date to the matter
         $proposedDate = $this->request->extra['proposed_distributed_at'] ?? null;
-
         if ($proposedDate) {
             $this->request->matter->update([
                 'distributed_at' => $proposedDate,

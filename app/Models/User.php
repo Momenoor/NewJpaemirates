@@ -31,6 +31,7 @@ class User extends Authenticatable implements FilamentUser
         'language',
         'email',
         'display_name',
+        'font_size',
     ];
 
     protected $with = [
@@ -53,7 +54,8 @@ class User extends Authenticatable implements FilamentUser
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'ui_preferences' => 'array'
+        'ui_preferences' => 'array',
+        'font_size' => 'integer'
     ];
 
 

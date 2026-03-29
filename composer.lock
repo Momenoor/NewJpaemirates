@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d83da7307f5a3e1a45f980e0cc3284d6",
+    "content-hash": "af85a31d5bfd6b34363d89088526f9a0",
     "packages": [
         {
             "name": "alizharb/filament-activity-log",
@@ -3182,6 +3182,82 @@
                 }
             ],
             "time": "2026-03-04T03:15:15+00:00"
+        },
+        {
+            "name": "jibaymcs/filament-tour",
+            "version": "v5.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/JibayMcs/filament-tour.git",
+                "reference": "6dc364554e7b1b18aeeb60252a62fe6b2d1565bb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/JibayMcs/filament-tour/zipball/6dc364554e7b1b18aeeb60252a62fe6b2d1565bb",
+                "reference": "6dc364554e7b1b18aeeb60252a62fe6b2d1565bb",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0|^5.0",
+                "php": ">8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "nunomaduro/collision": "^8.0",
+                "nunomaduro/larastan": "^3.0",
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^4.0",
+                "pestphp/pest-plugin-arch": "^4.0",
+                "pestphp/pest-plugin-laravel": "^4.0",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JibayMcs\\FilamentTour\\FilamentTourServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JibayMcs\\FilamentTour\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "JibayMcs",
+                    "email": "jb@ss2i-services.fr",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Bring the power of DriverJs to your Filament panels and start a tour !",
+            "homepage": "https://github.com/jibaymcs/filament-tour",
+            "keywords": [
+                "JibayMcs",
+                "driverjs",
+                "filament",
+                "filament-tour",
+                "filamentphp",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/jibaymcs/filament-tour/issues",
+                "source": "https://github.com/jibaymcs/filament-tour"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/JibayMcs",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-03-10T13:45:11+00:00"
         },
         {
             "name": "kirschbaum-development/eloquent-power-joins",

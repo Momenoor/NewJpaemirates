@@ -47,14 +47,15 @@ abstract class BaseRequestService
     {
         $this->request->refresh();
         $this->request->unsetRelation('matter');
+        if ($component) {
+            $livewire = $component->getLivewire();
+            $livewire->dispatch('$refresh');
 
-        $livewire = $component->getLivewire();
-        $livewire->dispatch('$refresh');
-
-        // Refresh the parent matter record if available
-        if (method_exists($livewire, 'getRecord') && $livewire->getRecord()) {
-            $livewire->getRecord()->refresh();
-            $livewire->getRecord()->unsetRelation('requests');
+            // Refresh the parent matter record if available
+            if (method_exists($livewire, 'getRecord') && $livewire->getRecord()) {
+                $livewire->getRecord()->refresh();
+                $livewire->getRecord()->unsetRelation('requests');
+            }
         }
     }
 

@@ -36,7 +36,8 @@ class ApproveRequestAction extends Action
             ->icon('heroicon-o-check-circle')
             ->color('success')
             ->requiresConfirmation()
-            ->visible(fn($record) => $record->status === RequestStatus::PENDING || $record->status === RequestStatus::DISPUTED
+            ->visible(fn($record) => $record->status === RequestStatus::DISPUTED
+                || ($record->type !== RequestType::CHANGE_DISTRIBUTED_DATE->value && $record->type === RequestStatus::PENDING)
                 && (
                     auth()->user()->can('EditRequest:MatterRequest')
                     || auth()->user()->can('ApproveRequest:Matter')

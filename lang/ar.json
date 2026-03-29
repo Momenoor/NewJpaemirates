@@ -759,6 +759,21 @@
     "No matters found for this party": "لم يتم العثور على ملفات لهذا الطرف",
     "Assistant Assigning Date": "تاريخ تعيين المساعد",
     "Court Assigning Date": "تاريخ الإحالة من المحكمة",
-    "Change Distributed Date": "تغيير تاريخ التوزيع"
-
+    "Change Distributed Date": "تغيير تاريخ التوزيع",
+    "Font Size": "حجم الخط",
+    "Use this slider to increase or decrease the font size across the entire panel. Your preference is saved automatically.": "استخدم هذا الممر لزيادة أو تقليل حجم الخط على شاشة كاملة. يتم حفظ تفضيلتك تلقائيًا.",
+    "Font Size Control": "تحكم حجم الخط",
+    "Click your avatar to open the user menu.": "انقر على صورة المستخدم لفتح قائمة المستخدم",
+    "Personalize Your Experience": "تخصيص تجربتك في حجم الخط",
+    "Last Activity": "آخر نشاط",
+    "Request Description": "وصف الطلب",
+    "Handled By": "تم التعامل معه من",
+    "Handled At": "تم التعامل معه في",
+    "Handling Note": "تعليق التعامل",
+    "Approval Details": "تفاصيل الموافقة",
+    "Request Information": "معلومات الطلب",
+    "Core details regarding this submission.": "التفاصيل الأساسية المتعلقة بتقديم هذا الطلب.",
+    "Matter Reference": "مرجع الملف",
+    "No comments provided.": "لم يتم تقديم تعليقات.",
+    "Timestamps": "الوقت والتاريخ"
 }

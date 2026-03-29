@@ -157,10 +157,12 @@ class MatterInfolist
             ->icon('heroicon-o-calendar-days')
             ->columns(2)
             ->schema([
-                TextEntry::make('distributed_at')->label(__('Received'))->date()
+                TextEntry::make('distributed_at')->label(__('Court Assigning Date'))->date()
                     ->icon('heroicon-o-arrow-down-tray')->placeholder('—'),
                 TextEntry::make('next_session_date')->label(__('Next Session'))->dateTime()
                     ->icon('heroicon-o-calendar')->placeholder('—'),
+                TextEntry::make('distributed_at')->label(__('Assistant Assigning Date'))->date()
+                    ->icon('heroicon-o-arrow-down-tray')->placeholder('—'),
                 TextEntry::make('initial_report_at')->label(__('Initial Report'))->date()
                     ->icon('heroicon-o-document-check')->placeholder('—'),
                 TextEntry::make('final_report_at')->label(__('Final Report'))->date()

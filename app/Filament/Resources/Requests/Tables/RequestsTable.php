@@ -2,11 +2,19 @@
 
 namespace App\Filament\Resources\Requests\Tables;
 
+use App\Enums\RequestStatus;
+use App\Enums\RequestType;
+use App\Filament\Actions\Request\ApproveRequestAction;
+use App\Filament\Actions\Request\RejectRequestAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
 class RequestsTable
@@ -30,17 +38,19 @@ class RequestsTable
                     ->searchable(),
                 TextColumn::make('comment')
                     ->label(__('Comment'))
+                    ->wrap()
                     ->searchable(),
                 TextColumn::make('approvedBy.name')
                     ->numeric()
-                    ->label(__('Approved By'))
+                    ->label(__('Handled By'))
                     ->sortable(),
                 TextColumn::make('approved_at')
-                    ->label(__('Approved At'))
+                    ->label(__('Handled At'))
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('approved_comment')
-                    ->label(__('Approved Comment'))
+                    ->label(__('Handling Note'))
+                    ->wrap()
                     ->searchable(),
                 TextColumn::make('type')
                     ->label(__('Type'))
@@ -58,10 +68,19 @@ class RequestsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('status')
+                    ->options(RequestStatus::class)
+                    ->multiple()
+                    ->label(__('Status'))
+                    ->default([RequestStatus::PENDING, RequestStatus::DISPUTED]),
+                SelectFilter::make('type')
+                    ->options(RequestType::class)
+                    ->multiple()
+                    ->label(__('Type')),
             ])
             ->recordActions([
-
+                ApproveRequestAction::make(),
+                RejectRequestAction::make(),
             ])
             ->toolbarActions([
 

@@ -7,6 +7,7 @@ use AlizHarb\ActivityLog\RelationManagers\ActivitiesRelationManager;
 use Andreia\FilamentUiSwitcher\FilamentUiSwitcherPlugin;
 use App\Filament\Pages\AdminDashboard;
 use App\Filament\Pages\Auth\CustomLogin;
+use App\Livewire\FontSizeSlider;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use App\Events\FilamentActionEvent;
 use CraftForge\FilamentLanguageSwitcher\FilamentLanguageSwitcherPlugin;
@@ -29,18 +30,21 @@ use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentTimezone;
+use Filament\Support\Facades\FilamentView;
 use Filament\Tables\Table;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
-use Guava\Calendar\Filament\CalendarWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use JibayMcs\FilamentTour\FilamentTourPlugin;
+use Livewire\Livewire;
 use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 use TomatoPHP\FilamentUsers\Filament\Resources\Users\Schemas\UserForm;
 use TomatoPHP\FilamentUsers\Filament\Resources\Users\UserResource;
@@ -70,16 +74,11 @@ class AdminPanelProvider extends PanelProvider
             ->profile()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
-//            ->pages([
-//                AdminDashboard::class,
-//            ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
-            ->discoverWidgets(in: app_path('Livewire'), for: 'App\Livewire')
-//            ->widgets([
-//                AccountWidget::class,
-//                FilamentInfoWidget::class,
-//                CalendarWidget::class,
-//            ])
+            ->renderHook(
+                PanelsRenderHook::USER_MENU_PROFILE_AFTER,
+                fn() => Blade::render('@livewire(\'font-size-slider\')')
+            )
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -107,8 +106,9 @@ class AdminPanelProvider extends PanelProvider
                     ->navigationGroup('System'),
                 //FilamentUiSwitcherPlugin::make(),
                 FilamentLanguageSwitcherPlugin::make()
-                ->locales(['en', 'ar'])
-
+                    ->locales(['en', 'ar']),
+                FilamentTourPlugin::make()
+                    ->enableCssSelector()
             ])
             ->databaseNotifications()
             ->databaseTransactions()
@@ -142,5 +142,6 @@ class AdminPanelProvider extends PanelProvider
         FilamentAsset::register([
             Css::make('custom-css', asset('css/custom-css.css')),
         ]);
+
     }
 }

@@ -7,12 +7,19 @@ use App\Filament\Widgets\MattersPerYearWidget;
 use App\Filament\Widgets\MatterStatsWidget;
 use Filament\Pages\Dashboard;
 use Filament\Pages\Page;
+use JibayMcs\FilamentTour\Highlight\HasHighlight;
+use JibayMcs\FilamentTour\Highlight\Highlight;
+use JibayMcs\FilamentTour\Tour\HasTour;
+use JibayMcs\FilamentTour\Tour\Step;
+use JibayMcs\FilamentTour\Tour\Tour;
 
 class AdminDashboard extends Dashboard
 {
+    use HasTour;
+
     public function getWidgets(): array
     {
-        return[
+        return [
             MatterStatsWidget::class,
             MattersPerYearWidget::class,
 
@@ -21,4 +28,30 @@ class AdminDashboard extends Dashboard
         ];
 
     }
+
+    /**
+     * @throws \Exception
+     */
+    public function tours(): array
+    {
+        return [
+            Tour::make('font-size-feature')
+                ->ignoreRoutes()
+                ->steps(
+                    Step::make('.fi-avatar') // targets the user avatar in the top bar
+                    ->title(__('Personalize Your Experience'))
+                        ->description(__('Click your avatar to open the user menu.'))
+                        ->icon('heroicon-o-user-circle')
+                        ->iconColor('primary'),
+
+                    Step::make('#font-size-slider') // targets the slider wrapper
+                    ->title(__('Font Size Control'))
+                        ->description(__('Use this slider to increase or decrease the font size across the entire panel. Your preference is saved automatically.'))
+                        ->icon('heroicon-o-adjustments-horizontal')
+                        ->iconColor('primary'),
+                ),
+        ];
+    }
+
+
 }
