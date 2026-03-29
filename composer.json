@@ -106,6 +106,13 @@
             "pestphp/pest-plugin": true,
             "php-http/discovery": true,
             "tbachert/spi": true
+        },
+        "audit": {
+            "ignore": [
+                "PKSA-xnj5-w74d-6wmz",
+                "PKSA-rnpm-45mg-w6ht",
+                "PKSA-5szq-gvrg-ttfq"
+            ]
         }
     },
     "minimum-stability": "beta",
