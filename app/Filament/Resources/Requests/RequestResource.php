@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class RequestResource extends Resource
 {
-    use HasPanelShield;
+
     protected static ?string $model = MatterRequest::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Newspaper;
