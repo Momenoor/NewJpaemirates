@@ -210,4 +210,9 @@ class AssistantMattersExporter extends Exporter
 
         return $body;
     }
+
+    public function getFileName(Export $export): string
+    {
+        return 'Assistant Matters Report' . '-' . date('Y-m-d H:i:s');
+    }
 }
