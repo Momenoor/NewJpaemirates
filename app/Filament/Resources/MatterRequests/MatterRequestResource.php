@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\MatterRequests;
 
-use App\Filament\Resources\MatterRequests\Pages\CreateRequest;
+use App\Filament\Resources\MatterRequests\Pages\CreateMatterRequest;
 use App\Filament\Resources\MatterRequests\Pages\EditRequest;
 use App\Filament\Resources\MatterRequests\Pages\ListMatterRequests;
 use App\Filament\Resources\MatterRequests\Pages\ViewMatterRequest;
@@ -68,7 +68,7 @@ class MatterRequestResource extends Resource
     {
         return [
             'index' => ListMatterRequests::route('/'),
-            //'create' => CreateRequest::route('/create'),
+            //'create' => CreateMatterRequest::route('/create'),
             'view' => ViewMatterRequest::route('/{record}'),
             //'edit' => EditRequest::route('/{record}/edit'),
         ];
