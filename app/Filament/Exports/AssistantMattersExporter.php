@@ -9,6 +9,16 @@ use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Number;
+use OpenSpout\Common\Entity\Style\CellAlignment;
+use OpenSpout\Common\Entity\Style\Color;
+use OpenSpout\Common\Entity\Style\Style;
+use OpenSpout\Common\Exception\InvalidArgumentException;
+use OpenSpout\Writer\Exception\InvalidSheetNameException;
+use OpenSpout\Writer\Exception\WriterNotOpenedException;
+use OpenSpout\Writer\XLSX\Entity\SheetView;
+use OpenSpout\Writer\XLSX\Options;
+use OpenSpout\Writer\XLSX\Writer;
 
 class AssistantMattersExporter extends Exporter
 {
@@ -33,6 +43,9 @@ class AssistantMattersExporter extends Exporter
             ExportColumn::make('status')
                 ->label(__('Status'))
                 ->getStateUsing(fn($record) => $record->matter?->status ?? '—'),
+            ExportColumn::make('level')
+                ->label(__('Level'))
+                ->getStateUsing(fn($record) => $record->matter?->level?->getLabel() ?? '—'),
             ExportColumn::make('matter.mainExpertsOnly.name')
                 ->label(__('Experts')),
             ExportColumn::make('plaintiffs')
@@ -71,7 +84,57 @@ class AssistantMattersExporter extends Exporter
                 ),
         ];
     }
+    public function getXlsxWriterOptions(): ?Options
+    {
+        $options = new Options();
 
+        // 1: Matter (Reference)
+        $options->setColumnWidth(15, 1);
+
+        // 2: Assistant
+        $options->setColumnWidth(25, 2);
+
+        // 3: Court
+        $options->setColumnWidth(22, 3);
+
+        // 4: Type
+        $options->setColumnWidth(18, 4);
+
+        // 5: Status
+        $options->setColumnWidth(15, 5);
+
+        // 6: Level (العمود الجديد الذي أضفته)
+        $options->setColumnWidth(15, 6);
+
+        // 7: Experts
+        $options->setColumnWidth(30, 7);
+
+        // 8: Plaintiffs (المدعون)
+        $options->setColumnWidth(40, 8);
+
+        // 9: Defendants (المدعى عليهم)
+        $options->setColumnWidth(40, 9);
+
+        // 10: Distributed At
+        $options->setColumnWidth(18, 10);
+
+        // 11: Initial Report Date
+        $options->setColumnWidth(18, 11);
+
+        // 12: Final Report Date
+        $options->setColumnWidth(18, 12);
+
+        // 13: Total Fees (excl. VAT)
+        $options->setColumnWidth(22, 13);
+
+        // 14: Total Collected (excl. VAT)
+        $options->setColumnWidth(22, 14);
+
+        // 15: Notes
+        $options->setColumnWidth(50, 15);
+
+        return $options;
+    }
     public static function modifyQuery(Builder $query): Builder
     {
         return $query
@@ -93,10 +156,55 @@ class AssistantMattersExporter extends Exporter
             ]);
     }
 
+    public function getXlsxCellStyle(): ?Style
+    {
+        return new Style()
+            ->setShouldWrapText()
+            ->setFontSize(11)
+            ->setFontName('Arial');
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function getXlsxHeaderCellStyle(): ?Style
+    {
+        return new Style()
+            ->setFontBold()
+            ->setShouldWrapText()
+            ->setFontSize(11)
+            ->setFontName('Arial')
+            ->setFontColor(Color::rgb(255, 255, 255))
+            ->setBackgroundColor(Color::rgb(31, 56, 100))
+            ->setCellAlignment(CellAlignment::CENTER);
+    }
+
+    /**
+     * @throws InvalidSheetNameException
+     * @throws WriterNotOpenedException
+     * @throws InvalidArgumentException
+     */
+    public function configureXlsxWriterBeforeClose(Writer $writer): Writer
+    {
+        $sheetView = new SheetView();
+        $sheetView->setFreezeRow(2);
+        $sheetView->setRightToLeft(app()->getLocale() == 'ar');
+
+        $sheet = $writer->getCurrentSheet();
+        $sheet->setSheetView($sheetView);
+        $sheet->setName('Assistant Matters');
+
+        return $writer;
+    }
+
     public static function getCompletedNotificationBody(Export $export): string
     {
-        return __('export_completed', [
-            'count' => number_format($export->successful_rows),
-        ]);
+        $body = trans_choice('export_completed', $export->successful_rows, ['count' => Number::format($export->successful_rows)]);
+
+        if ($failedRowsCount = $export->getFailedRowsCount()) {
+            $body .= ' ' . trans_choice('export_failed', $failedRowsCount, ['count' => Number::format($failedRowsCount)]);
+        }
+
+        return $body;
     }
 }

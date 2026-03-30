@@ -116,6 +116,7 @@ class MatterExporter extends Exporter
     {
         return new Style()
             ->setFontSize(11)
+            ->setShouldWrapText()
             ->setFontName('Arial');
     }
 
@@ -185,4 +186,5 @@ class MatterExporter extends Exporter
             'allocations',
         ]);
     }
+
 }
