@@ -36,11 +36,22 @@ class RejectRequestAction extends Action
             ->icon('heroicon-o-x-circle')
             ->color('danger')
             ->requiresConfirmation()
-            ->visible(fn($record) => $record->status === RequestStatus::DISPUTED
-                || ($record->type !== RequestType::CHANGE_DISTRIBUTED_DATE->value && $record->type === RequestStatus::PENDING)
-                && (
-                    auth()->user()->can('EditRequest:MatterRequest')
-                    || auth()->user()->can('RejectRequest:Matter')
+            ->visible(fn($record) =>
+                auth()->user()->hasAnyRole('super-admin', 'super_admin')
+                ||
+                ($record->type == RequestType::CHANGE_DISTRIBUTED_DATE && $record->status === RequestStatus::PENDING && auth()->id() === $record->request_by)
+                ||
+                (
+                    (auth()->user()->can('EditRequest:MatterRequest') || auth()->user()->can('RejectRequest:Matter'))
+
+                    &&
+
+                    // 2. Check Business Logic / Status
+                    (
+                        $record->status === RequestStatus::DISPUTED ||
+                        ($record->status === RequestStatus::PENDING && $record->type !== RequestType::CHANGE_DISTRIBUTED_DATE) ||
+                        ($record->status === RequestStatus::PENDING && auth()->id() === $record->request_by)
+                    )
                 )
             )
             ->modalHeading(__('Reject Request'))
