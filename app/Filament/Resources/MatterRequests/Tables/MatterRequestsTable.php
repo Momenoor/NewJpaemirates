@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Requests\Tables;
+namespace App\Filament\Resources\MatterRequests\Tables;
 
 use App\Enums\RequestStatus;
 use App\Enums\RequestType;
@@ -17,7 +17,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
-class RequestsTable
+class MatterRequestsTable
 {
     public static function configure(Table $table): Table
     {

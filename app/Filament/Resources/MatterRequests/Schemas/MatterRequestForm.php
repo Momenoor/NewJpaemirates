@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Filament\Resources\Requests\Schemas;
+namespace App\Filament\Resources\MatterRequests\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
-class RequestForm
+class MatterRequestForm
 {
     public static function configure(Schema $schema): Schema
     {

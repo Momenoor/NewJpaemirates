@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\Requests;
+namespace App\Filament\Resources\MatterRequests;
 
-use App\Filament\Resources\Requests\Pages\CreateRequest;
-use App\Filament\Resources\Requests\Pages\EditRequest;
-use App\Filament\Resources\Requests\Pages\ListRequests;
-use App\Filament\Resources\Requests\Pages\ViewRequest;
-use App\Filament\Resources\Requests\Schemas\RequestForm;
-use App\Filament\Resources\Requests\Schemas\RequestInfolist;
-use App\Filament\Resources\Requests\Tables\RequestsTable;
+use App\Filament\Resources\MatterRequests\Pages\CreateRequest;
+use App\Filament\Resources\MatterRequests\Pages\EditRequest;
+use App\Filament\Resources\MatterRequests\Pages\ListMatterRequests;
+use App\Filament\Resources\MatterRequests\Pages\ViewMatterRequest;
+use App\Filament\Resources\MatterRequests\Schemas\MatterRequestForm;
+use App\Filament\Resources\MatterRequests\Schemas\MatterRequestInfolist;
+use App\Filament\Resources\MatterRequests\Tables\MatterRequestsTable;
 use App\Models\MatterRequest;
 use BackedEnum;
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
@@ -18,7 +18,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
-class RequestResource extends Resource
+class MatterRequestResource extends Resource
 {
 
     protected static ?string $model = MatterRequest::class;
@@ -44,17 +44,17 @@ class RequestResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return RequestForm::configure($schema);
+        return MatterRequestForm::configure($schema);
     }
 
     public static function infolist(Schema $schema): Schema
     {
-        return RequestInfolist::configure($schema);
+        return MatterRequestInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return RequestsTable::configure($table);
+        return MatterRequestsTable::configure($table);
     }
 
     public static function getRelations(): array
@@ -67,9 +67,9 @@ class RequestResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListRequests::route('/'),
+            'index' => ListMatterRequests::route('/'),
             //'create' => CreateRequest::route('/create'),
-            'view' => ViewRequest::route('/{record}'),
+            'view' => ViewMatterRequest::route('/{record}'),
             //'edit' => EditRequest::route('/{record}/edit'),
         ];
     }

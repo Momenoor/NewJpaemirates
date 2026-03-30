@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Requests\Schemas;
+namespace App\Filament\Resources\MatterRequests\Schemas;
 
 use App\Enums\RequestStatus;
 
@@ -15,7 +15,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Filament\Support\Enums\TextSize;
 
-class RequestInfolist
+class MatterRequestInfolist
 {
     public static function configure(Schema $schema): Schema
     {

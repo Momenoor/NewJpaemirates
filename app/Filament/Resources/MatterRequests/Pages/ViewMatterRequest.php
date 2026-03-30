@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\Requests\Pages;
+namespace App\Filament\Resources\MatterRequests\Pages;
 
 use App\Filament\Actions\Request\ApproveRequestAction;
 use App\Filament\Actions\Request\RejectRequestAction;
-use App\Filament\Resources\Requests\RequestResource;
+use App\Filament\Resources\MatterRequests\MatterRequestResource;
 use Filament\Resources\Pages\ViewRecord;
 
-class ViewRequest extends ViewRecord
+class ViewMatterRequest extends ViewRecord
 {
-    protected static string $resource = RequestResource::class;
+    protected static string $resource = MatterRequestResource::class;
 
     public function getHeaderActions(): array
     {
