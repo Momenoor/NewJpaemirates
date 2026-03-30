@@ -150,6 +150,20 @@ class AdminPanelProvider extends PanelProvider
         FilamentAsset::register([
             Css::make('custom-css', asset('css/custom-css.css')),
         ]);
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::HEAD_END,
+            fn (): string => Blade::render("
+            <style>
+                :root {
+                    --user-font-size: {{ auth()->check() ? auth()->user()->font_size : 16 }}px;
+                }
+
+                body {
+                    font-size: var(--user-font-size) !important;
+                }
+            </style>
+        "),
+        );
 
     }
 }
