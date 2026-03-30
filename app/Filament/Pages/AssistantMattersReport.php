@@ -115,7 +115,7 @@ class AssistantMattersReport extends Page implements HasTable
                 TextColumn::make('matter.status')
                     ->label(__('Status'))
                     ->badge()
-                    ->getStateUsing(fn($record) => MatterStatus::tryFrom($record->matter?->status)->getLabel())
+                    ->getStateUsing(fn($record) => $record->matter?->status)
                     ->width('7%'),
 
                 // ── Experts on the matter ─────────────────────────────────

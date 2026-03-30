@@ -43,7 +43,7 @@ class AssistantMattersExporter extends Exporter
                 ->getStateUsing(fn($record) => $record->matter?->type?->name ?? '—'),
             ExportColumn::make('status')
                 ->label(__('Status'))
-                ->getStateUsing(fn($record) => MatterStatus::tryFrom($record->matter?->status)->getLabel() ?? '—'),
+                ->getStateUsing(fn($record) => $record->matter?->status->getLabel() ?? '—'),
             ExportColumn::make('difficulty')
                 ->label(__('Difficulty'))
                 ->getStateUsing(fn($record) => $record->matter?->difficulty?->getLabel() ?? '—'),
