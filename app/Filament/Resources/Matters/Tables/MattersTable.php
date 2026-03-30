@@ -478,7 +478,7 @@ class MattersTable
             ->filtersFormColumns(6)
             ->filtersLayout(FiltersLayout::Modal)
             ->filtersFormWidth(Width::FourExtraLarge)
-            ->filter
+            ->deselectAllRecordsWhenFiltered(true)
             ->recordActions([
                 ViewAction::make()->iconButton()->visible(fn($record) => auth()->user()->can('View:Matter')),
                 EditAction::make()->iconButton()->visible(fn($record) => auth()->user()->can('Update:Matter')),
