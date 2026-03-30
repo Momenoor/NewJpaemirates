@@ -175,14 +175,14 @@ class AssistantMattersReport extends Page implements HasTable
                     ->width('7%'),
 
                 // ── Notes ────────────────────────────────────────────────
-                TextColumn::make('matter.notes.content')
+                TextColumn::make('matter.notes.text')
                     ->label(__('Notes'))
                     ->listWithLineBreaks()
                     ->placeholder('—')
                     ->wrap()
                     ->limit(80)
                     ->tooltip(fn($record) => $record->matter?->notes
-                        ->map(fn($note) => $note->content)
+                        ->map(fn($note) => $note->text)
                         ->join(' | ')
                     )
                     ->width('12%'),
