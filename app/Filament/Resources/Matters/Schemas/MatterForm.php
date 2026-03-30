@@ -172,8 +172,8 @@ class MatterForm
                             ->schema([
                                 Section::make(__('Parties & Experts'))
                                     ->schema([
-                                        Repeater::make('mainExpertsOnly')
-                                            ->relationship('mainExpertsOnly')
+                                        Repeater::make('expertsOnly')
+                                            ->relationship('expertsOnly')
                                             ->label(__('Experts'))
                                             ->columns(3)
                                             ->table([

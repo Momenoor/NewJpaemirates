@@ -36,7 +36,7 @@ class CalendarEventForm
             ->where('type', 'defendant')
             ->map(fn($mp) => $mp->party?->name)->filter()->join(', ');
 
-        $experts = $matter->mainExpertsOnly
+        $experts = $matter->expertsOnly
             ->map(fn($mp) => $mp->party?->name)->filter()->join(', ');
 
         return collect([
@@ -69,7 +69,7 @@ class CalendarEventForm
                     ->live()
                     ->afterStateUpdated(function (?int $state, Set $set) {
                         if (!$state) return;
-                        $matter = Matter::with(['court', 'type', 'mainPartiesOnly.party', 'mainExpertsOnly.party'])
+                        $matter = Matter::with(['court', 'type', 'mainPartiesOnly.party', 'expertsOnly.party'])
                             ->find($state);
                         if (!$matter) return;
 

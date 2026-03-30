@@ -22,7 +22,6 @@ class AdminDashboard extends Dashboard
         return [
             MatterStatsWidget::class,
             MattersPerYearWidget::class,
-
             CalendarWidget::class,
 
         ];

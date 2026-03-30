@@ -22,6 +22,7 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -89,6 +90,13 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+            ])
+            ->navigationGroups([
+                NavigationGroup::make(__('Finance')),
+                NavigationGroup::make(__('Reports')),
+                NavigationGroup::make(__('Settings')),
+                NavigationGroup::make(__('Filament Shield'))
+
             ])
             ->authMiddleware([
                 Authenticate::class,

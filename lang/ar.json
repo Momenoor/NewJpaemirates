@@ -73,7 +73,7 @@
     "Applies to tiered matters only. Per PDF: 5=1.5%, 6=2%, >6=3%. Minimum 6 matters required — below minimum deducts 2% per missing matter.": "تنطبق على القضايا المتدرجة فقط. حسب وثيقة الشروط: 5=1.5%، 6=2%، >6=3%. الحد الأدنى المطلوب 6 قضايا — أقل من الحد يُخصم 2% عن كل قضية ناقصة.",
     "Approve": "اعتماد",
     "Approve Request": "الموافقة على الطلب",
-        "Architecture": "العمارة",
+    "Architecture": "العمارة",
     "Archive": "أرشفة",
     "Are you sure you want to approve this request?": "هل أنت متأكد من اعتماد هذا الطلب؟",
     "Are you sure you want to delete this attachment?": "هل أنت متأكد من حذف هذا المرفق؟",
@@ -775,5 +775,16 @@
     "Core details regarding this submission.": "التفاصيل الأساسية المتعلقة بتقديم هذا الطلب.",
     "Matter Reference": "مرجع الملف",
     "No comments provided.": "لم يتم تقديم تعليقات.",
-    "Timestamps": "الوقت والتاريخ"
+    "Timestamps": "الوقت والتاريخ",
+    "Distributed At": "تاريخ التوزيع",
+    "Total Fees (excl. VAT)": "الأتعاب (غير شاملة للضريبة)",
+    "Total Collected (excl. VAT)": "التحصيل (غير شامل للضريبة)",
+    "Reports" : "التقارير",
+    "Assistant Matters Report" : "تقرير ملفات المساعد",
+    "Assistant Matters Count" : "عدد ملفات المساعد",
+    "Active Matters": "الملفات قيد العمل",
+    "All Assistant Matters": " ملفات جميع المساعدين",
+    "Matters for: :name": "ملفات: :name"
 }
+
+

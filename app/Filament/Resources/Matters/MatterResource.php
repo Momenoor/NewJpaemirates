@@ -86,7 +86,7 @@ class MatterResource extends Resource
             ->with([
                 'mainPartiesOnly.party',
                 'mainPartiesOnly.representatives.party',
-                'mainExpertsOnly.party',
+                'expertsOnly.party',
                 'fees.allocations',
                 'court',
                 'type',

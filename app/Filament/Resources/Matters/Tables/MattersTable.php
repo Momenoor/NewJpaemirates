@@ -136,9 +136,7 @@ class MattersTable
                 TextColumn::make('indexedParties')
                     ->label(__('Parties'))
                     ->listWithLineBreaks()
-                    ->getStateUsing(fn($record) => $record->parent_id
-                        ? ['—']  // child row: don't repeat parties
-                        : $record->indexedParties
+                    ->getStateUsing(fn($record) =>  $record->indexedParties
                             ->map(function ($mp) {
                                 $type = $mp->type ? ucfirst(str_replace('-', ' ', $mp->type)) : '';
                                 $color = match ($mp->type) {
@@ -206,7 +204,7 @@ class MattersTable
                     ->searchable(query: function (Builder $query, string $search) {
                         $tokens = static::splitSearch($search);
                         foreach ($tokens as $token) {
-                            $query->whereHas('mainExpertsOnly.party', fn($q) => $q->where('name', 'like', "%{$token}%")
+                            $query->whereHas('expertsOnly.party', fn($q) => $q->where('name', 'like', "%{$token}%")
                             );
                         }
                         return $query;

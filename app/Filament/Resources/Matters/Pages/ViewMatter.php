@@ -77,7 +77,7 @@ class ViewMatter extends ViewRecord
 
     private function cloneMatter($record): void
     {
-        DB::transaction(function () use ($record) {
+        DB::transaction(callback: function () use ($record) {
             // ── 1. Clone the matter itself ────────────────────────────────
             $newMatter = $record->replicate();
 
@@ -113,7 +113,7 @@ class ViewMatter extends ViewRecord
             }
 
             // ── 3. Clone experts ──────────────────────────────────────────
-            $experts = $record->mainExpertsOnly()->get();
+            $experts = $record->expertsOnly()->get();
 
             foreach ($experts as $expert) {
                 $newExpert = $expert->replicate();

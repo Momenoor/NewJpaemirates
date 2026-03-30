@@ -127,7 +127,7 @@ class Matter extends Model
     /**
      * Top-level matter_party rows with role 'expert' only.
      */
-    public function mainExpertsOnly(): HasMany
+    public function expertsOnly(): HasMany
     {
         return $this->hasMany(MatterParty::class, 'matter_id')
             ->where(fn($q) => $q->whereNull('parent_id')->orWhere('parent_id', 0))
@@ -161,14 +161,27 @@ class Matter extends Model
             ->withPivot('id', 'type', 'role', 'parent_id');
     }
 
+    public function mainExpertsOnly(): BelongsToMany
+    {
+        return $this->belongsToMany(Party::class, 'matter_party')
+            // Filter the related Party record's JSON column
+            ->whereJsonContains('parties.role', [
+                'role' => 'expert',
+                'type' => 'certified'
+            ])
+            // Filter the relationship link (Pivot Table)
+            ->withPivot('id', 'type', 'role as pivot_role', 'parent_id');
+    }
+
     /**
      * Top-level parties only via belongsToMany (no representatives).
      */
     public function mainPartiesQuery(): BelongsToMany
     {
         return $this->belongsToMany(Party::class, 'matter_party')
+            ->whereJsonContains('parties.role', ['role' => 'party'])
             ->withPivot('id', 'type', 'role', 'parent_id')
-            ->wherePivot(fn($q) => $q->whereNull('parent_id')->orWhere('parent_id', 0));
+            ->wherePivotIn('parent_id', [null, '', 0]);
     }
 
     /**
@@ -209,9 +222,9 @@ class Matter extends Model
             return $this->_cache['indexedExperts'];
         }
 
-        $relation = $this->relationLoaded('mainExpertsOnly')
-            ? $this->mainExpertsOnly
-            : $this->mainExpertsOnly()->with('party')->get();
+        $relation = $this->relationLoaded('expertsOnly')
+            ? $this->expertsOnly
+            : $this->expertsOnly()->with('party')->get();
 
         $result = $relation
             ->groupBy('type')

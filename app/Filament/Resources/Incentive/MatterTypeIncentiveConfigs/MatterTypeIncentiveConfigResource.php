@@ -40,7 +40,7 @@ class MatterTypeIncentiveConfigResource extends Resource
     }
 
     protected static string|null|BackedEnum $navigationIcon = 'heroicon-o-cog-6-tooth';
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 5;
 
     protected static ?string $recordTitleAttribute = 'calculation_type';
 

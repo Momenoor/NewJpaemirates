@@ -17,6 +17,7 @@ class MatterParty extends Model
         return LogOptions::defaults()
             ->logAll();
     }
+
     protected $table = 'matter_party';
 
     protected $fillable = [
@@ -56,6 +57,16 @@ class MatterParty extends Model
         return $this->belongsTo(Matter::class);
     }
 
+    public function matter_fees(): HasMany
+    {
+        return $this->hasMany(Fee::class, 'matter_id', 'matter_id');
+    }
+
+    public function matter_allocations(): HasMany
+    {
+        return $this->hasMany(Allocation::class, 'matter_id', 'matter_id');
+    }
+
     /**
      * The party this row points to.
      */
@@ -86,5 +97,10 @@ class MatterParty extends Model
     {
         return $this->hasMany(MatterParty::class, 'parent_id', 'id')
             ->where('role', 'representative');
+    }
+
+    public function experts(): BelongsTo
+    {
+        return $this->belongsTo(Party::class, 'party_id')->whereJsonContains('role' , ['role' => 'expert', 'type' => 'certified']);
     }
 }

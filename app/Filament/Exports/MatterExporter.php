@@ -179,7 +179,7 @@ class MatterExporter extends Exporter
             'type',
             'mainPartiesOnly.party',           // used by getIndexedPartiesAttribute()
             'mainPartiesOnly.representatives.party', // loaded inside indexedParties too
-            'mainExpertsOnly.party',           // used by getIndexedExpertsAttribute()
+            'expertsOnly.party',           // used by getIndexedExpertsAttribute()
             'fees',
             'notes',
             'allocations',
