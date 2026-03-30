@@ -36,12 +36,22 @@ class ApproveRequestAction extends Action
             ->icon('heroicon-o-check-circle')
             ->color('success')
             ->requiresConfirmation()
-            ->visible(fn($record) => $record->status === RequestStatus::DISPUTED
-                || ($record->type !== RequestType::CHANGE_DISTRIBUTED_DATE && $record->status === RequestStatus::PENDING)
-                || (($record->type === RequestType::CHANGE_DISTRIBUTED_DATE || $record->status == RequestStatus::PENDING) && auth()->user()->id === $record->request_by)
-                && (
-                    auth()->user()->can('EditRequest:MatterRequest')
-                    || auth()->user()->can('ApproveRequest:Matter')
+            ->visible(fn($record): bool => // 1. Check Permissions Firt
+                auth()->user()->hasAnyRole('super-admin', 'super_admin')
+                ||
+                ($record->type == RequestType::CHANGE_DISTRIBUTED_DATE && $record->status === RequestStatus::PENDING && auth()->id() === $record->request_by)
+                ||
+                (
+                    (auth()->user()->can('EditRequest:MatterRequest') || auth()->user()->can('ApproveRequest:Matter'))
+
+                    &&
+
+                    // 2. Check Business Logic / Status
+                    (
+                        $record->status === RequestStatus::DISPUTED ||
+                        ($record->status === RequestStatus::PENDING && $record->type !== RequestType::CHANGE_DISTRIBUTED_DATE) ||
+                        ($record->status === RequestStatus::PENDING && auth()->id() === $record->request_by)
+                    )
                 )
             )
             ->modalHeading(__('Approve Request'))
