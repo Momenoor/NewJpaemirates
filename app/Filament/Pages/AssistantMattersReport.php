@@ -110,11 +110,6 @@ class AssistantMattersReport extends Page implements HasTable
                     ->badge()
                     ->wrap()
                     ->width('8%'),
-                // ── Level ────────────────────────────────────────────────
-                TextColumn::make('matter.level')
-                    ->label(__('Level'))
-                    ->badge()
-                    ->width('7%'),
                 // ── Status ────────────────────────────────────────────────
                 TextColumn::make('matter.status')
                     ->label(__('Status'))
