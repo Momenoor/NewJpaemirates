@@ -131,8 +131,8 @@ class AssistantMattersReport extends Page implements HasTable
                     ->width('13%'),
 
                 // ── Plaintiffs ────────────────────────────────────────────
-                TextColumn::make('matter.mainPartiesQuery.name')
-                    ->label(__('Plaintiffs'))
+                TextColumn::make('matter.mainPartiesOnly.party.name')
+                    ->label(__('Parties'))
                     ->listWithLineBreaks()
                     ->wrap()
                     ->width('13%'),
