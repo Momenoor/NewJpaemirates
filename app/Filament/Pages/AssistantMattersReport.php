@@ -125,28 +125,28 @@ class AssistantMattersReport extends Page implements HasTable
                     ->label(__('Experts'))
                     ->listWithLineBreaks()
                     ->wrap()
-                    ->width('17%'),
+                    ->width('13%'),
 
                 // ── Plaintiffs ────────────────────────────────────────────
                 TextColumn::make('matter.mainPartiesQuery.name')
                     ->label(__('Plaintiffs'))
                     ->listWithLineBreaks()
                     ->wrap()
-                    ->width('15%'),
+                    ->width('13%'),
 
                 TextColumn::make('matter.distributed_at')
                     ->label(__('Distributed At'))
                     ->date('d M Y')
                     ->placeholder('—')
                     ->sortable()
-                    ->width('8%'),
+                    ->width('7%'),
                 // ── Initial Report Date ───────────────────────────────────
                 TextColumn::make('matter.initial_report_at')
                     ->label(__('Initial Report'))
                     ->date('d M Y')
                     ->placeholder('—')
                     ->sortable()
-                    ->width('8%'),
+                    ->width('7%'),
 
                 // ── Final Report Date ─────────────────────────────────────
                 TextColumn::make('matter.final_report_at')
@@ -154,14 +154,14 @@ class AssistantMattersReport extends Page implements HasTable
                     ->date('d M Y')
                     ->placeholder('—')
                     ->sortable()
-                    ->width('8%'),
+                    ->width('7%'),
 
                 // ── Total Fees (excl. VAT) ────────────────────────────────
                 TextColumn::make('total_fees')
                     ->label(__('Total Fees (excl. VAT)'))
                     ->money('AED')
                     ->alignEnd()
-                    ->width('8%'),
+                    ->width('7%'),
 
                 // ── Total Allocations (excl. VAT) ─────────────────────────
                 TextColumn::make('total_allocations')
