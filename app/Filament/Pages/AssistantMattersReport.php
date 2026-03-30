@@ -100,6 +100,9 @@ class AssistantMattersReport extends Page implements HasTable
                     ->label(__('Court'))
                     ->wrap()
                     ->width('8%'),
+                TextColumn::make('matter.level')
+                    ->label(__('Level'))
+                    ->badge(),
 
                 // ── Matter Type ───────────────────────────────────────────
                 TextColumn::make('matter.type.name')
@@ -186,107 +189,107 @@ class AssistantMattersReport extends Page implements HasTable
 
             ])
             ->filters([
-                SelectFilter::make('party.name')
-                    ->relationship('party', 'name', fn($query) => $query->whereJsonContains('role', ['role' => 'expert', 'type' => 'assistant']))
-                    ->label(__('Assistant'))
-                    ->searchable()
-                    ->preload()
-                    ->multiple(),
-                SelectFilter::make('experts')
-                    ->relationship('matter.mainExpertsOnly', 'name')
-                    ->label(__('Experts'))
-                    ->searchable()
-                    ->preload()
-                    ->multiple(),
+        SelectFilter::make('party.name')
+            ->relationship('party', 'name', fn($query) => $query->whereJsonContains('role', ['role' => 'expert', 'type' => 'assistant']))
+            ->label(__('Assistant'))
+            ->searchable()
+            ->preload()
+            ->multiple(),
+        SelectFilter::make('experts')
+            ->relationship('matter.mainExpertsOnly', 'name')
+            ->label(__('Experts'))
+            ->searchable()
+            ->preload()
+            ->multiple(),
 
-                SelectFilter::make('matter.type')
-                    ->relationship('matter.type', 'name')
-                    ->preload()
-                    ->label(__('Matter Type'))
-                    ->options(\App\Models\Type::pluck('name', 'id'))
-                    ->searchable()
-                    ->multiple(),
-                SelectFilter::make('status')
-                    ->label(__('Status'))
-                    ->options([
-                        'in_progress' => __('In Progress'),
-                        'initial_report' => __('Initial Report'),
-                        'final_report' => __('Final Report'),
-                    ])
-                    ->query(function (Builder $query, array $data) {
-                        // If nothing is selected, don't modify the query
-                        if (empty($data['values'])) {
-                            return $query;
-                        }
-
-                        return $query->where(function (Builder $subQuery) use ($data) {
-                            foreach ($data['values'] as $value) {
-                                $subQuery->orWhere(function (Builder $innerQuery) use ($value) {
-                                    match ($value) {
-                                        'in_progress' => $innerQuery->whereHas('matter', fn($m) => $m->whereNull('final_report_at')->whereNull('initial_report_at')
-                                        ),
-                                        'initial_report' => $innerQuery->whereHas('matter', fn($m) => $m->whereNull('final_report_at')->whereNotNull('initial_report_at')
-                                        ),
-                                        'final_report' => $innerQuery->whereHas('matter', fn($m) => $m->whereNotNull('final_report_at')->whereNotNull('initial_report_at')
-                                        ),
-                                        default => $innerQuery,
-                                    };
-                                });
-                            }
-                        });
-                    })
-                    ->multiple(),
-                Filter::make('matter.initial_report_at')
-                    ->indicator('initial_report_at')
-                    ->label(__('Initial Report Date'))
-                    ->schema([
-                        Section::make(__('Initial Report Date'))->schema([
-                            DatePicker::make('initial_from')->label(__('From')),
-                            DatePicker::make('initial_until')->label(__('Until')),
-                        ])->columnSpanFull(),
-                    ])
-                    ->query(function (Builder $query, array $data) {
-                        $query
-                            ->when($data['initial_from'], fn($q) => $q->whereHas('matter', fn($m) => $m->whereDate('initial_report_at', '>=', $data['initial_from'])
-                            )
-                            )
-                            ->when($data['initial_until'], fn($q) => $q->whereHas('matter', fn($m) => $m->whereDate('initial_report_at', '<=', $data['initial_until'])
-                            )
-                            );
-                    })
-                    ->indicator('initial_report_at')
-                    ->columns(2),
-
-                Filter::make('matter.final_report_at')
-                    ->indicator('final_report_at')
-                    ->label(__('Final Report Date'))
-                    ->schema([
-                        Section::make(__('Final Report Date'))->schema([
-                            DatePicker::make('final_from')->label(__('From')),
-                            DatePicker::make('final_until')->label(__('Until')),
-                        ])->columnSpanFull(),
-                    ])
-                    ->query(function (Builder $query, array $data) {
-                        $query
-                            ->when($data['final_from'], fn($q) => $q->whereHas('matter', fn($m) => $m->whereDate('final_report_at', '>=', $data['final_from'])
-                            )
-                            )
-                            ->when($data['final_until'], fn($q) => $q->whereHas('matter', fn($m) => $m->whereDate('final_report_at', '<=', $data['final_until'])
-                            )
-                            );
-                    })
-                    ->columns(2),
-
+        SelectFilter::make('matter.type')
+            ->relationship('matter.type', 'name')
+            ->preload()
+            ->label(__('Matter Type'))
+            ->options(\App\Models\Type::pluck('name', 'id'))
+            ->searchable()
+            ->multiple(),
+        SelectFilter::make('status')
+            ->label(__('Status'))
+            ->options([
+                'in_progress' => __('In Progress'),
+                'initial_report' => __('Initial Report'),
+                'final_report' => __('Final Report'),
             ])
-            ->filtersFormColumns(2)
-            ->toolbarActions([
-                \Filament\Actions\ExportAction::make()
-                    ->exporter(AssistantMattersExporter::class)
-                    ->label(__('Export'))
-                    ->color('warning')
-                    ->columnMappingColumns(3)
-                    ->icon('heroicon-o-arrow-down-tray'),
-            ]);
+            ->query(function (Builder $query, array $data) {
+                // If nothing is selected, don't modify the query
+                if (empty($data['values'])) {
+                    return $query;
+                }
+
+                return $query->where(function (Builder $subQuery) use ($data) {
+                    foreach ($data['values'] as $value) {
+                        $subQuery->orWhere(function (Builder $innerQuery) use ($value) {
+                            match ($value) {
+                                'in_progress' => $innerQuery->whereHas('matter', fn($m) => $m->whereNull('final_report_at')->whereNull('initial_report_at')
+                                ),
+                                'initial_report' => $innerQuery->whereHas('matter', fn($m) => $m->whereNull('final_report_at')->whereNotNull('initial_report_at')
+                                ),
+                                'final_report' => $innerQuery->whereHas('matter', fn($m) => $m->whereNotNull('final_report_at')->whereNotNull('initial_report_at')
+                                ),
+                                default => $innerQuery,
+                            };
+                        });
+                    }
+                });
+            })
+            ->multiple(),
+        Filter::make('matter.initial_report_at')
+            ->indicator('initial_report_at')
+            ->label(__('Initial Report Date'))
+            ->schema([
+                Section::make(__('Initial Report Date'))->schema([
+                    DatePicker::make('initial_from')->label(__('From')),
+                    DatePicker::make('initial_until')->label(__('Until')),
+                ])->columnSpanFull(),
+            ])
+            ->query(function (Builder $query, array $data) {
+                $query
+                    ->when($data['initial_from'], fn($q) => $q->whereHas('matter', fn($m) => $m->whereDate('initial_report_at', '>=', $data['initial_from'])
+                    )
+                    )
+                    ->when($data['initial_until'], fn($q) => $q->whereHas('matter', fn($m) => $m->whereDate('initial_report_at', '<=', $data['initial_until'])
+                    )
+                    );
+            })
+            ->indicator('initial_report_at')
+            ->columns(2),
+
+        Filter::make('matter.final_report_at')
+            ->indicator('final_report_at')
+            ->label(__('Final Report Date'))
+            ->schema([
+                Section::make(__('Final Report Date'))->schema([
+                    DatePicker::make('final_from')->label(__('From')),
+                    DatePicker::make('final_until')->label(__('Until')),
+                ])->columnSpanFull(),
+            ])
+            ->query(function (Builder $query, array $data) {
+                $query
+                    ->when($data['final_from'], fn($q) => $q->whereHas('matter', fn($m) => $m->whereDate('final_report_at', '>=', $data['final_from'])
+                    )
+                    )
+                    ->when($data['final_until'], fn($q) => $q->whereHas('matter', fn($m) => $m->whereDate('final_report_at', '<=', $data['final_until'])
+                    )
+                    );
+            })
+            ->columns(2),
+
+    ])
+        ->filtersFormColumns(2)
+        ->toolbarActions([
+            \Filament\Actions\ExportAction::make()
+                ->exporter(AssistantMattersExporter::class)
+                ->label(__('Export'))
+                ->color('warning')
+                ->columnMappingColumns(3)
+                ->icon('heroicon-o-arrow-down-tray'),
+        ]);
     }
 
     // ── Query ─────────────────────────────────────────────────────────────────
