@@ -25,6 +25,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use BackedEnum;
+use Illuminate\Support\HtmlString;
 use UnitEnum;
 
 class AssistantMattersReport extends Page implements HasTable
@@ -158,17 +159,17 @@ class AssistantMattersReport extends Page implements HasTable
 
                 // ── Total Fees (excl. VAT) ────────────────────────────────
                 TextColumn::make('total_fees')
-                    ->label(__('Total Fees (excl. VAT)'))
+                    ->label(fn() => new HtmlString(__('Total Fees <br> (excl. VAT)')))
                     ->money('AED')
                     ->alignEnd()
                     ->width('7%'),
 
                 // ── Total Allocations (excl. VAT) ─────────────────────────
                 TextColumn::make('total_allocations')
-                    ->label(__('Total Collected (excl. VAT)'))
+                    ->label(fn() => new HtmlString(__('Total Collected <br> (excl. VAT)')))
                     ->money('AED')
                     ->alignEnd()
-                    ->width('8%'),
+                    ->width('7%'),
 
                 // ── Notes ────────────────────────────────────────────────
                 TextColumn::make('matter.notes.content')

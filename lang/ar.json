@@ -784,7 +784,9 @@
     "Assistant Matters Count" : "عدد ملفات المساعد",
     "Active Matters": "الملفات قيد العمل",
     "All Assistant Matters": " ملفات جميع المساعدين",
-    "Matters for: :name": "ملفات: :name"
+    "Matters for: :name": "ملفات: :name",
+    "Total Collected <br> (excl. VAT)": "التحصيل<br> (غ.ش.ض)",
+    "Total Fees <br> (excl. VAT)": "الأتعاب<br> (غ.ش.ض)"
 }
 
 
