@@ -3,6 +3,7 @@
 namespace App\Filament\Exports;
 
 use App\Enums\FeeType;
+use App\Enums\MatterStatus;
 use App\Models\MatterParty;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
@@ -42,7 +43,7 @@ class AssistantMattersExporter extends Exporter
                 ->getStateUsing(fn($record) => $record->matter?->type?->name ?? '—'),
             ExportColumn::make('status')
                 ->label(__('Status'))
-                ->getStateUsing(fn($record) => __($record->matter?->status ?? '—')),
+                ->getStateUsing(fn($record) => MatterStatus::tryFrom($record->matter?->status)->getLabel() ?? '—'),
             ExportColumn::make('difficulty')
                 ->label(__('Difficulty'))
                 ->getStateUsing(fn($record) => $record->matter?->difficulty?->getLabel() ?? '—'),
@@ -84,6 +85,7 @@ class AssistantMattersExporter extends Exporter
                 ),
         ];
     }
+
     public function getXlsxWriterOptions(): ?Options
     {
         $options = new Options();
@@ -135,6 +137,7 @@ class AssistantMattersExporter extends Exporter
 
         return $options;
     }
+
     public static function modifyQuery(Builder $query): Builder
     {
         return $query
