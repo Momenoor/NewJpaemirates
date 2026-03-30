@@ -81,7 +81,7 @@ class AssistantMattersExporter extends Exporter
             ExportColumn::make('notes')
                 ->label(__('Notes'))
                 ->getStateUsing(fn($record) => $record->matter?->notes
-                    ->map(fn($note) => $note->content)->filter()->join(' | ') ?? '—'
+                    ->map(fn($note) => $note->text)->filter()->join(' | ') ?? '—'
                 ),
         ];
     }
