@@ -37,12 +37,10 @@ class RejectRequestAction extends Action
             ->color('danger')
             ->requiresConfirmation()
             ->visible(fn($record) =>
-                auth()->user()->hasAnyRole('super-admin', 'super_admin')
-                ||
-                ($record->type == RequestType::CHANGE_DISTRIBUTED_DATE && $record->status === RequestStatus::PENDING && auth()->id() === $record->request_by)
+                ($record->type == RequestType::CHANGE_DISTRIBUTED_DATE && $record->status === RequestStatus::PENDING && (auth()->id() === $record->request_by || auth()->user()->hasAnyRole('super-admin', 'super_admin')))
                 ||
                 (
-                    (auth()->user()->can('EditRequest:MatterRequest') || auth()->user()->can('RejectRequest:Matter'))
+                    (auth()->user()->can('EditRequest:MatterRequest') || auth()->user()->can('RejectRequest:Matter') || auth()->user()->hasAnyRole('super-admin', 'super_admin'))
 
                     &&
 

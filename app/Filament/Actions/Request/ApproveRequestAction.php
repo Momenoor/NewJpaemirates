@@ -37,12 +37,11 @@ class ApproveRequestAction extends Action
             ->color('success')
             ->requiresConfirmation()
             ->visible(fn($record): bool => // 1. Check Permissions Firt
-                auth()->user()->hasAnyRole('super-admin', 'super_admin')
-                ||
-                ($record->type == RequestType::CHANGE_DISTRIBUTED_DATE && $record->status === RequestStatus::PENDING && auth()->id() === $record->request_by)
+
+                ($record->type == RequestType::CHANGE_DISTRIBUTED_DATE && $record->status === RequestStatus::PENDING && (auth()->id() === $record->request_by || auth()->user()->hasAnyRole('super-admin', 'super_admin')))
                 ||
                 (
-                    (auth()->user()->can('EditRequest:MatterRequest') || auth()->user()->can('ApproveRequest:Matter'))
+                    (auth()->user()->can('EditRequest:MatterRequest') || auth()->user()->can('ApproveRequest:Matter') || auth()->user()->hasAnyRole('super-admin', 'super_admin'))
 
                     &&
 
