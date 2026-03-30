@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Enums\MatterStatus;
 use App\Filament\Widgets\AssistantMatterCountTableWidget;
 use App\Filament\Widgets\AssistantMattersCountChartWidget;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
@@ -29,7 +30,7 @@ class AssistantMattersCount extends Page
 
     public function getTitle(): string
     {
-        return __('Assistant Matters Count');
+        return __('Assistant Matters Count') .': ' .MatterStatus::IN_PROGRESS->getLabel();
     }
 
     public function getColumns(): int|array
