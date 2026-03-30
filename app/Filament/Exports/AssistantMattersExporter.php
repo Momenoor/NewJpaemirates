@@ -43,9 +43,9 @@ class AssistantMattersExporter extends Exporter
             ExportColumn::make('status')
                 ->label(__('Status'))
                 ->getStateUsing(fn($record) => $record->matter?->status ?? '—'),
-            ExportColumn::make('level')
-                ->label(__('Level'))
-                ->getStateUsing(fn($record) => $record->matter?->level?->getLabel() ?? '—'),
+            ExportColumn::make('difficulty')
+                ->label(__('Difficulty'))
+                ->getStateUsing(fn($record) => $record->matter?->difficulty?->getLabel() ?? '—'),
             ExportColumn::make('matter.mainExpertsOnly.name')
                 ->label(__('Experts')),
             ExportColumn::make('plaintiffs')

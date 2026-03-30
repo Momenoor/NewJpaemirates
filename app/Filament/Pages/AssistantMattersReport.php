@@ -100,8 +100,8 @@ class AssistantMattersReport extends Page implements HasTable
                     ->label(__('Court'))
                     ->wrap()
                     ->width('8%'),
-                TextColumn::make('matter.level')
-                    ->label(__('Level'))
+                TextColumn::make('matter.difficulty')
+                    ->label(__('Difficulty'))
                     ->badge(),
 
                 // ── Matter Type ───────────────────────────────────────────
