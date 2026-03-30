@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Enums\FeeType;
+use App\Enums\MatterStatus;
 use App\Filament\Exports\AssistantMattersExporter;
 use App\Models\Matter;
 use App\Models\MatterParty;
@@ -114,13 +115,7 @@ class AssistantMattersReport extends Page implements HasTable
                 TextColumn::make('matter.status')
                     ->label(__('Status'))
                     ->badge()
-                    ->getStateUsing(fn($record) => $record->matter?->status)
-                    ->color(fn($state) => match ($state) {
-                        'In Progress' => 'info',
-                        'Initial Report' => 'warning',
-                        'Final Report' => 'success',
-                        default => 'gray',
-                    })
+                    ->getStateUsing(fn($record) => MatterStatus::tryFrom($record->matter?->status))
                     ->width('7%'),
 
                 // ── Experts on the matter ─────────────────────────────────
