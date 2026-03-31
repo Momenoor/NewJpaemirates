@@ -114,7 +114,7 @@ class AdminPanelProvider extends PanelProvider
                     ->navigationGroup('System'),
                 //FilamentUiSwitcherPlugin::make(),
                 FilamentLanguageSwitcherPlugin::make()
-                    ->locales(['en', 'ar']),
+                    ->locales(['en', ['code' => 'ar', 'name' => __('Arabic'), 'flag' => 'ae']]),
                 FilamentTourPlugin::make()
                     ->enableCssSelector()
             ])
@@ -152,7 +152,7 @@ class AdminPanelProvider extends PanelProvider
         ]);
         FilamentView::registerRenderHook(
             PanelsRenderHook::HEAD_END,
-            fn (): string => Blade::render("
+            fn(): string => Blade::render("
             <style>
                 :root {
                     --user-font-size: {{ auth()->check() ? auth()->user()->font_size : 16 }}px;
