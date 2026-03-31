@@ -70,7 +70,7 @@ class CalendarWidget extends FullCalendarWidget
             'initialView' => 'listWeek',
             //'eventDisplay' => 'block',
             'scrollTime' => '09:00:00',
-            'timeZone' => 'UTC', // Or 'local'
+            'timeZone' => 'local', // Or 'local'
             'slotMinTime' => '00:00:00', // Start workday at 8 AM
             'slotMaxTime' => '20:00:00',
         ];
@@ -103,7 +103,7 @@ class CalendarWidget extends FullCalendarWidget
     protected function getOptions(): array
     {
         return [
-            'timeZone' => 'UTC', // Or 'local'
+            'timeZone' => 'local', // Or 'local'
             'firstDay' => 0, // Sunday (Common for Gulf region)
             'slotMinTime' => '08:00:00', // Start workday at 8 AM
             'slotMaxTime' => '20:00:00', // End at 8 PM
