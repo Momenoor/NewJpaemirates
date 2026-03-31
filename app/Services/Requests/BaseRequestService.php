@@ -66,7 +66,7 @@ abstract class BaseRequestService
             ->body($body)
             ->actions([
                 Action::make('view')
-                    ->url(route('filament.admin.resources.requests.view', $this->request))
+                    ->url(route('filament.admin.resources.matter-requests.view', $this->request))
                     ->markAsRead()
             ])
             ->sendToDatabase($recipients);
@@ -88,7 +88,7 @@ abstract class BaseRequestService
                 'number' => $this->request->matter->number,
                 'year' => $this->request->matter->year
             ]),
-            User::role(['admin', 'super-admin'])->get()
+            User::role(['admin', 'super-admin','super_admin'])->get()
         );
     }
 
