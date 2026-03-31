@@ -36,8 +36,8 @@ class CalendarWidget extends FullCalendarWidget
             ->map(fn($event) => [
                 'id' => $event->id,
                 'title' => $event->title,
-                'start' => (!$event->is_all_day) ? $event->start_datetime : $event->start_datetime->subHours(4),
-                'end' => (!$event->is_all_day) ? $event->end_datetime : $event->end_datetime->subHours(4),
+                'start' =>  $event->start_datetime->subHours(4),
+                'end' =>  $event->end_datetime->subHours(4),
                 'allDay' => $event->is_all_day,
                 'extendedProps' => [
                     'location' => $event->location,
@@ -70,6 +70,7 @@ class CalendarWidget extends FullCalendarWidget
             'initialView' => 'listWeek',
             //'eventDisplay' => 'block',
             'scrollTime' => '09:00:00',
+            'timeZone' => 'Asia/Muscat', // Or 'local'
             'slotMinTime' => '00:00:00', // Start workday at 8 AM
             'slotMaxTime' => '20:00:00',
         ];
@@ -102,7 +103,7 @@ class CalendarWidget extends FullCalendarWidget
     protected function getOptions(): array
     {
         return [
-           // 'timeZone' => 'local', // Or 'local'
+            'timeZone' => 'Asia/Muscat', // Or 'local'
             'firstDay' => 0, // Sunday (Common for Gulf region)
             'slotMinTime' => '08:00:00', // Start workday at 8 AM
             'slotMaxTime' => '20:00:00', // End at 8 PM
