@@ -42,4 +42,10 @@ return [
         'redirect_uri' => env('MICROSOFT_REDIRECT_URI'),
         'user_email' => env('MICROSOFT_CALENDAR_EMAIL'),
     ],
+
+    'whatsapp' => [
+        'phone_id' => env('WHATSAPP_PHONE_ID'),
+        'token' => env('WHATSAPP_TOKEN'),
+        'from' => env('WHATSAPP_FROM'),
+    ]
 ];

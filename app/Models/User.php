@@ -5,6 +5,7 @@ namespace App\Models;
 use Andreia\FilamentUiSwitcher\Models\Traits\HasUiPreferences;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -72,5 +73,12 @@ class User extends Authenticatable implements FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
         return true;
+    }
+
+    public function phone(): Attribute
+    {
+        return new Attribute(
+            get: fn() => $this->party?->phone ?? '',
+        );
     }
 }
