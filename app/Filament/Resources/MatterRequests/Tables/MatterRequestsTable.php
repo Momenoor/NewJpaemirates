@@ -23,11 +23,10 @@ class MatterRequestsTable
     {
         return $table
             ->columns([
-                TextColumn::make('matter')
+                TextColumn::make('matter.number')
                     ->formatStateUsing(fn($record) => $record->matter->number . '/' . $record->matter->year)
                     ->url(fn($record) => route('filament.admin.resources.matters.view', $record->matter_id))
-                    ->label(__('Matter'))
-                    ->searchable(),
+                    ->label(__('Matter')),
                 TextColumn::make('requestBy.name')
                     ->label(__('Request By'))
                     ->numeric()

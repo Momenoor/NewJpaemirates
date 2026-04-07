@@ -20,6 +20,7 @@ class Attachment extends Model
 
     protected $fillable = [
         'matter_id',
+        'matter_request_id',
         'user_id',
         'type',
         'path',
@@ -36,6 +37,10 @@ class Attachment extends Model
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+    public function matterRequest(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(MatterRequest::class);
     }
 
 }

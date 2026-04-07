@@ -11,6 +11,7 @@ enum RequestType: string implements HasLabel, HasColor
     case REVIEW_INCENTIVE = 'review_incentive';
     case REVIEW_REPORT = 'review_report';
     case CHANGE_DISTRIBUTED_DATE = 'change_distributed_date';
+    case CONFIRM_REPORT = 'confirm_report';
 
     public function getLabel(): ?string
     {
@@ -19,6 +20,7 @@ enum RequestType: string implements HasLabel, HasColor
             self::REVIEW_INCENTIVE => __('Review Incentive'),
             self::REVIEW_REPORT => __('Review Report'),
             self::CHANGE_DISTRIBUTED_DATE => __('Change Distributed Date'),
+            self::CONFIRM_REPORT => __('Confirm Report'),
         };
     }
 
@@ -27,7 +29,7 @@ enum RequestType: string implements HasLabel, HasColor
         return match ($this) {
             self::CHANGE_DIFFICULTY => 'info',
             self::REVIEW_INCENTIVE => 'warning',
-            self::REVIEW_REPORT => 'success',
+            self::REVIEW_REPORT,self::CONFIRM_REPORT => 'success',
             self::CHANGE_DISTRIBUTED_DATE => 'primary',
             default => 'gray',
         };

@@ -6,15 +6,19 @@ use App\Enums\MatterDifficulty;
 use App\Enums\MatterStatus;
 use App\Enums\RequestStatus;
 use App\Enums\RequestType;
+use App\Mail\NewRequestNotificationMail;
+use App\Models\MatterRequest;
 use App\Models\User;
+use App\Services\WhatsAppService;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 abstract class BaseRequestService
 {
-    public function __construct(protected Model $request)
+    public function __construct(protected MatterRequest $request)
     {
     }
 
@@ -41,6 +45,19 @@ abstract class BaseRequestService
             'approved_at' => now(),
             'approved_comment' => $data['approved_comment'],
         ]);
+
+        foreach ($data['attachments'] ?? [] as $item) {
+            $path = $item['path'];
+            $this->request->attachments()->create([
+                'name' => 'request-attachment-' . $this->request->id . '-' . basename($path),
+                'path' => $path,
+                'size' => Storage::disk('public')->size($path),
+                'extension' => pathinfo($path, PATHINFO_EXTENSION),
+                'type' => 'matter-request',
+                'matter_id' => $this->request->matter_id,
+                'user_id' => auth()->id(),
+            ]);
+        }
     }
 
     protected function refresh($component): void
@@ -88,8 +105,20 @@ abstract class BaseRequestService
                 'number' => $this->request->matter->number,
                 'year' => $this->request->matter->year
             ]),
-            User::role(['admin', 'super-admin','super_admin'])->get()
+            User::role(['admin', 'super-admin', 'super_admin'])->get()
         );
+        $users = User::role([/*'admin',*/ 'super-admin', 'super_admin'])->get();
+        $emails = $users->pluck('email');
+        Mail::to($emails)
+            ->send(new NewRequestNotificationMail(
+                    $this->request->matter,
+                    $this->request
+                )
+            );
+        /*$users->map(function ($user) {
+            WhatsAppService::notifyNewRequest($user, $this->request);
+        });*/
+
     }
 
     protected function onApproveNotify(): void
@@ -133,7 +162,6 @@ abstract class BaseRequestService
                 'comment' => $comment,
                 'extra' => $extra,
             ]);
-
             foreach ($data['attachments'] ?? [] as $item) {
                 $path = $item['path'];
                 $request->attachments()->create([

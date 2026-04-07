@@ -67,8 +67,8 @@ class CreateRequestAction extends Action
                         ->preserveFilenames(),
                 ])
                 ->lazy()
-                ->defaultItems(fn(Get $get) => $get('type') === RequestType::REVIEW_REPORT ? 1 : 0)
-                ->required(fn(Get $get) => $get('type') === RequestType::REVIEW_REPORT)
+                ->defaultItems(fn(Get $get) => in_array($get('type') ,[RequestType::REVIEW_REPORT, RequestType::CONFIRM_REPORT]) ? 1 : 0)
+                ->required(fn(Get $get) => in_array($get('type') ,[RequestType::REVIEW_REPORT, RequestType::CONFIRM_REPORT]))
                 ->collapsible(),
         ]);
     }

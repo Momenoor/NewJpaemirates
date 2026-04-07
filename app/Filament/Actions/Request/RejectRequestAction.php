@@ -36,8 +36,7 @@ class RejectRequestAction extends Action
             ->icon('heroicon-o-x-circle')
             ->color('danger')
             ->requiresConfirmation()
-            ->visible(fn($record) =>
-                ($record->type == RequestType::CHANGE_DISTRIBUTED_DATE && $record->status === RequestStatus::PENDING && (auth()->id() === $record->request_by || auth()->user()->hasAnyRole('super-admin', 'super_admin')))
+            ->visible(fn($record) => ($record->type == RequestType::CHANGE_DISTRIBUTED_DATE && $record->status === RequestStatus::PENDING && (auth()->id() === $record->request_by || auth()->user()->hasAnyRole('super-admin', 'super_admin')))
                 ||
                 (
                     (auth()->user()->can('EditRequest:MatterRequest') || auth()->user()->can('RejectRequest:Matter') || auth()->user()->hasAnyRole('super-admin', 'super_admin'))
@@ -61,6 +60,20 @@ class RejectRequestAction extends Action
     {
         return $schema->components([
             Textarea::make('approved_comment')->label(__('Reviewer Comment'))->required()->rows(2),
+            Repeater::make('attachments')
+                ->label(__('Attachments'))
+                ->schema([
+                    FileUpload::make('path')
+                        ->label(__('File'))
+                        ->disk('public')
+                        ->directory('requests-attachments')
+                        ->required()
+                        ->preserveFilenames(),
+                ])
+                ->lazy()
+                ->defaultItems(fn(Get $get) => in_array($get('type'), [RequestType::REVIEW_REPORT, RequestType::CONFIRM_REPORT]) ? 1 : 0)
+                ->required(fn(Get $get) => in_array($get('type'), [RequestType::REVIEW_REPORT, RequestType::CONFIRM_REPORT]))
+                ->collapsible(),
         ]);
     }
 

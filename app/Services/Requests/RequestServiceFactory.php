@@ -14,6 +14,7 @@ class RequestServiceFactory
             RequestType::REVIEW_INCENTIVE => new ReviewIncentiveRequestService($request),
             RequestType::REVIEW_REPORT => new ReviewReportRequestService($request),
             RequestType::CHANGE_DISTRIBUTED_DATE => new ChangeDistributedAtRequestService($request),
+            RequestType::CONFIRM_REPORT => new ConfirmReportRequestService($request),
             default => throw new \InvalidArgumentException("Unsupported request type: {$request->type->value}"),
         };
     }

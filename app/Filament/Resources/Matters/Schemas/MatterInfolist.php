@@ -185,7 +185,7 @@ class MatterInfolist
                     ->columns(3)
                     ->columnSpanFull()
                     ->schema([
-                        TextEntry::make('requestBy.name')
+                        TextEntry::make('requestBy.display_name')
                             ->label(__('Requester'))
                             ->weight(FontWeight::SemiBold),
                         TextEntry::make('type')
@@ -196,7 +196,7 @@ class MatterInfolist
                             ->label(__('Status'))
                             ->badge(),
                         TextEntry::make('comment')->label(__('Comment'))->columnSpanFull(),
-                        TextEntry::make('approvedBy.name')
+                        TextEntry::make('approvedBy.display_name')
                             ->label(__('Reviewed By'))
                             ->visible(fn($record) => $record->status !== RequestStatus::PENDING && $record->status !== RequestStatus::DISPUTED),
                         TextEntry::make('approved_at')
@@ -242,7 +242,7 @@ class MatterInfolist
                     ->visible(fn($record) => $record?->notes?->isNotEmpty())
                     ->schema([
                         TextEntry::make('text')->label(__('Note'))->columnSpanFull(),
-                        TextEntry::make('user.name')->label(__('By'))
+                        TextEntry::make('user.display_name')->label(__('By'))
                             ->icon('heroicon-o-user')->size(TextSize::ExtraSmall),
                         TextEntry::make('datetime')->label(__('Date'))
                             ->dateTime()->icon('heroicon-o-clock')->size(TextSize::ExtraSmall),
@@ -264,7 +264,7 @@ class MatterInfolist
             ->schema([
                 RepeatableEntry::make('indexedExperts')
                     ->hiddenLabel()
-                    ->columns(4)
+                    ->columns(7)
                     ->columnSpanFull()
                     ->schema([
                         TextEntry::make('type')
@@ -278,7 +278,7 @@ class MatterInfolist
                             ->label(__('Name'))
                             ->icon('heroicon-o-user-circle')
                             ->weight(FontWeight::SemiBold)
-                            ->columnSpan(2),
+                            ->columnSpan(5),
                     ]),
             ]);
     }
@@ -291,7 +291,7 @@ class MatterInfolist
             ->schema([
                 RepeatableEntry::make('indexedParties')
                     ->hiddenLabel()
-                    ->columns(4)
+                    ->columns(7)
                     ->columnSpanFull()
                     ->schema([
                         TextEntry::make('type')
@@ -300,19 +300,22 @@ class MatterInfolist
                                 ? ucfirst(str_replace('-', ' ', $state)) : ''))
                             ->badge()
                             ->color(fn($state) => static::partyTypeColor($state)),
-                        TextEntry::make('role_index')->label('#')->badge()->color('gray'),
+                        TextEntry::make('role_index')
+                            ->label('#')
+                            ->badge()
+                            ->color('gray'),
                         TextEntry::make('party.name')
                             ->label(__('Name'))
                             ->icon('heroicon-o-user-circle')
                             ->weight(FontWeight::SemiBold)
-                            ->columnSpan(2),
+                            ->columnSpan(5)
+                            ->grow(),
                         RepeatableEntry::make('representatives')
                             ->label(__('Representatives'))
-                            ->columns(4)
+                            ->columns(1)
                             ->columnSpanFull()
                             ->visible(fn($record) => $record?->representatives?->isNotEmpty())
                             ->schema([
-                                TextEntry::make('rep_index')->label('#')->badge()->color('gray'),
                                 TextEntry::make('party.name')->label(__('Name'))
                                     ->icon('heroicon-o-user')->columnSpan(3),
                             ]),
@@ -474,7 +477,7 @@ class MatterInfolist
         return Action::make('addNote')
             ->label(__('Add Note'))
             ->icon('heroicon-o-plus')
-            ->visible(fn($record) => auth()->user()->can('createNote', $record))
+            ->visible(fn($record) => auth()->user()->can('CreateNote:Matter'))
             ->modalHeading(__('Add New Note'))
             ->schema([
                 Textarea::make('text')->label(__('Content'))->required()->rows(3),
@@ -499,7 +502,7 @@ class MatterInfolist
             ->label(__('Edit'))
             ->iconButton()
             ->icon('heroicon-o-pencil')
-            ->visible(fn($record) => auth()->user()->can('updateNote', $record->matter))
+            ->visible(fn($record) => auth()->user()->can('UpdateNote:Matter'))
             ->modalHeading(__('Edit Note'))
             ->schema([
                 Textarea::make('text')->label(__('Content'))->required()->rows(3),
@@ -519,7 +522,7 @@ class MatterInfolist
             ->iconButton()
             ->icon('heroicon-o-trash')
             ->color('danger')
-            ->visible(fn($record) => auth()->user()->can('deleteNote', $record->matter))
+            ->visible(fn($record) => auth()->user()->can('DeleteNote:Matter'))
             ->requiresConfirmation()
             ->action(function ($record, $component) {
                 $record->delete();
@@ -541,7 +544,7 @@ class MatterInfolist
             ->label(__('Edit'))
             ->iconButton()
             ->icon('heroicon-o-pencil')
-            ->visible(fn($record) => auth()->user()->can('updateFee', $record->matter))
+            ->visible(fn($record) => auth()->user()->can('UpdateFee:Matter'))
             ->modalHeading(__('Edit Fee'))
             ->schema([
                 TextInput::make('amount')->label(__('Fee Amount'))
@@ -569,7 +572,7 @@ class MatterInfolist
             ->iconButton()
             ->icon('heroicon-o-trash')
             ->color('danger')
-            ->visible(fn($record) => auth()->user()->can('deleteFee', $record->matter))
+            ->visible(fn($record) => auth()->user()->can('DeleteFee:Matter'))
             ->requiresConfirmation()
             ->action(function ($record, $component) {
                 $record->delete();

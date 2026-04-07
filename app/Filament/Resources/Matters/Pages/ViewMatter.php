@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Matters\Pages;
 
 use App\Enums\MatterCollectionStatus;
+use App\Enums\MatterLevel;
 use App\Filament\Actions\Calendar\SyncToOutlookAction;
 use App\Filament\Resources\Matters\MatterResource;
 use Filament\Actions\Action;
@@ -12,8 +13,11 @@ use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Components\Section;
 use Filament\Support\Colors\Color;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -65,7 +69,33 @@ class ViewMatter extends ViewRecord
                 ->label(__('Supplementary Matter'))
                 ->color('info')
                 ->visible(fn($record) => auth()->user()->can('replicate', $record))
-                ->action(fn($record) => $this->cloneMatter($record)),
+                ->schema(fn($record) => [
+                    Section::make(__('Supplementary Matter Details'))
+                        ->columns(2)
+                        ->schema([
+                            TextInput::make('number')
+                                ->label(__('Number'))
+                                ->default($record->number),
+                            TextInput::make('year')
+                                ->label(__('Year'))
+                                ->default($record->year),
+                            DatePicker::make('received_at')
+                                ->label(__('Received Date'))
+                                ->default(now()),
+                            DatePicker::make('distributed_at')
+                                ->label(__('Distributed Date'))
+                                ->default(now()),
+                            DatePicker::make('next_session_date')
+                                ->label(__('Next Session Date'))
+                                ->default(now()->addDays(7)),
+                            Select::make('level')
+                                ->label(__('Level'))
+                                ->options(MatterLevel::class)
+                                ->default($record->level)
+                                ->required(),
+                        ])
+                ])
+                ->action(fn($record, $data) => $this->cloneMatter($record, $data)),
             EditAction::make(),
             DeleteAction::make(),
             ForceDeleteAction::make()
@@ -75,17 +105,21 @@ class ViewMatter extends ViewRecord
         ];
     }
 
-    private function cloneMatter($record): void
+    private function cloneMatter($record, $data): void
     {
-        DB::transaction(callback: function () use ($record) {
+        DB::transaction(callback: function () use ($record, $data) {
             // ── 1. Clone the matter itself ────────────────────────────────
             $newMatter = $record->replicate();
 
             // Clear all dates except received_date
-            $newMatter->distributed_at = now();
-            $newMatter->next_session_date = null;
+            $newMatter->distributed_at = $data['distributed_at'];
+            $newMatter->next_session_date = $data['next_session_date'];
             $newMatter->initial_report_at = null;
             $newMatter->final_report_at = null;
+            $newMatter->received_at = $data['received_at'];
+            $newMatter->number = $data['number'];
+            $newMatter->year = $data['year'];
+            $newMatter->level = $data['level'];
 
             // Reset status fields
             $newMatter->collection_status = MatterCollectionStatus::NO_FEES;

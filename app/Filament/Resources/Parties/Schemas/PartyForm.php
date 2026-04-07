@@ -27,6 +27,7 @@ class PartyForm
                             ->label(__('Name'))
                             ->datalist(fn() => Party::pluck('name'))
                             ->required()
+                            ->unique(ignoreRecord: true)
                             ->columnSpanFull(),
                         TagsInput::make('phone')
                             ->label(__('Phone'))
@@ -84,11 +85,11 @@ class PartyForm
                             ->label(__('Expertise Area'))
                             ->visible(fn($get) => in_array('expert', $get('role.role') ?? []))
                             ->columnSpanFull(),
-                        Toggle::make('black_list')
-                            ->label(__('Black List'))
-                            ->default(false)
-                            ->dehydrateStateUsing(fn($state) => (bool)$state ? 1 : 0)
-                            ->required(),
+//                        Toggle::make('black_list')
+//                            ->label(__('Black List'))
+//                            ->default(false)
+//                            ->dehydrateStateUsing(fn($state) => (bool)$state ? 1 : 0)
+//                            ->required(),
                         Textarea::make('address')
                             ->label(__('Address'))
                             ->columnSpanFull(),

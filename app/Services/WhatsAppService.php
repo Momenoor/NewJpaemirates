@@ -19,7 +19,7 @@ class WhatsAppService
     public static function notifyNewRequest(User $user, MatterRequest $matterRequest): ?Response
     {
         // تصحيح: استخدام self:: بدلاً من $this لأن الدالة static
-        $formattedPhone = self::formatWhatsAppNumber($user->phone);
+        $formattedPhone = self::formatWhatsAppNumber($user->phone ?? $user->party->phone);
 
 
         if (is_null($formattedPhone)) {
@@ -69,20 +69,29 @@ class WhatsAppService
     public static function formatWhatsAppNumber($number): ?string
     {
         if (is_array($number)) {
-            $number = $number[0];
+            $number = $number[0] ?? null;
         }
-        if (empty($number) || is_array($number)) return null;
 
+        if (empty($number)) return null;
+
+// 1. Remove all non-numeric characters
         $cleanNumber = preg_replace('/[^0-9]/', '', (string)$number);
 
-        if (str_starts_with($cleanNumber, '009715')) {
+// 2. Remove leading '00' (International standard prefix)
+        if (str_starts_with($cleanNumber, '00')) {
             $cleanNumber = substr($cleanNumber, 2);
-        } elseif (str_starts_with($cleanNumber, '05')) {
-            $cleanNumber = '971' . substr($cleanNumber, 1);
-        } elseif (str_starts_with($cleanNumber, '97105')) {
-            $cleanNumber = '9715' . substr($cleanNumber, 5);
         }
-        if (preg_match('/^9715[0-9]{8}$/', $cleanNumber)) {
+
+// 3. Handle UAE-specific logic (If you still want to prioritize it)
+// Convert local 05... to 9715...
+        if (str_starts_with($cleanNumber, '05') && strlen($cleanNumber) === 10) {
+            $cleanNumber = '971' . substr($cleanNumber, 1);
+        }
+
+// 4. General Validation (ITU-T E.164 standard)
+// International numbers are usually 7 to 15 digits long.
+// We check that it doesn't start with 0 and fits length requirements.
+        if (preg_match('/^[1-9][0-9]{6,14}$/', $cleanNumber)) {
             return $cleanNumber;
         }
 

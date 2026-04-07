@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\RequestStatus;
 use App\Enums\RequestType;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -29,6 +28,11 @@ class MatterRequest extends Model
         'approved_at',
         'approved_comment',
         'extra',
+        'name',
+        'path',
+        'size',
+        'extension',
+        'user_id',
     ];
 
     protected $casts = [
@@ -60,8 +64,8 @@ class MatterRequest extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
-    public function attachments(): MatterRequest|\Illuminate\Database\Eloquent\Relations\HasManyThrough
+    public function attachments(): \Illuminate\Database\Eloquent\Relations\HasMany|MatterRequest
     {
-        return $this->hasManyThrough(Attachment::class, Matter::class, 'id', 'matter_id', 'id');
+        return $this->hasMany(Attachment::class);
     }
 }

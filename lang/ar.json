@@ -786,7 +786,19 @@
     "All Assistant Matters": " ملفات جميع المساعدين",
     "Matters for: :name": "ملفات: :name",
     "Total Collected <br> (excl. VAT)": "التحصيل<br> (غ.ش.ض)",
-    "Total Fees <br> (excl. VAT)": "الأتعاب<br> (غ.ش.ض)"
+    "Total Fees <br> (excl. VAT)": "الأتعاب<br> (غ.ش.ض)",
+    "Discount": "خصم",
+    "Uncollected": "غير مُحصَل",
+    "Distributed Date": "تاريخ التوزيع",
+    "A new :type request has been created, for matter #:number / :year": "تم إنشاء طلب جديد من نوع :type، للدعوى #:number / :year",
+    "Request Created": "تم إنشاء الطلب",
+    "Confirm Report": "إعتماد التقرير",
+    "View Request Details": "عرض تفاصيل الطلب",
+    "Hello": "مرحبا",
+    "General Request": "طلب عام",
+    "Request ID": "رقم الطلب",
+    "A new request has been submitted that requires your attention. Below are the details of the request:": "تم تقديم طلب جديد يتطلب انتباهك. أدناه تفاصيل الطلب:",
+    "Request Comment": "محتوى الطلب"
 }
 
 

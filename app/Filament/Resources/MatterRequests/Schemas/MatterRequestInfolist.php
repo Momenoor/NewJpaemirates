@@ -6,6 +6,7 @@ use App\Enums\RequestStatus;
 
 use App\Filament\Actions\Request\ApproveRequestAction;
 use App\Filament\Actions\Request\RejectRequestAction;
+use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Schemas\Components\Grid;
@@ -14,6 +15,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Filament\Support\Enums\TextSize;
+use Illuminate\Support\Facades\Storage;
 
 class MatterRequestInfolist
 {
@@ -94,6 +96,39 @@ class MatterRequestInfolist
                                             ->dateTimeTooltip(),
                                     ]),
                             ])->columnSpan(1),
+                        Section::make(__('Attachments'))
+                            ->columnSpanFull()
+                            ->icon('heroicon-m-paper-clip')
+                            ->schema([
+                                RepeatableEntry::make('attachments')
+                                    ->hiddenLabel()
+                                    ->columns(5)
+                                    ->columnSpanFull()
+                                    ->visible(fn($record) => $record->attachments->isNotEmpty())
+                                    ->schema([
+                                        TextEntry::make('name')
+                                            ->label(__('Name'))
+                                            ->color('primary')
+                                            ->icon('heroicon-o-document-text')
+                                            ->url(fn($record) => Storage::disk('public')->url($record->path))
+                                            ->openUrlInNewTab()
+                                            ->alignJustify()
+                                        ->columnSpan(2),
+                                        TextEntry::make('size')
+                                            ->label(__('Size'))
+                                            ->numeric()
+                                            ->formatStateUsing(fn($state) => number_format($state / (1024 * 1024), 2))
+                                            ->suffix('MB'),
+                                        TextEntry::make('created_at')
+                                            ->label(__('Created At'))
+                                            ->since()
+                                            ->dateTimeTooltip(),
+                                        TextEntry::make('updated_at')
+                                            ->label(__('Last Activity'))
+                                            ->since()
+                                            ->dateTimeTooltip(),
+                                    ])
+                            ])
                     ]),
             ]);
     }
