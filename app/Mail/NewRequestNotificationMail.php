@@ -54,10 +54,11 @@ class NewRequestNotificationMail extends Mailable
      */
     public function attachments(): array
     {
-        return $this->matterRequest->attachments
+        return $this->matterRequest->attachments()->get()
             ->map(function ($attachment) {
                 // Check existence directly on the disk
                 if (!Storage::disk('public')->exists($attachment->path)) {
+                    \Log::warning("Attachment file not found: " . $attachment->path);
                     return null;
                 }
 

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Enums\RequestStatus;
 use App\Enums\RequestType;
+use App\Observers\AttachmentObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -45,7 +47,10 @@ class MatterRequest extends Model
     protected static function booted(): void
     {
         static::deleting(function (MatterRequest $request) {
-            $request->matter->decrement('review_count');
+            if ($request->type == RequestType::REVIEW_REPORT && $request->matter->review_count > 0) {
+                $request->matter->decrement('review_count');
+            }
+            $request->attachments->each->delete();
         });
     }
 
@@ -64,8 +69,8 @@ class MatterRequest extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
-    public function attachments(): \Illuminate\Database\Eloquent\Relations\HasMany|MatterRequest
+    public function attachments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Attachment::class);
+        return $this->hasMany(Attachment::class, 'matter_request_id');
     }
 }

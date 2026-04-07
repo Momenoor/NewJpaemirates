@@ -55,6 +55,7 @@ abstract class BaseRequestService
                 'extension' => pathinfo($path, PATHINFO_EXTENSION),
                 'type' => 'matter-request',
                 'matter_id' => $this->request->matter_id,
+                'matter_request_id' => $this->request->id,
                 'user_id' => auth()->id(),
             ]);
         }
@@ -171,6 +172,7 @@ abstract class BaseRequestService
                     'extension' => pathinfo($path, PATHINFO_EXTENSION),
                     'type' => 'matter-request',
                     'matter_id' => $record->id,
+                    'matter_request_id' => $request->id,
                     'user_id' => auth()->id(),
                 ]);
             }

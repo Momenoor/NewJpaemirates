@@ -7,6 +7,7 @@ use App\Enums\RequestType;
 use App\Filament\Actions\Request\ApproveRequestAction;
 use App\Filament\Actions\Request\RejectRequestAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -27,7 +28,7 @@ class MatterRequestsTable
                     ->formatStateUsing(fn($record) => $record->matter->number . '/' . $record->matter->year)
                     ->url(fn($record) => route('filament.admin.resources.matters.view', $record->matter_id))
                     ->label(__('Matter')),
-                TextColumn::make('requestBy.name')
+                TextColumn::make('requestBy.display_name')
                     ->label(__('Request By'))
                     ->numeric()
                     ->sortable(),
@@ -35,11 +36,15 @@ class MatterRequestsTable
                     ->badge()
                     ->label(__('Status'))
                     ->searchable(),
+                TextColumn::make('type')
+                    ->label(__('Type'))
+                    ->badge()
+                    ->searchable(),
                 TextColumn::make('comment')
                     ->label(__('Comment'))
                     ->wrap()
                     ->searchable(),
-                TextColumn::make('approvedBy.name')
+                TextColumn::make('approvedBy.display_name')
                     ->numeric()
                     ->label(__('Handled By'))
                     ->sortable(),
@@ -51,15 +56,10 @@ class MatterRequestsTable
                     ->label(__('Handling Note'))
                     ->wrap()
                     ->searchable(),
-                TextColumn::make('type')
-                    ->label(__('Type'))
-                    ->badge()
-                    ->searchable(),
                 TextColumn::make('created_at')
                     ->label(__('Created'))
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
                 TextColumn::make('updated_at')
                     ->label(__('Updated'))
                     ->dateTime()
@@ -77,9 +77,11 @@ class MatterRequestsTable
                     ->multiple()
                     ->label(__('Type')),
             ])
+            ->defaultSort('created_at', 'desc')
             ->recordActions([
                 ApproveRequestAction::make(),
                 RejectRequestAction::make(),
+                DeleteAction::make()->visible(fn($record) => $record->status === RequestStatus::PENDING && auth()->user()->can('Delete:MatterRequest')),
             ])
             ->toolbarActions([
 

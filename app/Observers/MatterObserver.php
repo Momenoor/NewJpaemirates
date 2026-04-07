@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Enums\MatterCollectionStatus;
 use App\Models\Matter;
 use App\Services\NewMatterNotification;
+use Illuminate\Support\Facades\Storage;
 
 class MatterObserver
 {
@@ -53,7 +54,8 @@ class MatterObserver
         });
         $matter->allocations()->delete();
         $matter->notes()->delete();
-        $matter->attachments()->delete();
+
+        $matter->attachments->each->delete();
         $matter->requests()->delete();
     }
 
