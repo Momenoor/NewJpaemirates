@@ -798,7 +798,8 @@
     "General Request": "طلب عام",
     "Request ID": "رقم الطلب",
     "A new request has been submitted that requires your attention. Below are the details of the request:": "تم تقديم طلب جديد يتطلب انتباهك. أدناه تفاصيل الطلب:",
-    "Request Comment": "محتوى الطلب"
+    "Request Comment": "محتوى الطلب",
+    "New Difficulty MatterRequest": "طلب جديد من نوع صعوبة"
 }
 
 

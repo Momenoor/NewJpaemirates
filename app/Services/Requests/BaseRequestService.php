@@ -143,6 +143,9 @@ abstract class BaseRequestService
             User::role(['admin', 'super-admin', 'super_admin'])->get()
         );
         $users = User::role(['admin' ,'super-admin', 'super_admin'])->get();
+        $users->map(function ($user) {
+            WhatsAppService::notifyNewRequest($user, $this->request);
+        });
         $emails = $users->pluck('email');
         Mail::to($emails)
             ->send(new NewRequestNotificationMail(
@@ -150,9 +153,7 @@ abstract class BaseRequestService
                     $this->request
                 )
             );
-        $users->map(function ($user) {
-            WhatsAppService::notifyNewRequest($user, $this->request);
-        });
+
 
     }
 
