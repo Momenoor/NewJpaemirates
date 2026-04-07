@@ -55,14 +55,20 @@ class NewRequestNotificationMail extends Mailable
     public function attachments(): array
     {
         return $this->matterRequest->attachments
-            ->filter(fn($attachment) => Storage::disk('public')->exists($attachment->path)
-            )
-            ->map(fn($attachment) => Attachment::fromPath(Storage::disk('public')->path($attachment->path))
-                ->as($attachment->name)
-                ->withMime(
-                    Storage::disk('public')->mimeType($attachment->path) ?? 'application/octet-stream'
-                )
-            )
+            ->map(function ($attachment) {
+                // Check existence directly on the disk
+                if (!Storage::disk('public')->exists($attachment->path)) {
+                    return null;
+                }
+
+                // Use fromStorageDisk for better compatibility with Laravel's filesystem
+                return Attachment::fromStorageDisk('public', $attachment->path)
+                    ->as($attachment->name)
+                    ->withMime(
+                        Storage::disk('public')->mimeType($attachment->path) ?? 'application/octet-stream'
+                    );
+            })
+            ->filter() // Removes the 'null' entries where files didn't exist
             ->values()
             ->toArray();
     }
