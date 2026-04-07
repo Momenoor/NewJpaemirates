@@ -13,6 +13,7 @@ use App\Filament\Actions\Request\ApproveRequestAction;
 use App\Filament\Actions\Request\CreateRequestAction;
 use App\Filament\Actions\Request\RejectRequestAction;
 use App\Filament\Resources\Matters\MatterResource;
+use App\Helpers\FileUploadHelper;
 use App\Models\Allocation;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -642,6 +643,7 @@ class MatterInfolist
                             ->directory('matter-attachments')
                             ->visibility('public')
                             ->required()
+                            ->getUploadedFileNameForStorageUsing(fn ($file) => FileUploadHelper::getUniqueFilename($file, 'matter-attachments'))
                             ->live()
                             ->afterStateUpdated(function ($state, $set) {
                                 if ($state instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {

@@ -7,6 +7,7 @@ use App\Enums\MatterStatus;
 use App\Enums\RequestStatus;
 use App\Enums\RequestType;
 use App\Mail\NewRequestNotificationMail;
+use App\Mail\RequestActionNotificationMail;
 use App\Models\MatterRequest;
 use App\Models\User;
 use App\Services\WhatsAppService;
@@ -34,6 +35,20 @@ abstract class BaseRequestService
             'approved_at' => now(),
             'approved_comment' => $data['approved_comment'] ?? null,
         ]);
+
+        foreach ($data['attachments'] ?? [] as $item) {
+            $path = $item['path'];
+            $this->request->attachments()->create([
+                'name' => 'request-attachment-' . $this->request->id . '-' . basename($path),
+                'path' => $path,
+                'size' => Storage::disk('public')->size($path),
+                'extension' => pathinfo($path, PATHINFO_EXTENSION),
+                'type' => 'matter-request',
+                'matter_id' => $this->request->matter_id,
+                'matter_request_id' => $this->request->id,
+                'user_id' => auth()->id(),
+            ]);
+        }
     }
 
     protected function markRejected(array $data): void
@@ -92,9 +107,28 @@ abstract class BaseRequestService
 
     private function onActionNotify(string $title, string $body): void
     {
-        $this->request->matter->assistantsOnly
-            ->filter(fn($mp) => $mp->party?->user)
-            ->each(fn($mp) => $this->notify($title, $body, $mp->party->user));
+        $statusLabel = match ($this->request->status) {
+            'approved' => __('Approved'),
+            'rejected' => __('Rejected'),
+            default => $this->request->status,
+        };
+
+        $assistants = $this->request->matter->assistantsOnly
+            ->map(fn($mp) => $mp->party?->user)
+            ->filter();
+
+        $assistants->each(fn($user) => $this->notify($title, $body, $user));
+
+        if ($assistants->isNotEmpty()) {
+            $emails = $assistants->pluck('email')->filter();
+            if ($emails->isNotEmpty()) {
+                Mail::to($emails)->send(new RequestActionNotificationMail(
+                    $this->request->matter,
+                    $this->request,
+                    $statusLabel
+                ));
+            }
+        }
     }
 
     public function onCreateNotify(): void
@@ -108,7 +142,7 @@ abstract class BaseRequestService
             ]),
             User::role(['admin', 'super-admin', 'super_admin'])->get()
         );
-        $users = User::role([/*'admin',*/ 'super-admin', 'super_admin'])->get();
+        $users = User::role(['admin' ,'super-admin', 'super_admin'])->get();
         $emails = $users->pluck('email');
         Mail::to($emails)
             ->send(new NewRequestNotificationMail(
@@ -116,9 +150,9 @@ abstract class BaseRequestService
                     $this->request
                 )
             );
-        /*$users->map(function ($user) {
+        $users->map(function ($user) {
             WhatsAppService::notifyNewRequest($user, $this->request);
-        });*/
+        });
 
     }
 

@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\MatterRequest;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class RequestPolicy
+class MatterRequestPolicy
 {
     use HandlesAuthorization;
 

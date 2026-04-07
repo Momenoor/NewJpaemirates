@@ -6,6 +6,7 @@ use App\Enums\MatterDifficulty;
 use App\Enums\RequestStatus;
 use App\Enums\RequestType;
 use App\Filament\Resources\Matters\MatterResource;
+use App\Helpers\FileUploadHelper;
 use App\Services\Requests\BaseRequestService;
 use App\Services\Requests\RequestServiceFactory;
 use Filament\Actions\Action;
@@ -64,7 +65,8 @@ class CreateRequestAction extends Action
                         ->disk('public')
                         ->directory('requests-attachments')
                         ->required()
-                        ->preserveFilenames(),
+                        ->preserveFilenames()
+                        ->getUploadedFileNameForStorageUsing(fn ($file) => FileUploadHelper::getUniqueFilename($file, 'requests-attachments')),
                 ])
                 ->lazy()
                 ->defaultItems(fn(Get $get) => in_array($get('type') ,[RequestType::REVIEW_REPORT, RequestType::CONFIRM_REPORT]) ? 1 : 0)

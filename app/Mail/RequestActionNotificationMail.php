@@ -4,7 +4,6 @@ namespace App\Mail;
 
 use App\Models\Matter;
 use App\Models\MatterRequest;
-use App\Models\Party;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -14,14 +13,18 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 
-class NewRequestNotificationMail extends Mailable
+class RequestActionNotificationMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(public Matter $matter, public MatterRequest $matterRequest)
+    public function __construct(
+        public Matter $matter,
+        public MatterRequest $matterRequest,
+        public string $statusLabel
+    )
     {
         //
     }
@@ -32,7 +35,7 @@ class NewRequestNotificationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: __('New Request Submitted')
+            subject: __('Request :status', ['status' => $this->statusLabel])
             . ' — ' . $this->matter->year . '/' . $this->matter->number . ($this->matter->type ? ' — ' . $this->matter->type->name : ''),
         );
     }
@@ -43,7 +46,7 @@ class NewRequestNotificationMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mails.new-request-notification',
+            view: 'mails.request-action-notification',
         );
     }
 
@@ -55,13 +58,10 @@ class NewRequestNotificationMail extends Mailable
     public function attachments(): array
     {
         $attachments = $this->matterRequest->attachments()->get();
-        \Log::info("Processing attachments for MatterRequest ID: " . $this->matterRequest->id . ". Count: " . $attachments->count());
-
         $mailAttachments = [];
 
         foreach ($attachments as $attachment) {
             $exists = Storage::disk('public')->exists($attachment->path);
-            \Log::info("Checking attachment: " . $attachment->path . " | Exists: " . ($exists ? 'Yes' : 'No'));
 
             if (!$exists) {
                 \Log::warning("Attachment file not found on public disk: " . $attachment->path);

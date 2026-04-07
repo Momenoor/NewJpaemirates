@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Matters\Pages;
 
 use App\Enums\MatterCollectionStatus;
 use App\Enums\MatterLevel;
+use App\Helpers\FileUploadHelper;
 use App\Filament\Actions\Calendar\SyncToOutlookAction;
 use App\Filament\Resources\Matters\MatterResource;
 use Filament\Actions\Action;
@@ -44,7 +45,8 @@ class ViewMatter extends ViewRecord
                         ->disk('public')
                         ->directory('matter-attachments')
                         ->visibility('public')
-                        ->required(),
+                        ->required()
+                        ->getUploadedFileNameForStorageUsing(fn ($file) => FileUploadHelper::getUniqueFilename($file, 'matter-attachments')),
                     DatePicker::make('date')
                         ->label(__('Date'))
                         ->visible(auth()->user()->can('UpdateInitialReportDate:Matter')),

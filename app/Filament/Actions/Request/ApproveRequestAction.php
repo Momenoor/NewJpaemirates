@@ -5,7 +5,8 @@ namespace App\Filament\Actions\Request;
 use App\Enums\MatterDifficulty;
 use App\Enums\RequestStatus;
 use App\Enums\RequestType;
-use App\Filament\Resources\Matters\MatterResource;
+use App\Helpers\FileUploadHelper;
+use App\Models\MatterRequest;
 use App\Services\Requests\BaseRequestService;
 use App\Services\Requests\RequestServiceFactory;
 use Filament\Actions\Action;
@@ -69,6 +70,19 @@ class ApproveRequestAction extends Action
                 ->label(__('Has Substantive Changes'))
                 ->visible(fn($record) => $record->type === RequestType::REVIEW_REPORT)
                 ->default(false),
+            Repeater::make('attachments')
+                ->label(__('Attachments'))
+                ->schema([
+                    FileUpload::make('path')
+                        ->label(__('File'))
+                        ->disk('public')
+                        ->directory('requests-attachments')
+                        ->required()
+                        ->preserveFilenames()
+                        ->getUploadedFileNameForStorageUsing(fn ($file) => FileUploadHelper::getUniqueFilename($file, 'requests-attachments')),
+                ])
+                ->lazy()
+                ->collapsible(),
         ]);
     }
 
