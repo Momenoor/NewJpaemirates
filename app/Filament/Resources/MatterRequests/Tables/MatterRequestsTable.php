@@ -58,6 +58,7 @@ class MatterRequestsTable
                     ->searchable(),
                 TextColumn::make('created_at')
                     ->label(__('Created'))
+                    ->since()
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('updated_at')
