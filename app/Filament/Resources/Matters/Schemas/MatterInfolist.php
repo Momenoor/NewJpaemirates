@@ -82,7 +82,7 @@ class MatterInfolist
     public static function configure(Schema $schema): Schema
     {
         return $schema
-            ->columns(3)
+            ->columns(2)
             ->components([
                 Grid::make(1)->columnSpan(1)->schema([
                     static::identitySection(),
@@ -91,7 +91,7 @@ class MatterInfolist
                     static::requestsSection(),
                     static::notesSection(),
                 ]),
-                Grid::make(1)->columnSpan(2)->schema([
+                Grid::make(1)->columnSpan(1)->schema([
                     static::expertsSection(),
                     static::partiesSection(),
                     static::feesSection(),
