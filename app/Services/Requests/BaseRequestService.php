@@ -36,19 +36,7 @@ abstract class BaseRequestService
             'approved_comment' => $data['approved_comment'] ?? null,
         ]);
 
-        foreach ($data['attachments'] ?? [] as $item) {
-            $path = $item['path'];
-            $this->request->attachments()->create([
-                'name' => 'request-attachment-' . $this->request->id . '-' . basename($path),
-                'path' => $path,
-                'size' => Storage::disk('public')->size($path),
-                'extension' => pathinfo($path, PATHINFO_EXTENSION),
-                'type' => 'matter-request',
-                'matter_id' => $this->request->matter_id,
-                'matter_request_id' => $this->request->id,
-                'user_id' => auth()->id(),
-            ]);
-        }
+        $this->storeFile($data['attachments']);
     }
 
     protected function markRejected(array $data): void
@@ -60,20 +48,7 @@ abstract class BaseRequestService
             'approved_at' => now(),
             'approved_comment' => $data['approved_comment'],
         ]);
-
-        foreach ($data['attachments'] ?? [] as $item) {
-            $path = $item['path'];
-            $this->request->attachments()->create([
-                'name' => 'request-attachment-' . $this->request->id . '-' . basename($path),
-                'path' => $path,
-                'size' => Storage::disk('public')->size($path),
-                'extension' => pathinfo($path, PATHINFO_EXTENSION),
-                'type' => 'matter-request',
-                'matter_id' => $this->request->matter_id,
-                'matter_request_id' => $this->request->id,
-                'user_id' => auth()->id(),
-            ]);
-        }
+        $this->storeFile($data['attachments']);
     }
 
     protected function refresh($component): void
@@ -212,6 +187,29 @@ abstract class BaseRequestService
             RequestServiceFactory::make($request)->onCreateNotify();
             RequestServiceFactory::make($request)->refresh($component);
         };
+    }
+
+    /**
+     * @param $attachments
+     * @return void
+     */
+    protected function storeFile($attachments): void
+    {
+        if ($attachments) {
+            foreach ($attachments as $item) {
+                $path = $item['path'];
+                $this->request->attachments()->create([
+                    'name' => 'request-attachment-' . $this->request->id . '-' . basename($path),
+                    'path' => $path,
+                    'size' => Storage::disk('public')->size($path),
+                    'extension' => pathinfo($path, PATHINFO_EXTENSION),
+                    'type' => 'matter-request',
+                    'matter_id' => $this->request->matter_id,
+                    'matter_request_id' => $this->request->id,
+                    'user_id' => auth()->id(),
+                ]);
+            }
+        }
     }
 
 

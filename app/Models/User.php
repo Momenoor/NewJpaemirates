@@ -17,7 +17,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser
 {
-    use  HasFactory, Notifiable, HasRoles, HasUiPreferences;
+    use  HasFactory, Notifiable, HasRoles;
     use LogsActivity;
 
     public function getActivitylogOptions(): LogOptions
