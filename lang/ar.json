@@ -806,7 +806,8 @@
     "Notify by Whatsapp": "إشعار بالواتساب",
     "Notify by Email": "إشعار بالبريد الإلكتروني",
     "Display name": "الاسم المعروض",
-    "Auto-generated: Matter received date confirmed.": "تمت تأكيد تاريخ استلام الدعوى تلقائياً."
+    "Auto-generated: Matter received date confirmed.": "تمت تأكيد تاريخ استلام الدعوى تلقائياً.",
+    "Final Report must be approved first.": "يجب إعتماد التقرير النهائي أولاً."
 
 }
 
