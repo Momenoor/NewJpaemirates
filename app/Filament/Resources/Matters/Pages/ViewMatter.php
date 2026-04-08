@@ -46,7 +46,7 @@ class ViewMatter extends ViewRecord
                         ->directory('matter-attachments')
                         ->visibility('public')
                         ->required()
-                        ->getUploadedFileNameForStorageUsing(fn ($file) => FileUploadHelper::getUniqueFilename($file, 'matter-attachments')),
+                        ->getUploadedFileNameForStorageUsing(fn($file) => FileUploadHelper::getUniqueFilename($file, 'matter-attachments')),
                     DatePicker::make('date')
                         ->label(__('Date'))
                         ->visible(auth()->user()->can('UpdateInitialReportDate:Matter')),
@@ -58,7 +58,7 @@ class ViewMatter extends ViewRecord
                 ->label(fn($record) => $record->final_report_at ? __('Final Report Submitted') : __('Submit Final Report'))
                 ->color(fn($record) => $record->final_report_at === null ? 'success' : Color::Stone)
                 ->visible(fn($record) => auth()->user()->can('finalReport', $record))
-                ->disabled(fn($record) => $record->final_report_at !== null)
+                ->disabled(fn($record) => $record->final_report_at !== null && $record->final_report_memo_date == null)
                 ->schema([
                     DatePicker::make('date')
                         ->label(__('Date'))
