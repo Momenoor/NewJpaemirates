@@ -28,6 +28,7 @@ class ConfirmMatterReceivingForUnacceptedMail extends Command
      */
     public function handle(): void
     {
+        app()->setLocale('ar');
         MatterRequest::where('status', RequestStatus::PENDING->value)
             ->where('type', RequestType::CHANGE_DISTRIBUTED_DATE->value)
             ->whereDate('created_at', '<=', now()->subDays(1))
