@@ -72,6 +72,7 @@ class ApproveRequestAction extends Action
                 ->default(false),
             Repeater::make('attachments')
                 ->label(__('Attachments'))
+                ->defaultItems(0)
                 ->schema([
                     FileUpload::make('path')
                         ->label(__('File'))
