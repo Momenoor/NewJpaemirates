@@ -68,7 +68,7 @@ class ApproveRequestAction extends Action
                 ->rows(2),
             Toggle::make('has_substantive_changes')
                 ->label(__('Has Substantive Changes'))
-                ->visible(fn($record) => $record->type === RequestType::REVIEW_REPORT)
+                ->visible(fn($record) => in_array($record->type, [RequestType::REVIEW_REPORT, RequestType::CONFIRM_REPORT]))
                 ->default(false),
             Repeater::make('attachments')
                 ->label(__('Attachments'))
@@ -77,9 +77,8 @@ class ApproveRequestAction extends Action
                         ->label(__('File'))
                         ->disk('public')
                         ->directory('requests-attachments')
-                        ->required()
                         ->preserveFilenames()
-                        ->getUploadedFileNameForStorageUsing(fn ($file) => FileUploadHelper::getUniqueFilename($file, 'requests-attachments')),
+                        ->getUploadedFileNameForStorageUsing(fn($file) => FileUploadHelper::getUniqueFilename($file, 'requests-attachments')),
                 ])
                 ->lazy()
                 ->collapsible(),
