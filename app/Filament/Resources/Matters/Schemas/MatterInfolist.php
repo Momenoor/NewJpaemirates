@@ -438,10 +438,10 @@ class MatterInfolist
                             ->badge()
                             ->color('info')
                             ->formatStateUsing(fn($state) => $state
-                                ? $state
+                                ? __($state
                                     |> __(...)
                                     |> (fn($x) => str_replace('_', ' ', $x))
-                                    |> ucfirst(...) : ''),
+                                    |> ucfirst(...)) : ''),
                         TextEntry::make('extension')->label(__('Extension'))->badge()->color('gray'),
                         TextEntry::make('size')
                             ->label(__('Size'))
