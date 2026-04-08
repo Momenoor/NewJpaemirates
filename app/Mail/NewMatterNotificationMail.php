@@ -30,13 +30,13 @@ class NewMatterNotificationMail extends Mailable
         $this->acceptUrl = URL::signedRoute(
             'matter.received.accept',
             ['matter' => $matter->id, 'matterRequest' => $matterRequest->id],
-            now()->addDays(7)
+            now()->addDays(1)
         );
 
         $this->disputeUrl = URL::signedRoute(
             'matter.received.dispute',
             ['matter' => $matter->id, 'matterRequest' => $matterRequest->id],
-            now()->addDays(7)
+            now()->addDays(1)
         );
     }
 
