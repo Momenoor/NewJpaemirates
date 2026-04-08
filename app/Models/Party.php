@@ -143,4 +143,9 @@ class Party extends Model
         // We check if 'expert' exists inside that subarray.
         return isset($this->role['role']) && in_array('expert', (array)$this->role['role']);
     }
+
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

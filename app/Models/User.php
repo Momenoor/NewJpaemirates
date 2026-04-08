@@ -33,6 +33,8 @@ class User extends Authenticatable implements FilamentUser
         'email',
         'display_name',
         'font_size',
+        'notify_by_email',
+        'notify_by_whatsapp',
     ];
 
     protected $with = [
@@ -56,7 +58,9 @@ class User extends Authenticatable implements FilamentUser
     protected $casts = [
         'email_verified_at' => 'datetime',
         'ui_preferences' => 'array',
-        'font_size' => 'integer'
+        'font_size' => 'integer',
+        'notify_by_email' => 'boolean',
+        'notify_by_whatsapp' => 'boolean',
     ];
 
 

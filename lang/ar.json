@@ -799,7 +799,14 @@
     "Request ID": "رقم الطلب",
     "A new request has been submitted that requires your attention. Below are the details of the request:": "تم تقديم طلب جديد يتطلب انتباهك. أدناه تفاصيل الطلب:",
     "Request Comment": "محتوى الطلب",
-    "New Difficulty MatterRequest": "طلب جديد من نوع صعوبة"
+    "New Difficulty MatterRequest": "طلب جديد من نوع صعوبة",
+    "There is an update in your request. Below are the details:": "تم تحديث طلبك. أدناه تفاصيل الطلب:",
+    "Action Date:": "تاريخ الإجراء:",
+    "Display Name": "الاسم المعروض",
+    "Notify by Whatsapp": "إشعار بالواتساب",
+    "Notify by Email": "إشعار بالبريد الإلكتروني",
+    "Display name": "الاسم المعروض"
+
 }
 
 

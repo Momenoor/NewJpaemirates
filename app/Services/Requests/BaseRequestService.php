@@ -107,16 +107,11 @@ abstract class BaseRequestService
 
     private function onActionNotify(string $title, string $body): void
     {
-        $statusLabel = match ($this->request->status) {
-            'approved' => __('Approved'),
-            'rejected' => __('Rejected'),
-            default => $this->request->status,
-        };
+        $statusLabel = $this->request->status->getLabel();
 
         $assistants = $this->request->matter->assistantsOnly
             ->map(fn($mp) => $mp->party?->user)
             ->filter();
-
         $assistants->each(fn($user) => $this->notify($title, $body, $user));
 
         if ($assistants->isNotEmpty()) {
@@ -142,8 +137,11 @@ abstract class BaseRequestService
             ]),
             User::role(['admin', 'super-admin', 'super_admin'])->get()
         );
-        $users = User::role(['admin' ,'super-admin', 'super_admin'])->get();
-        $users->map(function ($user) {
+        $users = User::role(['admin', 'super-admin', 'super_admin'])->get();
+        $whatsappUsers = $users->filter(function ($user) {
+            return $user->notify_by_whatsapp;
+        });
+        $whatsappUsers->map(function ($user) {
             WhatsAppService::notifyNewRequest($user, $this->request);
         });
         $emails = $users->pluck('email');

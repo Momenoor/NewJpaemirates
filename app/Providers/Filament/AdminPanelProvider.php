@@ -7,6 +7,7 @@ use AlizHarb\ActivityLog\RelationManagers\ActivitiesRelationManager;
 use Andreia\FilamentUiSwitcher\FilamentUiSwitcherPlugin;
 use App\Filament\Pages\AdminDashboard;
 use App\Filament\Pages\Auth\CustomLogin;
+use App\Filament\Pages\Auth\CustomProfile;
 use App\Livewire\FontSizeSlider;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use App\Events\FilamentActionEvent;
@@ -17,6 +18,7 @@ use Filament\FontProviders\GoogleFontProvider;
 use Filament\FontProviders\LocalFontProvider;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -72,7 +74,7 @@ class AdminPanelProvider extends PanelProvider
             ->darkModeBrandLogo(asset('images/logo-dark.png'))
             ->brandLogoHeight('4rem')
             ->favicon(asset('images/favicon.png'))
-            ->profile()
+            ->profile(CustomProfile::class)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
@@ -139,8 +141,10 @@ class AdminPanelProvider extends PanelProvider
 
         Select::configureUsing(fn(Select $select) => $select->native(false));
         UserForm::register([
-            TextInput::make('display_name')->required(),
-            Select::make('party')->searchable()->relationship('party', 'name'),
+            TextInput::make('display_name')->label(__('Display name'))->required(),
+            Select::make('party')->label(__('Party'))->searchable()->relationship('party', 'name'),
+            Toggle::make('notify_by_whatsapp')->label(__('Notify by Whatsapp'))->visible(fn() => auth()->user()->hasAnyRole(['super-admin', 'super_admin']))->required(),
+            Toggle::make('notify_by_email')->label(__('Notify by Email'))->default(true)->required(),
         ]);
         Table::configureUsing(fn(Table $table) => $table->striped()->stackedOnMobile());
         app(FilamentUserServices::class)->register([
