@@ -58,7 +58,7 @@ class ViewMatter extends ViewRecord
                 ->label(fn($record) => $record->final_report_at ? __('Final Report Submitted') : __('Submit Final Report'))
                 ->color(fn($record) => $record->final_report_at === null ? 'success' : Color::Stone)
                 ->visible(fn($record) => auth()->user()->can('finalReport', $record))
-                ->disabled(fn($record) => $record->final_report_at !== null && $record->final_report_memo_date == null)
+                ->disabled(fn($record) => $record->final_report_at !== null || $record->final_report_memo_date == null)
                 ->schema([
                     DatePicker::make('date')
                         ->label(__('Date'))
