@@ -39,7 +39,8 @@ class MatterRequestInfolist
                                             ->icon('heroicon-m-hashtag')
                                             ->url(fn($record) => route('filament.admin.resources.matters.view', $record->matter_id))
                                             ->formatStateUsing(fn($state) => "{$state->number}/{$state->year}"),
-
+                                        TextEntry::make('requestBy.display_name')
+                                            ->label(__('Request By')),
                                         Grid::make(2)->schema([
                                             TextEntry::make('type')
                                                 ->label(__('Request Type'))
@@ -73,6 +74,7 @@ class MatterRequestInfolist
                                             ->placeholder('-'),
                                         TextEntry::make('approved_at')
                                             ->label(__('Handled At'))
+                                            ->since()
                                             ->dateTime('M d, Y H:i')
                                             ->size(TextSize::Small)
                                             ->color('gray'),
@@ -113,7 +115,7 @@ class MatterRequestInfolist
                                             ->url(fn($record) => Storage::disk('public')->url($record->path))
                                             ->openUrlInNewTab()
                                             ->alignJustify()
-                                        ->columnSpan(2),
+                                            ->columnSpan(2),
                                         TextEntry::make('size')
                                             ->label(__('Size'))
                                             ->numeric()

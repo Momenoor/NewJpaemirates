@@ -55,19 +55,14 @@ class NewRequestNotificationMail extends Mailable
     public function attachments(): array
     {
         $attachments = $this->matterRequest->attachments()->get();
-        \Log::info("Processing attachments for MatterRequest ID: " . $this->matterRequest->id . ". Count: " . $attachments->count());
 
         $mailAttachments = [];
 
         foreach ($attachments as $attachment) {
             $exists = Storage::disk('public')->exists($attachment->path);
-            \Log::info("Checking attachment: " . $attachment->path . " | Exists: " . ($exists ? 'Yes' : 'No'));
-
             if (!$exists) {
-                \Log::warning("Attachment file not found on public disk: " . $attachment->path);
                 continue;
             }
-
             try {
                 $mailAttachments[] = Attachment::fromStorageDisk('public', $attachment->path)
                     ->as($attachment->name)

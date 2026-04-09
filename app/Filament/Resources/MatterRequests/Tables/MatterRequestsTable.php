@@ -42,6 +42,7 @@ class MatterRequestsTable
                     ->searchable(),
                 TextColumn::make('comment')
                     ->label(__('Comment'))
+                    ->markdown()
                     ->wrap()
                     ->searchable(),
                 TextColumn::make('approvedBy.display_name')
@@ -50,6 +51,7 @@ class MatterRequestsTable
                     ->sortable(),
                 TextColumn::make('approved_at')
                     ->label(__('Handled At'))
+                    ->since()
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('approved_comment')

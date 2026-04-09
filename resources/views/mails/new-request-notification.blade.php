@@ -125,6 +125,10 @@
                     <td>{{ $matter->year }}/{{ $matter->number }}</td>
                 </tr>
                 <tr>
+                    <td>{{ __('Request By') }}:</td>
+                    <td>#{{ $matterRequest->request_by->display_name }}</td>
+                </tr>
+                <tr>
                     <td>{{ __('Request Type') }}:</td>
                     <td>{{ $matterRequest->type->getLabel() ?? __('General Request') }}</td>
                 </tr>
@@ -165,6 +169,7 @@
     <div class="footer">
         {{ config('app.name') }} · {{ now()->format('Y') }}<br>
         {{ __('All rights reserved.') }}
+        {{ __('This email was sent automatically. Do not reply.') }}
     </div>
 </div>
 </body>

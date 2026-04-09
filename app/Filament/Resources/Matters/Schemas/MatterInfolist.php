@@ -196,6 +196,12 @@ class MatterInfolist
                         TextEntry::make('status')
                             ->label(__('Status'))
                             ->badge(),
+                        TextEntry::make('created_at')
+                            ->label(__('Created At'))
+                            ->dateTime()
+                            ->since()
+                            ->icon('heroicon-o-calendar'),
+
                         TextEntry::make('comment')->label(__('Comment'))->columnSpanFull(),
                         TextEntry::make('approvedBy.display_name')
                             ->label(__('Reviewed By'))
@@ -246,6 +252,7 @@ class MatterInfolist
                         TextEntry::make('user.display_name')->label(__('By'))
                             ->icon('heroicon-o-user')->size(TextSize::ExtraSmall),
                         TextEntry::make('datetime')->label(__('Date'))
+                            ->since()
                             ->dateTime()->icon('heroicon-o-clock')->size(TextSize::ExtraSmall),
                         Actions::make([
                             static::editNoteAction(),
@@ -365,7 +372,7 @@ class MatterInfolist
                             ->money('AED')
                             ->weight(FontWeight::SemiBold)
                             ->icon('heroicon-o-banknotes')
-                            ->color(fn($state, Get $get) => $get('type')?->isNegative() ? 'danget' : null),
+                            ->color(fn($state, Get $get) => $get('type')?->isNegative() ? 'danger' : null),
                         TextEntry::make('collected_amount')
                             ->label(__('Collected'))
                             ->money('AED')
