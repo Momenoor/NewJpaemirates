@@ -45,6 +45,11 @@ class MatterRequestsTable
                     ->markdown()
                     ->wrap()
                     ->searchable(),
+                TextColumn::make('created_at')
+                    ->label(__('Created'))
+                    ->since()
+                    ->dateTime()
+                    ->sortable(),
                 TextColumn::make('approvedBy.display_name')
                     ->numeric()
                     ->label(__('Handled By'))
@@ -58,11 +63,6 @@ class MatterRequestsTable
                     ->label(__('Handling Note'))
                     ->wrap()
                     ->searchable(),
-                TextColumn::make('created_at')
-                    ->label(__('Created'))
-                    ->since()
-                    ->dateTime()
-                    ->sortable(),
                 TextColumn::make('updated_at')
                     ->label(__('Updated'))
                     ->dateTime()
