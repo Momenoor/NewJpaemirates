@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MatterRequests;
 
+use App\Enums\RequestStatus;
 use App\Filament\Resources\MatterRequests\Pages\CreateMatterRequest;
 use App\Filament\Resources\MatterRequests\Pages\EditRequest;
 use App\Filament\Resources\MatterRequests\Pages\ListMatterRequests;
@@ -25,6 +26,11 @@ class MatterRequestResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Newspaper;
     protected static ?int $navigationSort = 5;
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::count();
+    }
 
     public static function getPluralModelLabel(): string
     {
@@ -72,5 +78,10 @@ class MatterRequestResource extends Resource
             'view' => ViewMatterRequest::route('/{record}'),
             //'edit' => EditRequest::route('/{record}/edit'),
         ];
+    }
+
+    private static function count(): int
+    {
+        return static::getEloquentQuery()->where('status', RequestStatus::PENDING->value)->count();
     }
 }
