@@ -44,6 +44,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
@@ -158,24 +159,28 @@ class AdminPanelProvider extends PanelProvider
 
         FilamentView::registerRenderHook(
             PanelsRenderHook::HEAD_END,
-            function(): string {
-                if (!Cache::has('font-size')) {
-                    $fontSize = auth()->check() ? auth()->user()->font_size : 16;
-                    Cache::add('font-size', $fontSize, now()->addDays(30));
-                }
-                return
-                    Blade::render("
-                    <style>
-                        :root {
-                            --user-font-size: {{ Cache::get('font-size') }}px;
-                        }
+            function (): string {
+                $user = Auth::user();
 
-                        body {
-                            font-size: var(--user-font-size) !important;
-                        }
-                    </style>
-                ");
-            } ,
+                // Default to 16 if guest or if user has no setting
+                $defaultSize = 16;
+                $cacheKey = 'user_font_size_' . ($user->id ?? 'guest');
+
+                $fontSize = Cache::remember($cacheKey, now()->addDays(30), function () use ($user, $defaultSize) {
+                    return $user->font_size ?? $defaultSize;
+                });
+
+                return "
+            <style>
+                :root {
+                    --user-font-size: {$fontSize}px;
+                }
+                body {
+                    font-size: var(--user-font-size) !important;
+                }
+            </style>
+        ";
+            }
         );
 
     }

@@ -50,6 +50,7 @@ class FontSizeSlider extends Component implements HasForms
     public function updateUserFont($state): void
     {
         auth()->user()->update(['font_size' => $state]);
+        \Illuminate\Support\Facades\Cache::forget('user_font_size_' . auth()->id());
         $this->js("document.documentElement.style.setProperty('--user-font-size', '{$state}px')");
         $this->dispatch('font-size-updated', size: $state);
     }
