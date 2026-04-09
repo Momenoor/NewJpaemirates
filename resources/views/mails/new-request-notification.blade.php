@@ -126,7 +126,7 @@
                 </tr>
                 <tr>
                     <td>{{ __('Request By') }}:</td>
-                    <td>#{{ $matterRequest->request_by->display_name }}</td>
+                    <td>{{ $matterRequest->requestBy->display_name }}</td>
                 </tr>
                 <tr>
                     <td>{{ __('Request Type') }}:</td>

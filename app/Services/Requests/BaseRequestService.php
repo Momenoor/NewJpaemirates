@@ -103,29 +103,35 @@ abstract class BaseRequestService
 
     public function onCreateNotify(): void
     {
-        $this->notify(
-            __('Request Created'),
-            __("A new :type request has been created, for matter #:number / :year", [
-                'type' => $this->request->type->getLabel(),
-                'number' => $this->request->matter->number,
-                'year' => $this->request->matter->year
-            ]),
-            User::role(['admin', 'super-admin', 'super_admin'])->get()
-        );
-        $users = User::role(['admin', 'super-admin', 'super_admin'])->get();
-        $whatsappUsers = $users->filter(function ($user) {
-            return $user->notify_by_whatsapp;
-        });
-        $whatsappUsers->map(function ($user) {
-            WhatsAppService::notifyNewRequest($user, $this->request);
-        });
-        $emails = $users->pluck('email');
-        Mail::to($emails)
-            ->send(new NewRequestNotificationMail(
-                    $this->request->matter,
-                    $this->request
-                )
+        try {
+
+            $this->notify(
+                __('Request Created'),
+                __("A new :type request has been created, for matter #:number / :year", [
+                    'type' => $this->request->type->getLabel(),
+                    'number' => $this->request->matter->number,
+                    'year' => $this->request->matter->year
+                ]),
+                User::role(['admin', 'super-admin', 'super_admin'])->get()
             );
+            $users = User::role(['admin', 'super-admin', 'super_admin'])->get();
+            $whatsappUsers = $users->filter(function ($user) {
+                return $user->notify_by_whatsapp;
+            });
+            $whatsappUsers->map(function ($user) {
+                WhatsAppService::notifyNewRequest($user, $this->request);
+            });
+            $emails = $users->pluck('email');
+            Mail::to($emails)
+                ->send(new NewRequestNotificationMail(
+                        $this->request->matter,
+                        $this->request
+                    )
+                );
+
+        } catch (\Exception $e) {
+            \Log::error("Failed to send notification: " . $e->getMessage());
+        }
 
 
     }
