@@ -45,6 +45,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use JibayMcs\FilamentTour\FilamentTourPlugin;
 use Livewire\Livewire;
@@ -154,12 +155,16 @@ class AdminPanelProvider extends PanelProvider
         FilamentAsset::register([
             Css::make('custom-css', asset('css/custom-css.css')),
         ]);
+        if (!Cache::has('font-size')) {
+            $fontSize = auth()->check() ? auth()->user()->font_size : 16;
+            Cache::add('font-size', $fontSize, now()->addDays(30));
+        }
         FilamentView::registerRenderHook(
             PanelsRenderHook::HEAD_END,
             fn(): string => Blade::render("
             <style>
                 :root {
-                    --user-font-size: {{ auth()->check() ? auth()->user()->font_size : 16 }}px;
+                    --user-font-size: {{ Cache::get('font-size') }}px;
                 }
 
                 body {
