@@ -439,9 +439,9 @@ class MatterInfolist
                             ->color('info')
                             ->formatStateUsing(fn($state) => $state
                                 ? __($state
-                                    |> __(...)
-                                    |> (fn($x) => str_replace('_', ' ', $x))
-                                    |> ucfirst(...)) : ''),
+                                        |> __(...)
+                                        |> (fn($x) => str_replace('_', ' ', $x))
+                                        |> ucfirst(...)) : ''),
                         TextEntry::make('extension')->label(__('Extension'))->badge()->color('gray'),
                         TextEntry::make('size')
                             ->label(__('Size'))
@@ -643,7 +643,7 @@ class MatterInfolist
                             ->directory('matter-attachments')
                             ->visibility('public')
                             ->required()
-                            ->getUploadedFileNameForStorageUsing(fn ($file) => FileUploadHelper::getUniqueFilename($file, 'matter-attachments'))
+                            ->getUploadedFileNameForStorageUsing(fn($file) => FileUploadHelper::getUniqueFilename($file, 'matter-attachments'))
                             ->live()
                             ->afterStateUpdated(function ($state, $set) {
                                 if ($state instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
@@ -667,17 +667,18 @@ class MatterInfolist
             ])
             ->action(function (array $data, $record, $component) {
                 $disk = Storage::disk('public');
-
-                foreach ($data['attachments_data'] as $item) {
-                    $path = $item['file'];
-                    $record->attachments()->create([
-                        'user_id' => auth()->id(),
-                        'type' => $item['type'],
-                        'path' => $path,
-                        'name' => $item['name'] ?? basename($path),
-                        'size' => $disk->exists($path) ? $disk->size($path) : 0,
-                        'extension' => pathinfo($path, PATHINFO_EXTENSION) ?? '',
-                    ]);
+                if ($data['attachments_data']) {
+                    foreach ($data['attachments_data'] as $item) {
+                        $path = $item['file'];
+                        $record->attachments()->create([
+                            'user_id' => auth()->id(),
+                            'type' => $item['type'],
+                            'path' => $path,
+                            'name' => $item['name'] ?? basename($path),
+                            'size' => $disk->exists($path) ? $disk->size($path) : 0,
+                            'extension' => pathinfo($path, PATHINFO_EXTENSION) ?? '',
+                        ]);
+                    }
                 }
 
                 $record->refresh();

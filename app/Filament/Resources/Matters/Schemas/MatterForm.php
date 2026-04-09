@@ -89,7 +89,7 @@ class MatterForm
                                     DatePicker::make('final_report_memo_date')
                                         ->label(__('Final Report Memo Date'))
                                         ->visible(fn(string $operation, $record) => $operation === 'edit'
-                                            && $record->final_report_at !== null
+                                            && $record->final_report_memo_date !== null
                                             && auth()->user()->can('UpdateFinalReportDate:Matter')
                                         ),
                                     TextInput::make('review_count')

@@ -59,7 +59,7 @@ class ViewMatter extends ViewRecord
                 ->color(fn($record) => $record->final_report_at === null ? 'success' : Color::Stone)
                 ->visible(fn($record) => auth()->user()->can('finalReport', $record))
                 ->disabled(fn($record) => $record->final_report_at !== null || $record->final_report_memo_date == null)
-                ->tooltip(__('Final Report must be approved first.'))
+                ->tooltip(fn($record) => $record->final_report_memo_date === null ?? __('Final Report must be approved first.'))
                 ->schema([
                     DatePicker::make('date')
                         ->label(__('Date'))
