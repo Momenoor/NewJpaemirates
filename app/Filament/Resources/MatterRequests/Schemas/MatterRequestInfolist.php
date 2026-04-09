@@ -23,7 +23,7 @@ class MatterRequestInfolist
     {
         return $schema
             ->components([
-                Grid::make(4)
+                Grid::make(3)
                     ->schema([
                         // Left Column: Primary Request Details
                         Group::make()
@@ -59,7 +59,7 @@ class MatterRequestInfolist
                                             ->columnSpanFull()
                                             ->placeholder(__('No comments provided.')),
                                     ])->columns(1),
-                            ])->columnSpan(3),
+                            ])->columnSpan(2),
 
                         // Right Column: Metadata & Audit Trail
                         Group::make()

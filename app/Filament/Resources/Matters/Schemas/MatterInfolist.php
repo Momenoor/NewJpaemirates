@@ -183,7 +183,7 @@ class MatterInfolist
             ->schema([
                 RepeatableEntry::make('requests')
                     ->hiddenLabel()
-                    ->columns(3)
+                    ->columns(4)
                     ->columnSpanFull()
                     ->schema([
                         TextEntry::make('requestBy.display_name')
