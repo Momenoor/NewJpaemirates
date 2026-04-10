@@ -14,7 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule): void {
-        $schedule->command('matter:confirm-receiving')->daily()->withoutOverlapping();
+        $schedule->command('matter:confirm-receiving')->everyMinute();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
