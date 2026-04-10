@@ -50,12 +50,14 @@ class User extends Authenticatable implements FilamentUser
         'remember_token',
     ];
 
+
     /**
      * The attributes that should be cast.
      *
      * @var array<string, string>
      */
     protected $casts = [
+        'password' => 'hashed',
         'email_verified_at' => 'datetime',
         'ui_preferences' => 'array',
         'font_size' => 'integer',
