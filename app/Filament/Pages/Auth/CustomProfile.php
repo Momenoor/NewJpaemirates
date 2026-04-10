@@ -8,6 +8,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use SensitiveParameter;
 
@@ -41,6 +42,9 @@ class CustomProfile extends EditProfile
                 ->label(__('Notify by Email'))
                 ->default(true)
                 ->required(),
+            $this->getPasswordFormComponent(),
+            $this->getPasswordConfirmationFormComponent(),
+            $this->getCurrentPasswordFormComponent(),
         ]);
     }
 
